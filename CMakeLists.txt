@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.28)
+project(compiler)
+
+set(CMAKE_CXX_STANDARD 17)
+
+add_executable(compiler main.cpp
+        lexer/lexer.cpp
+        lexer/token.cpp
+        parser/parser.cpp
+        parser/decl.cpp
+        parser/stmt.cpp
+        parser/expr.cpp)
