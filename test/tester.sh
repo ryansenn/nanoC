@@ -33,7 +33,7 @@ run_tests() {
 }
 
 # List of directories to run tests in
-test_dirs=("ast" "syntax_error")
+test_dirs=("ast" "syntax_error" "semantic_error")
 
 # Loop through each directory in the list and run tests
 for dir in "${test_dirs[@]}"; do

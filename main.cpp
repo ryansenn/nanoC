@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include "parser/parser.h"
-#include "semantic/symbol.h"
+#include "semantic/name_analysis.h"
 
 void printTokens(Lexer& lexer){
     std::shared_ptr<Token> token = lexer.nextToken();
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     }
 
     try{
-        Analysis a;
+        NameAnalysis a;
         program->accept(a);
     }
     catch(const std::exception& e) {

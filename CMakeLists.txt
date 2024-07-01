@@ -9,4 +9,5 @@ add_executable(compiler main.cpp
         parser/parser.cpp
         parser/decl.cpp
         parser/stmt.cpp
-        parser/expr.cpp)
+        parser/expr.cpp
+        semantic/name_analysis.cpp)
