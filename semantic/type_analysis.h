@@ -2,18 +2,17 @@
 // Created by Ryan Senoune on 2024-06-30.
 //
 
-#ifndef COMPILER_NAME_ANALYSIS_H
-#define COMPILER_NAME_ANALYSIS_H
+#ifndef COMPILER_TYPE_ANALYSIS_H
+#define COMPILER_TYPE_ANALYSIS_H
 
 #include "../parser/ast.h"
 #include "semantic_exception.h"
 
-class NameAnalysis : public Visitor {
-    std::vector<std::unordered_map<std::string, std::shared_ptr<Symbol>>> scopes;
 
-    std::shared_ptr<Symbol> get(std::string identifier);
-    std::shared_ptr<Symbol> get_local(std::string identifier);
-    void put(std::string identifier, std::shared_ptr<Symbol> symbol);
+class TypeAnalysis : public Visitor{
+
+    bool match_type(std::shared_ptr<Type> t1, std::shared_ptr<Type> t2);
+    bool match_args(std::vector<std::shared_ptr<Expr>> call, std::vector<std::shared_ptr<VarDecl>> args);
 
     void visit(std::shared_ptr<FuncDecl> func) override;
     void visit(std::shared_ptr<FunProto> funProto) override;
@@ -35,4 +34,5 @@ class NameAnalysis : public Visitor {
     void visit(std::shared_ptr<Type> type) override;
 };
 
-#endif //COMPILER_NAME_ANALYSIS_H
+
+#endif //COMPILER_TYPE_ANALYSIS_H

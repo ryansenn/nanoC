@@ -13,39 +13,42 @@
 
 class Visitor{
 public:
-    virtual void visit(std::shared_ptr<class Program> program) = 0;
-    virtual void visit(std::shared_ptr<class FuncDecl> func) = 0;
-    virtual void visit(std::shared_ptr<class Block> block) = 0;
-    virtual void visit(std::shared_ptr<class Return> ret) = 0;
-    virtual void visit(std::shared_ptr<class If> block) = 0;
-    virtual void visit(std::shared_ptr<class While> block) = 0;
-    virtual void visit(std::shared_ptr<class Break> block) = 0;
-    virtual void visit(std::shared_ptr<class Continue> block) = 0;
-    virtual void visit(std::shared_ptr<class VarDecl> var) = 0;
-    virtual void visit(std::shared_ptr<class Subscript> subscript) = 0;
-    virtual void visit(std::shared_ptr<class Member> member) = 0;
-    virtual void visit(std::shared_ptr<class Call> call) = 0;
-    virtual void visit(std::shared_ptr<class Primary> primary) = 0;
-    virtual void visit(std::shared_ptr<class Unary> unary) = 0;
-    virtual void visit(std::shared_ptr<class Binary> binary) = 0;
-    virtual void visit(std::shared_ptr<class Type> type) = 0;
-    virtual void visit(std::shared_ptr<class FunProto> funProto) = 0;
-    virtual void visit(std::shared_ptr<class StructDecl> funProto) = 0;
+    virtual void visit(std::shared_ptr<class Program> program){}
+    virtual void visit(std::shared_ptr<class FuncDecl> func){}
+    virtual void visit(std::shared_ptr<class Block> block){}
+    virtual void visit(std::shared_ptr<class Return> ret){}
+    virtual void visit(std::shared_ptr<class If> block){}
+    virtual void visit(std::shared_ptr<class While> block){}
+    virtual void visit(std::shared_ptr<class Break> block){}
+    virtual void visit(std::shared_ptr<class Continue> block){}
+    virtual void visit(std::shared_ptr<class VarDecl> var){}
+    virtual void visit(std::shared_ptr<class Subscript> subscript){}
+    virtual void visit(std::shared_ptr<class Member> member){}
+    virtual void visit(std::shared_ptr<class Call> call){}
+    virtual void visit(std::shared_ptr<class Primary> primary){}
+    virtual void visit(std::shared_ptr<class Unary> unary){}
+    virtual void visit(std::shared_ptr<class Binary> binary){}
+    virtual void visit(std::shared_ptr<class Type> type){}
+    virtual void visit(std::shared_ptr<class FunProto> funProto){}
+    virtual void visit(std::shared_ptr<class StructDecl> funProto){}
 };
 
-struct Symbol;
+struct Symbol : std::enable_shared_from_this<Symbol>{
+    enum class Type{ VAR, FUNC, PROTO, STRUCT };
 
-struct Stmt {
-    virtual void accept(Visitor& visitor) = 0;
-};
+    Type type;
 
-struct Expr : Stmt{
-    virtual void accept(Visitor& visitor) = 0;
-};
 
-struct Decl {
-    Decl(){}
-    virtual void accept(Visitor& visitor) = 0;
+    std::variant<std::shared_ptr<VarDecl>,
+            std::shared_ptr<FuncDecl>,
+            std::shared_ptr<FunProto>,
+            std::shared_ptr<StructDecl>> decl;
+
+
+    Symbol(Type type, std::shared_ptr<VarDecl> varDecl) : type(type), decl(std::move(varDecl)) {}
+    Symbol(Type type, std::shared_ptr<FuncDecl> funcDecl) : type(type), decl(std::move(funcDecl)) {}
+    Symbol(Type type, std::shared_ptr<FunProto> funProto) : type(type), decl(std::move(funProto)) {}
+    Symbol(Type type, std::shared_ptr<StructDecl> structDecl) : type(type), decl(std::move(structDecl)) {}
 };
 
 struct Type : std::enable_shared_from_this<Type> {
@@ -62,6 +65,21 @@ public:
         visitor.visit(shared_from_this());
     }
 };
+
+struct Stmt {
+    virtual void accept(Visitor& visitor) = 0;
+};
+
+struct Expr : Stmt{
+    std::shared_ptr<Type> type;
+    virtual void accept(Visitor& visitor) = 0;
+};
+
+struct Decl {
+    Decl(){}
+    virtual void accept(Visitor& visitor) = 0;
+};
+
 
 struct Subscript : Expr, std::enable_shared_from_this<Subscript> {
     std::shared_ptr<Expr> array;

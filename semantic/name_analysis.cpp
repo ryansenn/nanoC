@@ -38,9 +38,10 @@ void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
 }
 
 void NameAnalysis::visit(std::shared_ptr<FunProto> funProto) {
-    if (!get(funProto->name)) {
-        put(funProto->name, std::make_shared<Symbol>(Symbol::Type::PROTO, funProto));
+    if (get_local(funProto->name)) {
+        throw semantic_exception("Function prototype '" + funProto->name + "' has already been declared in the same scope", funProto->type->token);
     }
+    put(funProto->name, std::make_shared<Symbol>(Symbol::Type::PROTO, funProto));
 }
 
 void NameAnalysis::visit(std::shared_ptr<Call> call) {
@@ -74,11 +75,11 @@ void NameAnalysis::visit(std::shared_ptr<StructDecl> structDecl) {
     }
 }
 
-void NameAnalysis::visit(std::shared_ptr<class Unary> unary) {
+void NameAnalysis::visit(std::shared_ptr<Unary> unary) {
     unary->expr1->accept(*this);
 }
 
-void NameAnalysis::visit(std::shared_ptr<class Binary> binary) {
+void NameAnalysis::visit(std::shared_ptr<Binary> binary) {
     binary->expr1->accept(*this);
     binary->expr2->accept(*this);
 }
