@@ -1,8 +1,8 @@
 /*
 Program (
-    StructDecl s (VarDecl(Integer, p count: 0, array size: ), VarDecl(Character, p count: 0, array size: ))
-    FuncDecl main() (Integer, p count: 0, array size: ) (
-        VarDecl(Structure, p count: 0, array size: )
+    StructDecl s (VarDecl(Integer ), VarDecl(Character ))
+    FuncDecl main() (Integer ) (
+        VarDecl(Structure s)
         ((x.a) = 5)
         return( 0 )
     )

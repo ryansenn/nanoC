@@ -1,13 +1,13 @@
 /*
 Program (
-    FuncDecl f(VarDecl(Integer, p count: 0, array size: )) (Integer, p count: 0, array size: ) (
+    FuncDecl f(VarDecl(Integer )) (Integer ) (
         return( 1 )
     )
-    FuncDecl main() (Integer, p count: 0, array size: ) (
-        VarDecl(Integer, p count: 0, array size: )
-        VarDecl(Integer, p count: 0, array size: )
-        VarDecl(Integer, p count: 0, array size: )
-        VarDecl(Integer, p count: 0, array size: 1 2 )
+    FuncDecl main() (Integer ) (
+        VarDecl(Integer )
+        VarDecl(Integer )
+        VarDecl(Integer )
+        VarDecl(Integer [1][2])
         (a = (Func Call f (((arr[2])[0]) ) - 5))
         (b = (((*(&(b)) * c) + (2 % 5)) + 2))
         (c = (((10 - 5) > 3) && (1 || (0 == 20))))
@@ -20,8 +20,8 @@ Program (
         ((a + b) + c)
         (a = (b = c))
         (a = ((b.c) = d))
-        (Structure, p count: 0, array size: )(-((s.member)))
-        -((Character, p count: 0, array size: )((Integer, p count: 1, array size: )((Character, p count: 0, array size: )((l.member)))))
+        (Structure chancla)(-((s.member)))
+        -((Character )((Integer *)((Character )((l.member)))))
         return( 0 )
     )
 )

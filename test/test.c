@@ -1,7 +1,7 @@
 /*
 Program (
-    FuncDecl main() (Integer ) (
-        VarDecl(Integer )
+    FuncDecl main() (Integer, p count: 0, array size: ) (
+        VarDecl(Integer, p count: 0, array size: )
         (i = 0)
         While ((i < 10)) (
             (i = (i + 1))

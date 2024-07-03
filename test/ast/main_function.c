@@ -1,6 +1,6 @@
 /*
 Program (
-    FuncDecl main() (Integer, p count: 0, array size: ) (
+    FuncDecl main() (Integer ) (
         return( 0 )
     )
 )

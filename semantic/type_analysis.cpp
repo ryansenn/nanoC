@@ -10,15 +10,15 @@ void TypeAnalysis::visit(std::shared_ptr<VarDecl> varDecl) {
     }
 }
 
-bool TypeAnalysis::match_type(std::shared_ptr<Type> t1, std::shared_ptr<Type> t2){
-    return t1->token->token_type == t2->token->token_type && t1->name == t2->name && t1->pointerCount == t2->pointerCount && t1->arraySize == t2->arraySize;
+bool TypeAnalysis::match_type(std::shared_ptr<Type> actual, std::shared_ptr<Type> expected){
+    if (!(actual->token->token_type == expected->token->token_type && actual->name == expected->name && actual->pointerCount == expected->pointerCount && actual->arraySize == expected->arraySize)){
+            throw semantic_exception("Expected argument of type  '" + expected->name + "'", actual->token);
+    }
 }
 
 bool TypeAnalysis::match_args(std::vector<std::shared_ptr<Expr>> call, std::vector<std::shared_ptr<VarDecl>> args){
     for(int i=0;i<call.size();i++){
-        if (!match_type(call[i])){
-
-        }
+        match_type(call[i]->type, args[i]->type);
     }
 }
 
@@ -28,7 +28,6 @@ void TypeAnalysis::visit(std::shared_ptr<Call> call) {
         throw semantic_exception("Too few/many arguments in function '" + call->identifier->value + "'", call->identifier);
     }
 
-    if (!match_args(call->args, funcDecl->args)){
+    match_args(call->args, funcDecl->args);
 
-    }
 }

@@ -365,9 +365,17 @@ class PrintVisitor : public Visitor{
     }
 
     void visit(std::shared_ptr<Type> type) override{
-        std::cout << type->token->token_type << ", p count: " << type->pointerCount << ", array size: ";
+        std::cout << type->token->token_type << " " << type->name;
+        for (int i=0;i<type->pointerCount;i++){
+            std::cout << "*";
+        }
         for (auto p:type->arraySize){
-            std::cout << p << " ";
+            if (p == -1){
+                std::cout << "[]";
+            }
+            else{
+                std::cout << "[" << p << "]";
+            }
         }
     }
 

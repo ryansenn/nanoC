@@ -1,13 +1,13 @@
 /*
 Program (
-    FuncDecl f(VarDecl(Integer, p count: 0, array size: ), VarDecl(Character, p count: 0, array size: -1 )) (Void, p count: 0, array size: ) (
+    FuncDecl f(VarDecl(Integer ), VarDecl(Character [])) (Void ) (
         return(  )
     )
-    FuncDecl h(VarDecl(Structure, p count: 1, array size: )) (Integer, p count: 0, array size: ) (
+    FuncDecl h(VarDecl(Structure s*)) (Integer ) (
         return( 1 )
     )
-    FunProto k() (Character, p count: 1, array size: )
-    FuncDecl main() (Integer, p count: 0, array size: ) (
+    FunProto k() (Character *)
+    FuncDecl main() (Integer ) (
         return( 0 )
     )
 )

@@ -1,12 +1,12 @@
 /*
 Program (
-    StructDecl Person (VarDecl(Integer, p count: 0, array size: ), VarDecl(Character, p count: 0, array size: 50 ))
-    FunProto add(VarDecl(Integer, p count: 0, array size: ), VarDecl(Integer, p count: 0, array size: )) (Integer, p count: 0, array size: )
-    FuncDecl main() (Integer, p count: 0, array size: ) (
-        VarDecl(Integer, p count: 0, array size: )
-        VarDecl(Integer, p count: 0, array size: )
-        VarDecl(Integer, p count: 0, array size: 5 10 )
-        VarDecl(Structure, p count: 0, array size: )
+    StructDecl Person (VarDecl(Integer ), VarDecl(Character [50]))
+    FunProto add(VarDecl(Integer ), VarDecl(Integer )) (Integer )
+    FuncDecl main() (Integer ) (
+        VarDecl(Integer )
+        VarDecl(Integer )
+        VarDecl(Integer [5][10])
+        VarDecl(Structure Person)
         (x = 10)
         (y = 20)
         (((arr[0])[0]) = x)
@@ -21,7 +21,7 @@ Program (
             (y = Func Call add (x, y ))
         )
 
-        VarDecl(Integer, p count: 0, array size: )
+        VarDecl(Integer )
         (i = 0)
         While ((i < 5)) (
             If ((((arr[i])[2]) == 20)) (
@@ -37,7 +37,7 @@ Program (
         )
         return( 0 )
     )
-    FuncDecl add(VarDecl(Integer, p count: 0, array size: ), VarDecl(Integer, p count: 0, array size: )) (Integer, p count: 0, array size: ) (
+    FuncDecl add(VarDecl(Integer ), VarDecl(Integer )) (Integer ) (
         return( (a + b) )
     )
 )

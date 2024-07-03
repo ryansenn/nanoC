@@ -1,7 +1,7 @@
 /*
 Program (
-    FuncDecl main() (Integer, p count: 0, array size: ) (
-        VarDecl(Integer, p count: 0, array size: )
+    FuncDecl main() (Integer ) (
+        VarDecl(Integer )
         (i = 1)
         If (i) (
             (1 + 1)

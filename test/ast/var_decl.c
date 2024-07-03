@@ -1,9 +1,9 @@
 /*
 Program (
-    FuncDecl main() (Integer, p count: 0, array size: ) (
-        VarDecl(Integer, p count: 0, array size: )
-        VarDecl(Character, p count: 2, array size: 2 10 )
-        VarDecl(Void, p count: 3, array size: )
+    FuncDecl main() (Integer ) (
+        VarDecl(Integer )
+        VarDecl(Character **[2][10])
+        VarDecl(Void ***)
         return( 0 )
     )
 )
