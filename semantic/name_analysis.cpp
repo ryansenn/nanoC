@@ -27,6 +27,22 @@ void NameAnalysis::put(std::string identifier, std::shared_ptr<Symbol> symbol) {
 void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
     if (get_local(func->name)) {
         if (get_local(func->name)->type == Symbol::Type::PROTO) {
+            auto funProto = std::get<std::shared_ptr<FunProto>>(get_local(func->name)->decl);
+
+            if (*(funProto->type) != *(func->type)){
+                throw semantic_exception("Conflicting return type in function '" + func->name + "'", func->type->token);
+            }
+
+            if (funProto->args.size() != func->args.size()){
+                throw semantic_exception("Conflicting number of arguments in function '" + func->name + "'", func->type->token);
+            }
+
+            for (int i=0;i<funProto->args.size();i++){
+                if (*(func->args[i]->type) != *(funProto->args[i]->type)){
+                    throw semantic_exception("Conflicting type in argument '" + func->args[i]->name + "' in function '" + func->name + "'", func->type->token);
+                }
+            }
+
             get_local(func->name)->type = Symbol::Type::FUNC;
             get_local(func->name)->decl = func;
         } else {
@@ -34,7 +50,13 @@ void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
         }
     }
     put(func->name, std::make_shared<Symbol>(Symbol::Type::FUNC, func));
-    func->block->accept(*this);
+
+    for (auto a : func->args){
+        a->accept(*this);
+    }
+    for (auto s : func->block->stmts){
+        s->accept(*this);
+    }
 }
 
 void NameAnalysis::visit(std::shared_ptr<FunProto> funProto) {

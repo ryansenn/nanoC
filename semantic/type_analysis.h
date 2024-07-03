@@ -11,8 +11,6 @@
 
 class TypeAnalysis : public Visitor{
 
-    bool match_type(std::shared_ptr<Type> t1, std::shared_ptr<Type> t2);
-    bool match_args(std::vector<std::shared_ptr<Expr>> call, std::vector<std::shared_ptr<VarDecl>> args);
 
     void visit(std::shared_ptr<FuncDecl> func) override;
     void visit(std::shared_ptr<FunProto> funProto) override;

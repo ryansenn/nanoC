@@ -61,10 +61,20 @@ public:
 
     Type(std::shared_ptr<Token> token) : token(std::move(token)), pointerCount(0), arraySize(0) {}
 
+    bool operator==(const Type& t) const {
+        return token->token_type == t.token->token_type && name == t.name && pointerCount == t.pointerCount && arraySize == t.arraySize;
+    }
+
+    bool operator!=(const Type& t) const {
+        return !(*this == t);
+    }
+
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }
 };
+
+std::ostream& operator<<(std::ostream& os, const Type& type);
 
 struct Stmt {
     virtual void accept(Visitor& visitor) = 0;
@@ -240,212 +250,32 @@ struct Program : public std::enable_shared_from_this<Program>{
     }
 };
 
-
 class PrintVisitor : public Visitor{
 
     std::string space = "    ";
     std::string indent = "";
     int w = 1;
 
-    void incr(){
-        indent += space;
-    }
-
-    void decr(){
-        if (indent.size() >= space.size()){
-            indent.erase(indent.size() - space.size());
-        }
-    }
-
-    void visit(std::shared_ptr<Program> program) override{
-        std::cout << "Program (" << std::endl;
-        incr();
-        for (auto d : program->decls){
-            std::cout << indent;
-            d->accept(*this);
-            std::cout << std::endl;
-        }
-        decr();
-        std::cout << ")";
-    }
-
-    void visit(std::shared_ptr<FuncDecl> func) override{
-        std::cout << "FuncDecl " << func->name << "(";
-        bool first = true;
-        for(auto a : func->args){
-            if (!first){
-                std::cout << ", ";
-            }
-            first = false;
-            a->accept(*this);
-        }
-        std::cout <<") (";
-        func->type->accept(*this);
-        std::cout << ") (" << std::endl;
-        incr();
-        func->block->accept(*this);
-        decr();
-        std::cout << indent << ")";
-    }
-
-    void visit(std::shared_ptr<FunProto> funProto) override{
-        std::cout << "FunProto " << funProto->name << "(";
-        bool first = true;
-        for(auto a : funProto->args){
-            if (!first){
-                std::cout << ", ";
-            }
-            first = false;
-            a->accept(*this);
-        }
-        std::cout << ") (";
-        funProto->type->accept(*this);
-        std::cout << ")";
-
-    }
-
-    void visit(std::shared_ptr<Block> block) override{
-        for (auto s : block->stmts){
-            std::cout << indent;
-            s->accept(*this);
-            std::cout << std::endl;
-        }
-    }
-
-    void visit(std::shared_ptr<If> i) override{
-        std::cout << "If (";
-        i->expr1->accept(*this);
-        std::cout << ") (" << std::endl;
-        incr();
-        i->stmt1->accept(*this);
-        decr();
-        std::cout << indent << ")" << std::endl;
-
-        if (i->stmt2.has_value()){
-            std::cout << indent << "Else (" << std::endl;
-            incr();
-            i->stmt2->get()->accept(*this);
-            decr();
-            std::cout << indent << ")" << std::endl;
-        }
-    }
-
-    void visit(std::shared_ptr<While> w) override{
-        std::cout << "While (";
-        w->expr->accept(*this);
-        std::cout << ") (" << std::endl;
-        incr();
-        w->stmt->accept(*this);
-        decr();
-        std::cout << indent << ")";
-    }
-
-    void visit(std::shared_ptr<Continue> c) override{
-        std::cout << "Continue";
-    }
-
-    void visit(std::shared_ptr<Break> b) override{
-        std::cout << "Break";
-    }
-
-    void visit(std::shared_ptr<Return> ret) override{
-        std::cout << "return( ";
-        incr();
-        if (ret->expr.has_value()){
-            ret->expr.value()->accept(*this);
-        }
-        decr();
-        std::cout << " )";
-    }
-
-    void visit(std::shared_ptr<VarDecl> varDecl) override{
-        std::cout << "VarDecl(";
-        varDecl->type->accept(*this);
-        std::cout << ")";
-    }
-
-    void visit(std::shared_ptr<Type> type) override{
-        std::cout << type->token->token_type << " " << type->name;
-        for (int i=0;i<type->pointerCount;i++){
-            std::cout << "*";
-        }
-        for (auto p:type->arraySize){
-            if (p == -1){
-                std::cout << "[]";
-            }
-            else{
-                std::cout << "[" << p << "]";
-            }
-        }
-    }
-
-    void visit(std::shared_ptr<Call> call) override{
-        std::cout << "Func Call " << call->identifier->value << " (";
-        bool first = true;
-        for (auto& arg: call->args){
-            if (!first){
-                std::cout << ", ";
-            }
-            first = false;
-            arg->accept(*this);
-        }
-        std::cout << " )";
-    }
-
-    void visit(std::shared_ptr<StructDecl> structDecl) override{
-        std::cout << "StructDecl " << structDecl->name << " (";
-        for (int i=0;i<structDecl->varDecls.size();i++){
-            if (i!=0){
-                std::cout << ", ";
-            }
-            structDecl->varDecls[i]->accept(*this);
-        }
-        std::cout <<")";
-    }
-
-    void visit(std::shared_ptr<class Unary> unary) override{
-        if (std::holds_alternative<std::shared_ptr<Type>>(unary->op)){
-            std::cout << "(";
-            std::get<std::shared_ptr<Type>>(unary->op)->accept(*this);
-            std::cout << ")";
-        }
-        else{
-            std::cout << std::get<std::shared_ptr<Token>>(unary->op)->token_type;
-        }
-
-        std::cout << "(";
-        unary->expr1->accept(*this);
-        std::cout << ")";
-    }
-
-    void visit(std::shared_ptr<class Binary> binary) override{
-        std::cout << "(";
-        binary->expr1->accept(*this);
-        std::cout << " " << binary->op->token_type << " ";
-        binary->expr2->accept(*this);
-        std::cout << ")";
-    }
-
-    void visit(std::shared_ptr<Primary> primary) override{
-        std::cout << primary->token->value;
-    }
-
-    void visit(std::shared_ptr<Subscript> subscript) override{
-        std::cout << "(";
-        subscript->array->accept(*this);
-        std::cout << "[";
-        subscript->index->accept(*this);
-        std::cout << "]";
-        std::cout << ")";
-    }
-
-    void visit(std::shared_ptr<Member> member) override{
-        std::cout << "(";
-        member->structure->accept(*this);
-        std::cout << "." << member->member;
-        std::cout << ")";
-    }
-
+    void incr();
+    void decr();
+    void visit(std::shared_ptr<Program> program) override;
+    void visit(std::shared_ptr<FuncDecl> func) override;
+    void visit(std::shared_ptr<FunProto> funProto) override;
+    void visit(std::shared_ptr<Block> block) override;
+    void visit(std::shared_ptr<If> i) override;
+    void visit(std::shared_ptr<While> w) override;
+    void visit(std::shared_ptr<Continue> c) override;
+    void visit(std::shared_ptr<Break> b) override;
+    void visit(std::shared_ptr<Return> ret) override;
+    void visit(std::shared_ptr<VarDecl> varDecl) override;
+    void visit(std::shared_ptr<Type> type) override;
+    void visit(std::shared_ptr<Call> call) override;
+    void visit(std::shared_ptr<StructDecl> structDecl) override;
+    void visit(std::shared_ptr<Unary> unary) override;
+    void visit(std::shared_ptr<Binary> binary) override;
+    void visit(std::shared_ptr<Primary> primary) override;
+    void visit(std::shared_ptr<Subscript> subscript) override;
+    void visit(std::shared_ptr<Member> member) override;
 };
 
 #endif //COMPILER_AST_H
