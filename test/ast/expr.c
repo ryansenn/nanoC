@@ -22,6 +22,7 @@ Program (
         (a = ((b.c) = d))
         (Structure chancla)(-((s.member)))
         -((Character )((Integer *)((Character )((l.member)))))
+        !((1 == 1))
         return( 0 )
     )
 )
@@ -53,6 +54,7 @@ int main(){
     a=b.c=d;
     (struct chancla)-s.member;
     -(char)(int*)(char)l.member;
+    !(1 == 1);
 
     return 0;
 }

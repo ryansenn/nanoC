@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <optional>
+#include <sstream>
 #include "../lexer/token.h"
 
 class Visitor{
@@ -27,29 +28,27 @@ public:
     virtual void visit(std::shared_ptr<class Call> call){}
     virtual void visit(std::shared_ptr<class Primary> primary){}
     virtual void visit(std::shared_ptr<class Unary> unary){}
+    virtual void visit(std::shared_ptr<class TypeCast> typeCast){}
     virtual void visit(std::shared_ptr<class Binary> binary){}
     virtual void visit(std::shared_ptr<class Type> type){}
     virtual void visit(std::shared_ptr<class FunProto> funProto){}
     virtual void visit(std::shared_ptr<class StructDecl> funProto){}
 };
 
-struct Symbol : std::enable_shared_from_this<Symbol>{
-    enum class Type{ VAR, FUNC, PROTO, STRUCT };
+struct Decl {
+    Decl(){}
+    virtual void accept(Visitor& visitor) = 0;
+};
 
+struct Symbol  : std::enable_shared_from_this<Symbol>{
+    enum class Type {VAR,FUNC,PROTO,STRUCT};
     Type type;
 
+    std::shared_ptr<Decl> decl;
 
-    std::variant<std::shared_ptr<VarDecl>,
-            std::shared_ptr<FuncDecl>,
-            std::shared_ptr<FunProto>,
-            std::shared_ptr<StructDecl>> decl;
-
-
-    Symbol(Type type, std::shared_ptr<VarDecl> varDecl) : type(type), decl(std::move(varDecl)) {}
-    Symbol(Type type, std::shared_ptr<FuncDecl> funcDecl) : type(type), decl(std::move(funcDecl)) {}
-    Symbol(Type type, std::shared_ptr<FunProto> funProto) : type(type), decl(std::move(funProto)) {}
-    Symbol(Type type, std::shared_ptr<StructDecl> structDecl) : type(type), decl(std::move(structDecl)) {}
+    Symbol(Type type, std::shared_ptr<Decl> decl) : type(type), decl(decl) {}
 };
+
 
 struct Type : std::enable_shared_from_this<Type> {
 public:
@@ -69,6 +68,8 @@ public:
         return !(*this == t);
     }
 
+    std::string str();
+
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }
@@ -82,11 +83,6 @@ struct Stmt {
 
 struct Expr : Stmt{
     std::shared_ptr<Type> type;
-    virtual void accept(Visitor& visitor) = 0;
-};
-
-struct Decl {
-    Decl(){}
     virtual void accept(Visitor& visitor) = 0;
 };
 
@@ -111,7 +107,8 @@ struct Member : Expr, std::enable_shared_from_this<Member> {
 
 
 struct Primary : Expr, std::enable_shared_from_this<Primary> {
-    std::shared_ptr<Token> token; // Inside of the token, we find the type (token.token_type) and value (token.value)
+    // Inside of the token, we find the type (token.token_type) and value (token.value)
+    std::shared_ptr<Token> token; // identifier, char, int
     std::shared_ptr<Symbol> symbol;
     Primary(std::shared_ptr<Token> token) : token(std::move(token)) {}
     void accept(Visitor& visitor){
@@ -130,10 +127,19 @@ struct Call : Expr, std::enable_shared_from_this<Call> {
 };
 
 struct Unary : Expr, std::enable_shared_from_this<Unary> {
-    std::variant<std::shared_ptr<Token>, std::shared_ptr<Type>> op; // The operator is held into Token.token_type
+    std::shared_ptr<Token> op; // The operator is held into Token.token_type
     std::shared_ptr<Expr> expr1;
     Unary(std::shared_ptr<Token> o, std::shared_ptr<Expr> e1) : op(std::move(o)), expr1(std::move(e1)) {}
-    Unary(std::shared_ptr<Type> o, std::shared_ptr<Expr> e1) : op(std::move(o)), expr1(std::move(e1)) {}
+    void accept(Visitor& visitor){
+        visitor.visit(shared_from_this());
+    }
+};
+
+struct TypeCast : Expr, std::enable_shared_from_this<TypeCast> {
+    std::shared_ptr<Type> type; // The operator is held into Token.token_type
+    std::shared_ptr<Expr> expr1;
+    TypeCast(std::shared_ptr<Type> type, std::shared_ptr<Expr> expr1) : type(std::move(type)), expr1(std::move(expr1)){}
+
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }
@@ -272,6 +278,7 @@ class PrintVisitor : public Visitor{
     void visit(std::shared_ptr<Call> call) override;
     void visit(std::shared_ptr<StructDecl> structDecl) override;
     void visit(std::shared_ptr<Unary> unary) override;
+    void visit(std::shared_ptr<TypeCast> typeCast) override;
     void visit(std::shared_ptr<Binary> binary) override;
     void visit(std::shared_ptr<Primary> primary) override;
     void visit(std::shared_ptr<Subscript> subscript) override;

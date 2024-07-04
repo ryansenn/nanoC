@@ -20,6 +20,12 @@ std::ostream& operator<<(std::ostream& os, const Type& type) {
     return os;
 }
 
+std::string Type::str() {
+    std::ostringstream oss;
+    oss << (*this);
+    return oss.str();
+}
+
 void PrintVisitor::incr() {
     indent += space;
 }
@@ -165,16 +171,18 @@ void PrintVisitor::visit(std::shared_ptr<StructDecl> structDecl) {
 }
 
 void PrintVisitor::visit(std::shared_ptr<Unary> unary) {
-    if (std::holds_alternative<std::shared_ptr<Type>>(unary->op)) {
-        std::cout << "(";
-        std::get<std::shared_ptr<Type>>(unary->op)->accept(*this);
-        std::cout << ")";
-    } else {
-        std::cout << std::get<std::shared_ptr<Token>>(unary->op)->token_type;
-    }
-
+    std::cout << unary->op->token_type;
     std::cout << "(";
     unary->expr1->accept(*this);
+    std::cout << ")";
+}
+
+void PrintVisitor::visit(std::shared_ptr<TypeCast> typeCast) {
+    std::cout << "(";
+    typeCast->type->accept(*this);
+    std::cout << ")";
+    std::cout << "(";
+    typeCast->expr1->accept(*this);
     std::cout << ")";
 }
 

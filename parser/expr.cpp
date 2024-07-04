@@ -37,8 +37,8 @@ std::shared_ptr<Expr> Parser::funccall(){
 }
 
 std::shared_ptr<Expr> Parser::unary(){
-    if (accept({TT::MINUS, TT::ASTERISK, TT::AND})){
-        std::shared_ptr<Token> op = consume({TT::MINUS, TT::ASTERISK, TT::AND},"");
+    if (accept({TT::MINUS, TT::ASTERISK, TT::AND, TT::NOT})){
+        std::shared_ptr<Token> op = consume({TT::MINUS, TT::ASTERISK, TT::AND, TT::NOT},"");
         op->value = "op";
         if (accept(TT::MINUS)){
             throw parsing_exception("Expected primary non unary expression", peek(0));
@@ -49,7 +49,7 @@ std::shared_ptr<Expr> Parser::unary(){
         consume(TT::LPAR, "Expected '(' before type cast");
         std::shared_ptr<Type> t = type();
         consume(TT::RPAR, "Expected ')' after type cast");
-        return std::make_shared<Unary>(std::move(t), factor());
+        return std::make_shared<TypeCast>(std::move(t), factor());
     }
 }
 
@@ -58,7 +58,7 @@ std::shared_ptr<Expr> Parser::unary(){
 std::shared_ptr<Expr> Parser::factor(){
     std::shared_ptr<Expr> f;
 
-    if (accept({TT::MINUS, TT::ASTERISK, TT::AND}) || accept(TT::LPAR) && accept({TT::STRUCT,TT::INT,TT::CHAR,TT::VOID},1)){
+    if (accept({TT::MINUS, TT::ASTERISK, TT::AND, TT::NOT}) || accept(TT::LPAR) && accept({TT::STRUCT,TT::INT,TT::CHAR,TT::VOID},1)){
         f = unary();
     }
 

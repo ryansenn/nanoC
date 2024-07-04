@@ -26,7 +26,7 @@ std::unordered_map<TokenType, std::string> tokenNames = {
 {TokenType::DIV, "/"}, {TokenType::REM, "%"},
 {TokenType::AND, "&"}, {TokenType::DOT, "."},
 {TokenType::END_OF_FILE, "End of File"}, {TokenType::INVALID, "Invalid"},
-{TokenType::COMMENT, "Comment"}
+{TokenType::COMMENT, "Comment"}, {TokenType::NOT, "!"}
 };
 
 std::unordered_map<std::string, TokenType> tokenMap = {

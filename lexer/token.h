@@ -12,7 +12,7 @@ enum class TokenType {
     IDENTIFIER, ASSIGN, LBRA, RBRA, LPAR, RPAR, LSBR, RSBR, SC, COMMA,
     INT, VOID, CHAR, IF, ELSE, WHILE, RETURN, STRUCT, SIZEOF, CONTINUE, BREAK,
     INCLUDE, CHAR_LITERAL, STRING_LITERAL, INT_LITERAL, LOGAND, LOGOR,
-    EQ, NE, LT, GT, LE, GE, PLUS, MINUS, ASTERISK, DIV, REM, AND, OR, DOT,
+    EQ, NE, LT, GT, LE, GE, PLUS, MINUS, NOT, ASTERISK, DIV, REM, AND, OR, DOT,
     END_OF_FILE, INVALID, COMMENT
 };
 
@@ -26,6 +26,7 @@ std::string getTokenName(TokenType tokenType);
 
 struct Token{
     Token(TokenType token_type, const std::string& value, int line, int column) : token_type(token_type), value(value), line(line), column(column) {}
+    Token(TokenType token_type) : token_type(token_type), value(""), line(0), column(0) {}
     TokenType token_type;
     std::string value;
     int line;

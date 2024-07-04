@@ -11,6 +11,8 @@
 
 class TypeAnalysis : public Visitor{
 
+    void expect(std::shared_ptr<Type> actual, TT expected);
+    void expect(std::shared_ptr<Type> actual, std::shared_ptr<Type> expected);
 
     void visit(std::shared_ptr<FuncDecl> func) override;
     void visit(std::shared_ptr<FunProto> funProto) override;

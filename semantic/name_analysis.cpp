@@ -27,7 +27,7 @@ void NameAnalysis::put(std::string identifier, std::shared_ptr<Symbol> symbol) {
 void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
     if (get_local(func->name)) {
         if (get_local(func->name)->type == Symbol::Type::PROTO) {
-            auto funProto = std::get<std::shared_ptr<FunProto>>(get_local(func->name)->decl);
+            std::shared_ptr<FunProto> funProto = std::dynamic_pointer_cast<FunProto>(get_local(func->name)->decl);
 
             if (*(funProto->type) != *(func->type)){
                 throw semantic_exception("Conflicting return type in function '" + func->name + "'", func->type->token);

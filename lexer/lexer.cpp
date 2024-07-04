@@ -85,7 +85,7 @@ std::shared_ptr<Token> Lexer::nextToken() {
             return std::make_shared<Token>(TokenType::NE, "", line, column);
         }
 
-        return std::make_shared<Token>(TokenType::INVALID, "", line, column);
+        return std::make_shared<Token>(TokenType::NOT, "", line, column);
     }
 
     if (peak() == '<') {
