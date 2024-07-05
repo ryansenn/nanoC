@@ -4,15 +4,7 @@
 
 #include "type_analysis.h"
 
-void TypeAnalysis::expect(std::shared_ptr<Type> actual, TT expected) {
-    if (actual->token->token_type != expected){
-        throw semantic_exception("Invalid type '" + actual->str() + "' but found type '" + getTokenName(expected) + "'",actual->token);
-    }
-}
 
-void TypeAnalysis::expect(std::shared_ptr<Type> actual, std::shared_ptr<Type> expected) {
-
-}
 
 void TypeAnalysis::visit(std::shared_ptr<Primary> p) {
     switch (p->token->token_type) {
@@ -35,7 +27,9 @@ void TypeAnalysis::visit(std::shared_ptr<Unary> u) {
     switch (u->op->token_type) {
         case TT::MINUS:
         case TT::NOT:
-            expect(u->type, TT::INT);
+            if (u->expr1->type->str() != "int"){
+                throw semantic_exception("Invalid unary type '" + u->expr1->type->str() + "' but expected type 'int'",u->op);
+            }
         case TT::ASTERISK:
             if (u->expr1->type->pointerCount == 0){
                 throw semantic_exception("Dereferencing non-pointer '" + u->expr1->type->str() + "'", u->expr1->type->token);
@@ -48,9 +42,63 @@ void TypeAnalysis::visit(std::shared_ptr<Unary> u) {
     }
 }
 
+void TypeAnalysis::visit(std::shared_ptr<Binary> b) {
+    switch (b->op->token_type) {
+        case TT::PLUS:
+        case TT::MINUS:
+        case TT::ASTERISK:
+        case TT::DIV:
+        case TT::LOGAND:
+        case TT::LOGOR:
+        case TT::GT:
+        case TT::GE:
+        case TT::LT:
+        case TT::LE:
+            if (b->expr1->type->str() != "int" || b->expr2->type->str() != "int"){
+                throw semantic_exception("Invalid operand type for binary operator '" + getTokenName(b->op->token_type) + "'", b->op);
+            }
+            b->type = std::make_shared<Type>(*(b->expr1->type));
+        case TT::NE:
+        case TT::EQ:
+            if (b->expr1->type->token->token_type == TT::STRUCT || b->expr2->type->token->token_type == TT::STRUCT){
+                throw semantic_exception("Invalid operand type for binary operator '" + getTokenName(b->op->token_type) + "'", b->op);
+            }
+            b->type = std::make_shared<Type>(std::make_shared<Token>(TT::INT));
+        default:
+            break;
+    }
+}
+
+void TypeAnalysis::visit(std::shared_ptr<Subscript> s) {
+    if (s->array->type->pointerCount == 0 && s->array->type->arraySize.size() == 0){
+        throw semantic_exception("Array subscript operator requires an array or pointer type but found '" + s->array->type->str() + "'", s->array->type->token);
+    }
+
+    if (s->index->type->str() != "int"){
+        throw semantic_exception("Array index must be an integer type but found '" + s->index->type->str() + "'", s->index->type->token);
+    }
+
+    s->type = std::make_shared<Type>(std::make_shared<Token>(TT::INT));
+}
+
+void TypeAnalysis::visit(std::shared_ptr<Member> m) {
+    if (m->structure->type->token->token_type != TT::STRUCT || m->structure->type->pointerCount > 0 || m->structure->type->arraySize.size() > 0){
+        throw semantic_exception("Left operand of '.' operator must be a structure but found '" + m->structure->type->str() + "'", m->structure->type->token);
+    }
+}
+
+void TypeAnalysis::visit(std::shared_ptr<TypeCast> t) {
+    if ((t->expr1->type->str() == "char" && t->typeCast->str() == "int") || (t->expr1->type->pointerCount > 0 && t->typeCast->pointerCount > 0)){
+        t->type = std::make_shared<Type>(*t->typeCast);
+    }
+    else {
+        throw semantic_exception("Invalid type cast from '" + t->expr1->type->str() + "' to '" + t->typeCast->str() + "'", t->typeCast->token);
+    }
+}
+
 void TypeAnalysis::visit(std::shared_ptr<VarDecl> varDecl) {
     if (varDecl->type->token->token_type == TT::VOID && varDecl->type->pointerCount == 0){
-        throw semantic_exception("declaration of variable '" + varDecl->name + "' of type void", varDecl->type->token);
+        throw semantic_exception("Declaration of variable '" + varDecl->name + "' of type void", varDecl->type->token);
     }
 }
 
@@ -66,4 +114,17 @@ void TypeAnalysis::visit(std::shared_ptr<Call> call) {
         }
     }
 
+    call->type = std::make_shared<Type>(*(funcDecl->type));
 }
+
+void TypeAnalysis::visit(std::shared_ptr<FuncDecl> p) {}
+void TypeAnalysis::visit(std::shared_ptr<FunProto> p) {}
+void TypeAnalysis::visit(std::shared_ptr<StructDecl> p) {}
+void TypeAnalysis::visit(std::shared_ptr<If> p) {}
+void TypeAnalysis::visit(std::shared_ptr<Block> p) {}
+void TypeAnalysis::visit(std::shared_ptr<Break> p) {}
+void TypeAnalysis::visit(std::shared_ptr<While> p) {}
+void TypeAnalysis::visit(std::shared_ptr<Return> p) {}
+void TypeAnalysis::visit(std::shared_ptr<Continue> p) {}
+void TypeAnalysis::visit(std::shared_ptr<Type> p) {}
+void TypeAnalysis::visit(std::shared_ptr<Program> p) {}

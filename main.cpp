@@ -4,6 +4,7 @@
 #include <string>
 #include "parser/parser.h"
 #include "semantic/name_analysis.h"
+#include "semantic/type_analysis.h"
 
 void printTokens(Lexer& lexer){
     std::shared_ptr<Token> token = lexer.nextToken();
@@ -59,8 +60,11 @@ int main(int argc, char *argv[]) {
     }
 
     try{
-        NameAnalysis a;
-        program->accept(a);
+        NameAnalysis n;
+        program->accept(n);
+
+        TypeAnalysis t;
+        program->accept(t);
     }
     catch(const std::exception& e) {
         std::cerr << e.what() << std::endl;

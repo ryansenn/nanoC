@@ -11,9 +11,6 @@
 
 class TypeAnalysis : public Visitor{
 
-    void expect(std::shared_ptr<Type> actual, TT expected);
-    void expect(std::shared_ptr<Type> actual, std::shared_ptr<Type> expected);
-
     void visit(std::shared_ptr<FuncDecl> func) override;
     void visit(std::shared_ptr<FunProto> funProto) override;
     void visit(std::shared_ptr<Call> call) override;
@@ -23,6 +20,7 @@ class TypeAnalysis : public Visitor{
     void visit(std::shared_ptr<Unary> unary) override;
     void visit(std::shared_ptr<Binary> binary) override;
     void visit(std::shared_ptr<Subscript> subscript) override;
+    void visit(std::shared_ptr<TypeCast> t) override;
     void visit(std::shared_ptr<Member> member) override;
     void visit(std::shared_ptr<Block> block) override;
     void visit(std::shared_ptr<If> i) override;

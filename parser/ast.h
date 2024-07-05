@@ -70,6 +70,8 @@ public:
 
     std::string str();
 
+    std::shared_ptr<Type> copy();
+
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }
@@ -136,9 +138,9 @@ struct Unary : Expr, std::enable_shared_from_this<Unary> {
 };
 
 struct TypeCast : Expr, std::enable_shared_from_this<TypeCast> {
-    std::shared_ptr<Type> type; // The operator is held into Token.token_type
+    std::shared_ptr<Type> typeCast; // The operator is held into Token.token_type
     std::shared_ptr<Expr> expr1;
-    TypeCast(std::shared_ptr<Type> type, std::shared_ptr<Expr> expr1) : type(std::move(type)), expr1(std::move(expr1)){}
+    TypeCast(std::shared_ptr<Type> typeCast, std::shared_ptr<Expr> expr1) : typeCast(std::move(typeCast)), expr1(std::move(expr1)){}
 
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
