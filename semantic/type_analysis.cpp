@@ -64,6 +64,8 @@ void TypeAnalysis::visit(std::shared_ptr<Binary> b) {
                 throw semantic_exception("Invalid operand type for binary operator '" + getTokenName(b->op->token_type) + "'", b->op);
             }
             b->type = std::make_shared<Type>(std::make_shared<Token>(TT::INT));
+        case TT::ASSIGN:
+            b->type = std::make_shared<Type>(*(b->expr2->type));
         default:
             break;
     }
