@@ -201,6 +201,9 @@ void TypeAnalysis::visit(std::shared_ptr<FunProto> p) {
 }
 void TypeAnalysis::visit(std::shared_ptr<StructDecl> p) {
     for (auto d : p->varDecls){
+        if (d->type->name == p->name && d->type->pointerCount == 0){
+            throw semantic_exception("Recursive reference '" + d->name + "' without a pointer in struct '"+ p->name +"'", d->type->token);
+        }
         d->accept(*this);
     }
 }
