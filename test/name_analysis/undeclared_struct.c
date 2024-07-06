@@ -1,5 +1,5 @@
 /*
-Semantic error: Function 'f' is not declared at line 5 column 6
+Semantic error: Struct 'A' is not declared at line 9 column 11
 */
 
 struct S{};

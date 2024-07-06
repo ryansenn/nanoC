@@ -93,7 +93,11 @@ void NameAnalysis::visit(std::shared_ptr<VarDecl> varDecl) {
         throw semantic_exception("Identifier '" + varDecl->name + "' has already been declared in the same scope", varDecl->type->token);
     }
     if (varDecl->type->token->token_type == TT::STRUCT){
-        varDecl->type->symbol = get(varDecl->name);
+        std::shared_ptr<Symbol> structDecl = get(varDecl->type->name);
+        if (!structDecl){
+            throw semantic_exception("Struct '" + varDecl->type->name + "' is not declared", varDecl->type->token);
+        }
+        varDecl->type->symbol = structDecl;
     }
     put(varDecl->name, std::make_shared<Symbol>(Symbol::Type::VAR, varDecl));
 }
