@@ -1,6 +1,6 @@
 /*
 Program (
-    FuncDecl main() (Integer ) (
+    FuncDecl main() (int) (
         return( 0 )
     )
 )

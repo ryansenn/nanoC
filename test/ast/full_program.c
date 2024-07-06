@@ -1,12 +1,12 @@
 /*
 Program (
-    StructDecl Person (VarDecl(Integer ), VarDecl(Character [50]))
-    FunProto add(VarDecl(Integer ), VarDecl(Integer )) (Integer )
-    FuncDecl main() (Integer ) (
-        VarDecl(Integer )
-        VarDecl(Integer )
-        VarDecl(Integer [5][10])
-        VarDecl(Structure Person)
+    StructDecl Person (VarDecl(int), VarDecl(char[50]))
+    FunProto add(VarDecl(int), VarDecl(int)) (int)
+    FuncDecl main() (int) (
+        VarDecl(int)
+        VarDecl(int)
+        VarDecl(int[5][10])
+        VarDecl(struct Person)
         (x = 10)
         (y = 20)
         (((arr[0])[0]) = x)
@@ -21,7 +21,7 @@ Program (
             (y = Func Call add (x, y ))
         )
 
-        VarDecl(Integer )
+        VarDecl(int)
         (i = 0)
         While ((i < 5)) (
             If ((((arr[i])[2]) == 20)) (
@@ -37,7 +37,7 @@ Program (
         )
         return( 0 )
     )
-    FuncDecl add(VarDecl(Integer ), VarDecl(Integer )) (Integer ) (
+    FuncDecl add(VarDecl(int), VarDecl(int)) (int) (
         return( (a + b) )
     )
 )

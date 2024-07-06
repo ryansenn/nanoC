@@ -9,7 +9,7 @@ Lexer::Lexer(const std::string& source_code) : source_code(source_code){}
 
 std::shared_ptr<Token> Lexer::nextToken() {
 
-    while (!reachedEnd() && (peak() == ' ' || peak() == '\n')) {
+    while (!reachedEnd() && (peek() == ' ' || peek() == '\n')) {
         consume();
     }
 
@@ -17,19 +17,19 @@ std::shared_ptr<Token> Lexer::nextToken() {
         return std::make_shared<Token>(TokenType::END_OF_FILE, "", line, column);
     }
 
-    if (peak() == '/') {
+    if (peek() == '/') {
         consume();
 
-        if (!reachedEnd() && peak() == '*') {
+        if (!reachedEnd() && peek() == '*') {
             consume();
 
             while (!reachedEnd()) {
-                if (consume() == '*' && !reachedEnd() && peak() == '/') {
+                if (consume() == '*' && !reachedEnd() && peek() == '/') {
                     consume();
                     return nextToken();
                 }
             }
-        } else if (!reachedEnd() && peak() == '/') {
+        } else if (!reachedEnd() && peek() == '/') {
             consume();
 
             while (!reachedEnd()) {
@@ -46,31 +46,31 @@ std::shared_ptr<Token> Lexer::nextToken() {
         return std::make_shared<Token>(TokenType::END_OF_FILE, "", line, column);
     }
 
-    if (singleCharToken.find(peak()) != singleCharToken.end()) {
+    if (singleCharToken.find(peek()) != singleCharToken.end()) {
         return std::make_shared<Token>(tokenMap.find(std::string(1, consume()))->second, "", line, column);
     }
 
-    if (peak() == '=') {
+    if (peek() == '=') {
         consume();
-        if (!reachedEnd() && peak() == '=') {
+        if (!reachedEnd() && peek() == '=') {
             consume();
             return std::make_shared<Token>(TokenType::EQ, "", line, column);
         }
         return std::make_shared<Token>(TokenType::ASSIGN, "", line, column);
     }
 
-    if (peak() == '&') {
+    if (peek() == '&') {
         consume();
-        if (!reachedEnd() && peak() == '&') {
+        if (!reachedEnd() && peek() == '&') {
             consume();
             return std::make_shared<Token>(TokenType::LOGAND, "", line, column);
         }
         return std::make_shared<Token>(TokenType::AND, "", line, column);
     }
 
-    if (peak() == '|') {
+    if (peek() == '|') {
         consume();
-        if (!reachedEnd() && peak() == '|') {
+        if (!reachedEnd() && peek() == '|') {
             consume();
             return std::make_shared<Token>(TokenType::LOGOR, "", line, column);
         }
@@ -78,9 +78,9 @@ std::shared_ptr<Token> Lexer::nextToken() {
         return std::make_shared<Token>(TokenType::OR, "", line, column);
     }
 
-    if (peak() == '!') {
+    if (peek() == '!') {
         consume();
-        if (!reachedEnd() && peak() == '=') {
+        if (!reachedEnd() && peek() == '=') {
             consume();
             return std::make_shared<Token>(TokenType::NE, "", line, column);
         }
@@ -88,28 +88,28 @@ std::shared_ptr<Token> Lexer::nextToken() {
         return std::make_shared<Token>(TokenType::NOT, "", line, column);
     }
 
-    if (peak() == '<') {
+    if (peek() == '<') {
         consume();
-        if (!reachedEnd() && peak() == '=') {
+        if (!reachedEnd() && peek() == '=') {
             consume();
             return std::make_shared<Token>(TokenType::LE, "", line, column);
         }
         return std::make_shared<Token>(TokenType::LT, "", line, column);
     }
 
-    if (peak() == '>') {
+    if (peek() == '>') {
         consume();
-        if (!reachedEnd() && peak() == '=') {
+        if (!reachedEnd() && peek() == '=') {
             consume();
             return std::make_shared<Token>(TokenType::GE, "", line, column);
         }
         return std::make_shared<Token>(TokenType::GT, "", line, column);
     }
 
-    if (isalpha(peak()) || peak() == '_') {
+    if (isalpha(peek()) || peek() == '_') {
         std::string word = "";
 
-        while (!reachedEnd() && (isalnum(peak()) || peak() == '_')) {
+        while (!reachedEnd() && (isalnum(peek()) || peek() == '_')) {
             word += consume();
         }
 
@@ -120,17 +120,17 @@ std::shared_ptr<Token> Lexer::nextToken() {
         return std::make_shared<Token>(TokenType::IDENTIFIER, word, line, column);
     }
 
-    if (isdigit(peak())) {
+    if (isdigit(peek())) {
         std::string word = "";
 
-        while (!reachedEnd() && isdigit(peak())) {
+        while (!reachedEnd() && isdigit(peek())) {
             word += consume();
         }
 
         return std::make_shared<Token>(TokenType::INT_LITERAL, word, line, column);
     }
 
-    if (peak() == '"') {
+    if (peek() == '"') {
         std::string word = "";
         consume();
         bool escape = false;
@@ -151,45 +151,51 @@ std::shared_ptr<Token> Lexer::nextToken() {
             word += c;
         }
 
-        return std::make_shared<Token>(TokenType::INVALID, "", line, column);
+        throw lexing_exception("Unclosed string literal", line, column);
     }
 
-    if (peak() == '\'') {
-        std::string word = "";
+    if (peek() == '\'') {
         consume();
 
         if (!reachedEnd()) {
+
+            if (peek() == '\\'){
+               consume();
+            }
             char c = consume();
 
-            if (c == '\\' && !reachedEnd()) {
-                if (consume() == '\'') {
-                    return std::make_shared<Token>(TokenType::CHAR_LITERAL, std::string(1, c), line, column);
-                }
+            if (peek() != '\''){
+                throw lexing_exception("Unclosed char literal", line, column);
             }
+
+            consume();
+
+            return std::make_shared<Token>(TokenType::CHAR_LITERAL, std::string(1, c), line, column);
+
         }
 
-        return std::make_shared<Token>(TokenType::INVALID, "", line, column);
+        throw lexing_exception("Unclosed char literal", line, column);
     }
 
-    if (peak() == '#') {
+    if (peek() == '#') {
         consume();
 
-        while (!reachedEnd() && peak() == ' ') {
+        while (!reachedEnd() && peek() == ' ') {
             consume();
         }
         std::string word = "";
 
-        while (!reachedEnd() && peak() != ' ') {
+        while (!reachedEnd() && peek() != ' ') {
             word += consume();
         }
 
         if (word == "include") {
 
-            while (!reachedEnd() && peak() == ' ') {
+            while (!reachedEnd() && peek() == ' ') {
                 consume();
             }
 
-            if (reachedEnd() || (peak() != '"' && peak() != '<')) {
+            if (reachedEnd() || (peek() != '"' && peek() != '<')) {
                 return std::make_shared<Token>(TokenType::INVALID, "", line, column);
             }
 
@@ -202,7 +208,7 @@ std::shared_ptr<Token> Lexer::nextToken() {
             word = "";
 
             while (!reachedEnd()) {
-                if (peak() == end) {
+                if (peek() == end) {
                     consume();
                     return std::make_shared<Token>(TokenType::INCLUDE, word, line, column);
                 }
@@ -210,10 +216,10 @@ std::shared_ptr<Token> Lexer::nextToken() {
             }
 
         }
-        return std::make_shared<Token>(TokenType::INVALID, "", line, column);
+        throw lexing_exception("Expected \"include\" after '#'", line, column);
     }
 
-    return std::make_shared<Token>(TokenType::INVALID, "", line, column);
+    throw lexing_exception("Expected \"include\" after '#'", line, column);
 }
 
 
@@ -221,16 +227,15 @@ bool Lexer::reachedEnd(){
     return index >= source_code.size();
 }
 
-char Lexer::peak(){
+char Lexer::peek(){
     if (!reachedEnd()){
         return source_code[index];
     }
-    std::cerr << "Error: trying to peak when end of source code has been reached" << std::endl;
     return ' ';
 }
 
 char Lexer::consume(){
-    if (peak() == '\n'){
+    if (peek() == '\n'){
         line++;
         column = 1;
     }

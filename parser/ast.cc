@@ -5,7 +5,12 @@
 #include "ast.h"
 
 std::ostream& operator<<(std::ostream& os, const Type& type) {
-    os << type.token->token_type << " " << type.name;
+    if (type.token->token_type == TT::STRUCT){
+        os << type.token->token_type << " " << type.name;
+    }
+    else{
+        os << type.token->token_type;
+    }
     for (int i=0;i<type.pointerCount;i++){
         os << "*";
     }
@@ -179,7 +184,7 @@ void PrintVisitor::visit(std::shared_ptr<Unary> unary) {
 
 void PrintVisitor::visit(std::shared_ptr<TypeCast> typeCast) {
     std::cout << "(";
-    typeCast->type->accept(*this);
+    typeCast->typeCast->accept(*this);
     std::cout << ")";
     std::cout << "(";
     typeCast->expr1->accept(*this);

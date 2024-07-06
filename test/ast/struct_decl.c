@@ -1,8 +1,8 @@
 /*
 Program (
-    StructDecl s (VarDecl(Integer ), VarDecl(Character ))
-    FuncDecl main() (Integer ) (
-        VarDecl(Structure s)
+    StructDecl s (VarDecl(int), VarDecl(char))
+    FuncDecl main() (int) (
+        VarDecl(struct s)
         ((x.a) = 5)
         return( 0 )
     )

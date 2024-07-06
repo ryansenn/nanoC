@@ -178,8 +178,10 @@ struct StructDecl : Decl, std::enable_shared_from_this<StructDecl> {
 struct Return : Stmt, std::enable_shared_from_this<Return> {
 public:
     std::optional<std::shared_ptr<Expr>> expr;
-    Return() {}
-    Return(std::shared_ptr<Expr> e) : expr(std::move(e)) {}
+    std::shared_ptr<Symbol> funcDecl;
+    std::shared_ptr<Token> token;
+    Return(std::shared_ptr<Token> token): token(std::move(token)) {}
+    Return(std::shared_ptr<Expr> e, std::shared_ptr<Token> token) : expr(std::move(e)),token(std::move(token)) {}
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }

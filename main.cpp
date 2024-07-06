@@ -10,7 +10,12 @@ void printTokens(Lexer& lexer){
     std::shared_ptr<Token> token = lexer.nextToken();
 
     while (token->token_type != TokenType::END_OF_FILE){
-        std::cout << tokenNames.find(token->token_type)->second << " " << token->value << std::endl;
+        if (token->value != ""){
+            std::cout << tokenNames.find(token->token_type)->second << " " << token->value << std::endl;
+        }
+        else{
+            std::cout << tokenNames.find(token->token_type)->second << std::endl;
+        }
         token = lexer.nextToken();
     }
 }
@@ -39,16 +44,24 @@ int main(int argc, char *argv[]) {
 
     Lexer lexer(content);
 
+    if (argc > 2 && strcmp(argv[2],"-lexer") == 0){
+        try{
+            printTokens(lexer);
+            return 0;
+        }
+        catch(const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+            return 1;
+        }
+
+    }
+
     Parser parser(lexer);
     std::shared_ptr<Program> program;
     try{
         program = parser.program();
     }
-    catch(const parsing_exception& e) {
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
-    catch (const std::exception& e) {
+    catch(const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;
     }

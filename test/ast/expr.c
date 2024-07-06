@@ -1,13 +1,13 @@
 /*
 Program (
-    FuncDecl f(VarDecl(Integer )) (Integer ) (
+    FuncDecl f(VarDecl(int)) (int) (
         return( 1 )
     )
-    FuncDecl main() (Integer ) (
-        VarDecl(Integer )
-        VarDecl(Integer )
-        VarDecl(Integer )
-        VarDecl(Integer [1][2])
+    FuncDecl main() (int) (
+        VarDecl(int)
+        VarDecl(int)
+        VarDecl(int)
+        VarDecl(int[1][2])
         (a = (Func Call f (((arr[2])[0]) ) - 5))
         (b = (((*(&(b)) * c) + (2 % 5)) + 2))
         (c = (((10 - 5) > 3) && (1 || (0 == 20))))
@@ -20,8 +20,8 @@ Program (
         ((a + b) + c)
         (a = (b = c))
         (a = ((b.c) = d))
-        (Structure chancla)(-((s.member)))
-        -((Character )((Integer *)((Character )((l.member)))))
+        (struct chancla)(-((s.member)))
+        -((char)((int*)((char)((l.member)))))
         !((1 == 1))
         return( 0 )
     )

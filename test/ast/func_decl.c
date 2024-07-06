@@ -1,13 +1,13 @@
 /*
 Program (
-    FuncDecl f(VarDecl(Integer ), VarDecl(Character [])) (Void ) (
+    FuncDecl f(VarDecl(int), VarDecl(char[])) (void) (
         return(  )
     )
-    FuncDecl h(VarDecl(Structure s*)) (Integer ) (
+    FuncDecl h(VarDecl(struct s*)) (int) (
         return( 1 )
     )
-    FunProto k() (Character *)
-    FuncDecl main() (Integer ) (
+    FunProto k() (char*)
+    FuncDecl main() (int) (
         return( 0 )
     )
 )

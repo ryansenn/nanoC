@@ -143,6 +143,15 @@ void NameAnalysis::visit(std::shared_ptr<While> w) {
 }
 
 void NameAnalysis::visit(std::shared_ptr<Return> ret) {
+
+    for (int i=scopes.size() - 1; i>=0; i--){
+        for (auto pair : scopes[i]){
+            if (pair.second->type == Symbol::Type::FUNC){
+                ret->funcDecl = pair.second;
+            }
+        }
+    }
+
     if (ret->expr.has_value()) {
         ret->expr->get()->accept(*this);
     }

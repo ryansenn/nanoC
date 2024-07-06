@@ -51,8 +51,8 @@ std::shared_ptr<Stmt> Parser::stmt(){
             return std::make_shared<Break>();
         case TT::RETURN:
         {
-            consume(TT::RETURN, "");
-            std::shared_ptr<Return> r = std::make_shared<Return>();
+            std::shared_ptr<Token> token = consume(TT::RETURN, "");
+            std::shared_ptr<Return> r = std::make_shared<Return>(std::move(token));
             if (!accept(TT::SC)){
                 r->expr = expr();
             }

@@ -1,9 +1,9 @@
 /*
 Program (
-    FuncDecl main() (Integer ) (
-        VarDecl(Integer )
-        VarDecl(Character **[2][10])
-        VarDecl(Void ***)
+    FuncDecl main() (int) (
+        VarDecl(int)
+        VarDecl(char**[2][10])
+        VarDecl(void***)
         return( 0 )
     )
 )

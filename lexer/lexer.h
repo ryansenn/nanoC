@@ -6,6 +6,7 @@
 #define COMPILER_LEXER_H
 
 #include "token.h"
+#include "lexing_exception.h"
 
 class Lexer {
     std::string source_code;
@@ -15,7 +16,7 @@ class Lexer {
     std::shared_ptr<Token> nextToken();
     bool reachedEnd();
     private:
-    char peak();
+    char peek();
     char consume();
     int line = 1;
     int column = 1;

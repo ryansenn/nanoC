@@ -1,7 +1,7 @@
 /*
 Program (
-    FuncDecl main() (Integer ) (
-        VarDecl(Integer )
+    FuncDecl main() (int) (
+        VarDecl(int)
         (i = 1)
         If (i) (
             (1 + 1)
