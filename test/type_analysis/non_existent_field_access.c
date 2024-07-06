@@ -1,5 +1,5 @@
 /*
-
+Semantic error: Struct 'S' has no member named 'hello' at line 12 column 7
 */
 
 struct S {

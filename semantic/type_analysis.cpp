@@ -106,6 +106,14 @@ void TypeAnalysis::visit(std::shared_ptr<Member> m) {
     if (m->structure->type->token->token_type != TT::STRUCT || m->structure->type->pointerCount > 0 || m->structure->type->arraySize.size() > 0){
         throw semantic_exception("Left operand of '.' operator must be a structure but found '" + m->structure->type->str() + "'", m->token);
     }
+    std::shared_ptr<StructDecl> structDecl = std::dynamic_pointer_cast<StructDecl>(m->structure->type->symbol->decl);
+    for (auto v : structDecl->varDecls){
+        if (v->name == m->member){
+            m->type = std::make_shared<Type>(*(v->type));
+            return;
+        }
+    }
+    throw semantic_exception("Struct '" + structDecl->name + "' has no member named '" + m->member + "'", m->token);
 }
 
 void TypeAnalysis::visit(std::shared_ptr<TypeCast> t) {
