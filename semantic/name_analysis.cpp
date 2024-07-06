@@ -92,6 +92,9 @@ void NameAnalysis::visit(std::shared_ptr<VarDecl> varDecl) {
     if (get_local(varDecl->name)) {
         throw semantic_exception("Identifier '" + varDecl->name + "' has already been declared in the same scope", varDecl->type->token);
     }
+    if (varDecl->type->token->token_type == TT::STRUCT){
+        varDecl->type->symbol = get(varDecl->name);
+    }
     put(varDecl->name, std::make_shared<Symbol>(Symbol::Type::VAR, varDecl));
 }
 
@@ -106,9 +109,19 @@ void NameAnalysis::visit(std::shared_ptr<Primary> primary) {
 }
 
 void NameAnalysis::visit(std::shared_ptr<StructDecl> structDecl) {
+    for (auto pair : scopes[scopes.size()-1]){
+        if (pair.second->type == Symbol::Type::STRUCT && pair.first == structDecl->name){
+            throw semantic_exception("Struct '" + structDecl->name + "' has already been declared");
+        }
+    }
+
+    put(structDecl->name, std::make_shared<Symbol>(Symbol::Type::STRUCT, structDecl));
+
+    scopes.emplace_back();
     for (auto v : structDecl->varDecls) {
         v->accept(*this);
     }
+    scopes.pop_back();
 }
 
 void NameAnalysis::visit(std::shared_ptr<Unary> unary) {
