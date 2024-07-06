@@ -1,5 +1,5 @@
 /*
-
+Semantic error: While condition must be an integer at line 14 column 10
 */
 
 int main(){

@@ -1,5 +1,5 @@
 /*
-
+Semantic error: Invalid operand type for binary operator '<' at line 21 column 9
 */
 
 struct S1{};

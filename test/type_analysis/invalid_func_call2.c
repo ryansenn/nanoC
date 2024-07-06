@@ -1,8 +1,8 @@
 /*
-
+Semantic error: Too few/many arguments in function 'f' call at line 11 column 6
 */
 
-void f(int a, char b){
+void f(int a, int b){
     return;
 }
 

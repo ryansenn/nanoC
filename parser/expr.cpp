@@ -7,13 +7,13 @@
 std::shared_ptr<Expr> Parser::access(std::shared_ptr<Expr> f){
     while(accept({TT::LSBR, TT::DOT})){
         if(accept(TT::LSBR)){
-            consume(TT::LSBR, "");
-            f = std::make_shared<Subscript>(std::move(f), expr());
+            std::shared_ptr<Token> token = consume(TT::LSBR, "");
+            f = std::make_shared<Subscript>(std::move(f), expr(), std::move(token));
             consume(TT::RSBR, "Expected closing ']'");
         }
         else{
-            consume(TT::DOT, "");
-            f = std::make_shared<Member>(std::move(f), consume(TT::IDENTIFIER, "Expected identifier for struct member access")->value);
+            std::shared_ptr<Token> token = consume(TT::DOT, "");
+            f = std::make_shared<Member>(std::move(f), consume(TT::IDENTIFIER, "Expected identifier for struct member access")->value, std::move(token));
         }
     }
     return f;

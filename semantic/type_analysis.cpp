@@ -77,6 +77,9 @@ void TypeAnalysis::visit(std::shared_ptr<Binary> b) {
             b->type = std::make_shared<Type>(std::make_shared<Token>(TT::INT));
             break;
         case TT::ASSIGN:
+            if (*(b->expr1->type) != *(b->expr2->type)){
+                throw semantic_exception("Incompatible types when initializing type '" + b->expr1->type->str() + "' using type '" + b->expr2->type->str() + "'" , b->op);
+            }
             b->type = std::make_shared<Type>(*(b->expr2->type));
             break;
         default:
@@ -88,11 +91,11 @@ void TypeAnalysis::visit(std::shared_ptr<Subscript> s) {
     s->array->accept(*this);
     s->index->accept(*this);
     if (s->array->type->pointerCount == 0 && s->array->type->arraySize.size() == 0){
-        throw semantic_exception("Array subscript operator requires an array or pointer type but found '" + s->array->type->str() + "'", s->array->type->token);
+        throw semantic_exception("Array subscript operator requires an array or pointer type but found '" + s->array->type->str() + "'", s->token);
     }
 
     if (s->index->type->str() != "int"){
-        throw semantic_exception("Array index must be an integer type but found '" + s->index->type->str() + "'", s->index->type->token);
+        throw semantic_exception("Array index must be an integer type but found '" + s->index->type->str() + "'", s->token);
     }
 
     s->type = std::make_shared<Type>(std::make_shared<Token>(TT::INT));
@@ -101,7 +104,7 @@ void TypeAnalysis::visit(std::shared_ptr<Subscript> s) {
 void TypeAnalysis::visit(std::shared_ptr<Member> m) {
     m->structure->accept(*this);
     if (m->structure->type->token->token_type != TT::STRUCT || m->structure->type->pointerCount > 0 || m->structure->type->arraySize.size() > 0){
-        throw semantic_exception("Left operand of '.' operator must be a structure but found '" + m->structure->type->str() + "'", m->structure->type->token);
+        throw semantic_exception("Left operand of '.' operator must be a structure but found '" + m->structure->type->str() + "'", m->token);
     }
 }
 
@@ -121,12 +124,12 @@ void TypeAnalysis::visit(std::shared_ptr<Call> call) {
     }
     std::shared_ptr<FuncDecl> funcDecl = std::dynamic_pointer_cast<FuncDecl>(call->symbol->decl);
     if (call->args.size() != funcDecl->args.size()){
-        throw semantic_exception("Too few/many arguments in function '" + call->identifier->value + "'", call->identifier);
+        throw semantic_exception("Too few/many arguments in function '" + call->identifier->value + "' call", call->identifier);
     }
 
     for(int i=0;i<call->args.size();i++){
         if (*(call->args[i]->type) != *(funcDecl->args[i]->type)){
-            throw semantic_exception("Incompatible type in function call '" + call->identifier->value + "', expected ");
+            throw semantic_exception("Type mismatch in function '" + call->identifier->value + "' call, argument '" + funcDecl->args[i]->name + "' expected type '" + funcDecl->args[i]->type->str() + "' but received '" + call->args[i]->type->str() + "'", call->identifier);
         }
     }
 
@@ -143,7 +146,7 @@ void TypeAnalysis::visit(std::shared_ptr<While> w) {
     w->expr->accept(*this);
     w->stmt->accept(*this);
     if (w->expr->type->str() != "int"){
-        throw semantic_exception("While condition must be an integer", w->expr->type->token);
+        throw semantic_exception("While condition must be an integer", w->token);
     }
 }
 
@@ -154,7 +157,7 @@ void TypeAnalysis::visit(std::shared_ptr<If> i) {
         i->stmt2->get()->accept(*this);
     }
     if (i->expr1->type->str() != "int"){
-        throw semantic_exception("If condition must be an integer", i->expr1->type->token);
+        throw semantic_exception("If condition expression must be an integer", i->token);
     }
 }
 

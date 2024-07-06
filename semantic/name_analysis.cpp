@@ -51,12 +51,16 @@ void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
     }
     put(func->name, std::make_shared<Symbol>(Symbol::Type::FUNC, func));
 
+    scopes.emplace_back();
+
     for (auto a : func->args){
         a->accept(*this);
     }
     for (auto s : func->block->stmts){
         s->accept(*this);
     }
+
+    scopes.pop_back();
 }
 
 void NameAnalysis::visit(std::shared_ptr<FunProto> funProto) {
@@ -64,6 +68,12 @@ void NameAnalysis::visit(std::shared_ptr<FunProto> funProto) {
         throw semantic_exception("Function prototype '" + funProto->name + "' has already been declared in the same scope", funProto->type->token);
     }
     put(funProto->name, std::make_shared<Symbol>(Symbol::Type::PROTO, funProto));
+
+    scopes.emplace_back();
+    for (auto a : funProto->args){
+        a->accept(*this);
+    }
+    scopes.pop_back();
 }
 
 void NameAnalysis::visit(std::shared_ptr<Call> call) {
@@ -72,6 +82,10 @@ void NameAnalysis::visit(std::shared_ptr<Call> call) {
         throw semantic_exception("Function '" + call->identifier->value + "' is not declared", call->identifier);
     }
     call->symbol = funcDecl;
+
+    for (auto a : call->args){
+        a->accept(*this);
+    }
 }
 
 void NameAnalysis::visit(std::shared_ptr<VarDecl> varDecl) {
@@ -113,6 +127,10 @@ void NameAnalysis::visit(std::shared_ptr<Subscript> subscript) {
 
 void NameAnalysis::visit(std::shared_ptr<Member> member) {
     member->structure->accept(*this);
+}
+
+void NameAnalysis::visit(std::shared_ptr<TypeCast> typeCast){
+    typeCast->expr1->accept(*this);
 }
 
 void NameAnalysis::visit(std::shared_ptr<Block> block) {

@@ -1,5 +1,5 @@
 /*
-
+Semantic error: If condition expression must be an integer at line 22 column 7
 */
 
 struct S{};
@@ -9,7 +9,7 @@ int main(){
     int a;
     a=0;
 
-    S s;
+    struct S s;
 
 
     if(a < 5){

@@ -28,18 +28,19 @@ std::shared_ptr<Stmt> Parser::stmt(){
         }
         case TT::LBRA:
             return block();
-        case TT::WHILE:
-            consume(TT::WHILE,"");
-            return std::make_shared<While>(expr(), stmt());
+        case TT::WHILE: {
+            std::shared_ptr<Token> token = consume(TT::WHILE, "");
+            return std::make_shared<While>(expr(), stmt(), std::move(token));
+        }
         case TT::IF: {
-            consume(TT::IF,"");
+            std::shared_ptr<Token> token = consume(TT::IF,"");
             std::shared_ptr<Expr> e = expr();
             std::shared_ptr<Stmt> s1 = stmt();
             if (accept(TT::ELSE)) {
                 consume(TT::ELSE, "");
-                return std::make_shared<If>(std::move(e), std::move(s1), stmt());
+                return std::make_shared<If>(std::move(e), std::move(s1), stmt(), std::move(token));
             }
-            return std::make_shared<If>(std::move(e), std::move(s1));
+            return std::make_shared<If>(std::move(e), std::move(s1), std::move(token));
         }
         case TT::CONTINUE:
             consume(TT::CONTINUE, "");

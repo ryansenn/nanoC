@@ -92,7 +92,8 @@ struct Expr : Stmt{
 struct Subscript : Expr, std::enable_shared_from_this<Subscript> {
     std::shared_ptr<Expr> array;
     std::shared_ptr<Expr> index;
-    Subscript(std::shared_ptr<Expr> array, std::shared_ptr<Expr> index) : array(std::move(array)), index(std::move(index)) {}
+    std::shared_ptr<Token> token;
+    Subscript(std::shared_ptr<Expr> array, std::shared_ptr<Expr> index, std::shared_ptr<Token> token) : array(std::move(array)), index(std::move(index)), token(std::move(token)) {}
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }
@@ -101,7 +102,8 @@ struct Subscript : Expr, std::enable_shared_from_this<Subscript> {
 struct Member : Expr, std::enable_shared_from_this<Member> {
     std::shared_ptr<Expr> structure;
     std::string member;
-    Member(std::shared_ptr<Expr> structure, std::string member) : structure(std::move(structure)), member(member) {}
+    std::shared_ptr<Token> token;
+    Member(std::shared_ptr<Expr> structure, std::string member, std::shared_ptr<Token> token) : structure(std::move(structure)), member(member), token(std::move(token)) {}
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }
@@ -192,8 +194,9 @@ public:
     std::shared_ptr<Expr> expr1;
     std::shared_ptr<Stmt> stmt1;
     std::optional<std::shared_ptr<Stmt>> stmt2;
-    If(std::shared_ptr<Expr> e1, std::shared_ptr<Stmt> s1) : expr1(std::move(e1)), stmt1(std::move(s1)) {}
-    If(std::shared_ptr<Expr> e1, std::shared_ptr<Stmt> s1, std::shared_ptr<Stmt> s2) : expr1(std::move(e1)), stmt1(std::move(s1)), stmt2(std::move(s2)) {}
+    std::shared_ptr<Token> token;
+    If(std::shared_ptr<Expr> e1, std::shared_ptr<Stmt> s1, std::shared_ptr<Token> token) : expr1(std::move(e1)), stmt1(std::move(s1)), token(std::move(token)) {}
+    If(std::shared_ptr<Expr> e1, std::shared_ptr<Stmt> s1, std::shared_ptr<Stmt> s2, std::shared_ptr<Token> token) : expr1(std::move(e1)), stmt1(std::move(s1)), stmt2(std::move(s2)), token(std::move(token)) {}
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }
@@ -203,7 +206,8 @@ struct While : Stmt, std::enable_shared_from_this<While> {
 public:
     std::shared_ptr<Expr> expr;
     std::shared_ptr<Stmt> stmt;
-    While(std::shared_ptr<Expr> e, std::shared_ptr<Stmt> s) : expr(std::move(e)), stmt(std::move(s)) {}
+    std::shared_ptr<Token> token;
+    While(std::shared_ptr<Expr> e, std::shared_ptr<Stmt> s, std::shared_ptr<Token> token) : expr(std::move(e)), stmt(std::move(s)), token(std::move(token)) {}
     void accept(Visitor& visitor){
         visitor.visit(shared_from_this());
     }

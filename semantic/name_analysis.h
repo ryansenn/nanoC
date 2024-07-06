@@ -33,6 +33,7 @@ class NameAnalysis : public Visitor {
     void visit(std::shared_ptr<Continue> c) override;
     void visit(std::shared_ptr<Break> b) override;
     void visit(std::shared_ptr<Type> type) override;
+    void visit(std::shared_ptr<TypeCast> typeCast) override;
 };
 
 #endif //COMPILER_NAME_ANALYSIS_H
