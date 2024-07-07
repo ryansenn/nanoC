@@ -84,7 +84,9 @@ struct Stmt {
 };
 
 struct Expr : Stmt{
+public:
     std::shared_ptr<Type> type;
+    bool lvalue = false;
     virtual void accept(Visitor& visitor) = 0;
 };
 

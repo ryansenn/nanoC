@@ -1,13 +1,11 @@
 /*
-Semantic error: Type mismatch in function 'f' call, argument 'a' expected type 'char[6]' but received 'char[4]' at line 11 column 6
+Semantic error: Type struct 'A' is not declared at line 9 column 11
 */
 
-void f(char a[6]){
-    return;
-}
+struct S{};
 
 int main(){
-    f("hello");
-    f("bro");
+    struct S s;
+    struct A m;
     return 0;
 }

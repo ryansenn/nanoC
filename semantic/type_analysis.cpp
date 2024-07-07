@@ -10,6 +10,7 @@ void TypeAnalysis::visit(std::shared_ptr<Primary> p) {
     switch (p->token->token_type) {
         case TT::IDENTIFIER:
             p->type = std::make_shared<Type>(*(std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)->type));
+            p->lvalue = true;
             break;
         case TT::INT_LITERAL:
             p->type = std::make_shared<Type>(std::make_shared<Token>(TT::INT));
@@ -41,8 +42,12 @@ void TypeAnalysis::visit(std::shared_ptr<Unary> u) {
                 throw semantic_exception("Dereferencing non-pointer '" + u->expr1->type->str() + "'", u->op);
             }
             u->type->pointerCount--;
+            u->lvalue = true;
             break;
         case TT::AND:
+            if (!u->expr1->lvalue){
+                throw semantic_exception("Cannot reference non-lvalue expression", u->op);
+            }
             u->type->pointerCount++;
             break;
         default:
@@ -80,6 +85,9 @@ void TypeAnalysis::visit(std::shared_ptr<Binary> b) {
             if (*(b->expr1->type) != *(b->expr2->type)){
                 throw semantic_exception("Incompatible types when initializing type '" + b->expr1->type->str() + "' using type '" + b->expr2->type->str() + "'" , b->op);
             }
+            if (!b->expr1->lvalue){
+                throw semantic_exception("lvalue required as left operand of assignment", b->op);
+            }
             b->type = std::make_shared<Type>(*(b->expr2->type));
             break;
         default:
@@ -98,11 +106,18 @@ void TypeAnalysis::visit(std::shared_ptr<Subscript> s) {
         throw semantic_exception("Array index must be an integer type but found '" + s->index->type->str() + "'", s->token);
     }
 
-    s->type = std::make_shared<Type>(std::make_shared<Token>(TT::INT));
+    s->type = std::make_shared<Type>(*(s->array->type));
+    s->type->arraySize.clear();
+    for (int i=0;i<s->array->type->arraySize.size()-1;i++){
+        s->type->arraySize.push_back(s->array->type->arraySize[i]);
+    }
+
+    s->lvalue = s->array->lvalue;
 }
 
 void TypeAnalysis::visit(std::shared_ptr<Member> m) {
     m->structure->accept(*this);
+    m->lvalue = m->structure->lvalue;
     if (m->structure->type->token->token_type != TT::STRUCT || m->structure->type->pointerCount > 0 || m->structure->type->arraySize.size() > 0){
         throw semantic_exception("Left operand of '.' operator must be a structure but found '" + m->structure->type->str() + "'", m->token);
     }

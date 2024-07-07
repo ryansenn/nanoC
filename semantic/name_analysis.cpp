@@ -49,6 +49,7 @@ void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
             throw semantic_exception("Identifier '" + func->name + "' has already been declared in the same scope", func->type->token);
         }
     }
+    func->type->accept(*this);
     put(func->name, std::make_shared<Symbol>(Symbol::Type::FUNC, func));
 
     scopes.emplace_back();
@@ -92,13 +93,7 @@ void NameAnalysis::visit(std::shared_ptr<VarDecl> varDecl) {
     if (get_local(varDecl->name)) {
         throw semantic_exception("Identifier '" + varDecl->name + "' has already been declared in the same scope", varDecl->type->token);
     }
-    if (varDecl->type->token->token_type == TT::STRUCT){
-        std::shared_ptr<Symbol> structDecl = get(varDecl->type->name);
-        if (!structDecl){
-            throw semantic_exception("Struct '" + varDecl->type->name + "' is not declared", varDecl->type->token);
-        }
-        varDecl->type->symbol = structDecl;
-    }
+    varDecl->type->accept(*this);
     put(varDecl->name, std::make_shared<Symbol>(Symbol::Type::VAR, varDecl));
 }
 
@@ -200,11 +195,20 @@ void NameAnalysis::visit(std::shared_ptr<Program> program) {
     scopes.pop_back();
 }
 
+void NameAnalysis::visit(std::shared_ptr<Type> t) {
+    if (t->token->token_type == TT::STRUCT){
+        for (auto pair : scopes[0]){
+            if (pair.second->type == Symbol::Type::STRUCT && pair.first == t->name){
+                t->symbol = pair.second;
+                return;
+            }
+        }
+        throw semantic_exception("Type struct '"+ t->name +"' is not declared", t->token);
+    }
+}
+
 void NameAnalysis::visit(std::shared_ptr<Continue> c) {
 }
 
 void NameAnalysis::visit(std::shared_ptr<Break> b) {
-}
-
-void NameAnalysis::visit(std::shared_ptr<Type> type) {
 }

@@ -1,5 +1,5 @@
 /*
-Semantic error: Struct 'A' is not declared at line 9 column 11
+Semantic error: Type struct 'A' is not declared at line 9 column 11
 */
 
 struct S{};

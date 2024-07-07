@@ -96,7 +96,7 @@ std::shared_ptr<StructDecl> Parser::structdecl(){
 
 std::shared_ptr<Decl> Parser::decl(){
 
-    if (accept(TT::STRUCT)){
+    if (accept(TT::STRUCT) && accept(TT::IDENTIFIER, 1) && accept(TT::LBRA, 2)){
         return structdecl();
     }
 
