@@ -13,4 +13,5 @@ add_executable(compiler main.cpp
         semantic/name_analysis.cpp
         parser/ast.cc
         semantic/type_analysis.cpp
+        x86/code_gen.cpp
 )

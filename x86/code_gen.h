@@ -15,7 +15,10 @@ public:
 
     code_gen(std::string& name) : file(name) {}
 
-
+    void visit(std::shared_ptr<Program>) override;
+    void visit(std::shared_ptr<FuncDecl>) override;
+    void visit(std::shared_ptr<Block>) override;
+    void visit(std::shared_ptr<Return>) override;
 };
 
 
