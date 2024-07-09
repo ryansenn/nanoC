@@ -8,7 +8,7 @@
 #include "../parser/ast.h"
 #include "semantic_exception.h"
 
-class NameAnalysis : public Visitor {
+class NameAnalysis : public Visitor<void> {
     std::vector<std::unordered_map<std::string, std::shared_ptr<Symbol>>> scopes;
 
     std::shared_ptr<Symbol> get(std::string identifier);

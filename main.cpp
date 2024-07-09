@@ -5,6 +5,7 @@
 #include "parser/parser.h"
 #include "semantic/name_analysis.h"
 #include "semantic/type_analysis.h"
+#include "x86/code_gen.h"
 
 void printTokens(Lexer& lexer){
     std::shared_ptr<Token> token = lexer.nextToken();
@@ -78,11 +79,16 @@ int main(int argc, char *argv[]) {
 
         TypeAnalysis t;
         program->accept(t);
+
+        CodeGen c("output.asm");
+        //program->accept(c);
+
     }
     catch(const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;
     }
+
 
 
 

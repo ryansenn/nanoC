@@ -9,7 +9,7 @@
 #include "semantic_exception.h"
 
 
-class TypeAnalysis : public Visitor{
+class TypeAnalysis : public Visitor<void>{
 
     void visit(std::shared_ptr<FuncDecl> func) override;
     void visit(std::shared_ptr<FunProto> funProto) override;

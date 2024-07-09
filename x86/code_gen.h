@@ -8,17 +8,24 @@
 #include "fstream"
 #include "../parser/ast.h"
 
+class Register{
 
-class code_gen : public Visitor {
+};
+
+class VirtualRegister : public Register {
+
+};
+
+class CodeGen : public Visitor<std::shared_ptr<Register>> {
 public:
     std::ofstream file;
 
-    code_gen(std::string& name) : file(name) {}
+    CodeGen(std::string name) : file(name) {}
 
-    void visit(std::shared_ptr<Program>) override;
-    void visit(std::shared_ptr<FuncDecl>) override;
-    void visit(std::shared_ptr<Block>) override;
-    void visit(std::shared_ptr<Return>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<FuncDecl>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Block>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Return>) override;
 };
 
 

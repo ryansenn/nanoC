@@ -12,32 +12,36 @@
 #include <sstream>
 #include "../lexer/token.h"
 
+template <typename T>
 class Visitor{
 public:
-    virtual void visit(std::shared_ptr<class Program> program){}
-    virtual void visit(std::shared_ptr<class FuncDecl> func){}
-    virtual void visit(std::shared_ptr<class Block> block){}
-    virtual void visit(std::shared_ptr<class Return> ret){}
-    virtual void visit(std::shared_ptr<class If> block){}
-    virtual void visit(std::shared_ptr<class While> block){}
-    virtual void visit(std::shared_ptr<class Break> block){}
-    virtual void visit(std::shared_ptr<class Continue> block){}
-    virtual void visit(std::shared_ptr<class VarDecl> var){}
-    virtual void visit(std::shared_ptr<class Subscript> subscript){}
-    virtual void visit(std::shared_ptr<class Member> member){}
-    virtual void visit(std::shared_ptr<class Call> call){}
-    virtual void visit(std::shared_ptr<class Primary> primary){}
-    virtual void visit(std::shared_ptr<class Unary> unary){}
-    virtual void visit(std::shared_ptr<class TypeCast> typeCast){}
-    virtual void visit(std::shared_ptr<class Binary> binary){}
-    virtual void visit(std::shared_ptr<class Type> type){}
-    virtual void visit(std::shared_ptr<class FunProto> funProto){}
-    virtual void visit(std::shared_ptr<class StructDecl> funProto){}
+    virtual T visit(std::shared_ptr<class Program> program){}
+    virtual T visit(std::shared_ptr<class FuncDecl> func){}
+    virtual T visit(std::shared_ptr<class Block> block){}
+    virtual T visit(std::shared_ptr<class Return> ret){}
+    virtual T visit(std::shared_ptr<class If> block){}
+    virtual T visit(std::shared_ptr<class While> block){}
+    virtual T visit(std::shared_ptr<class Break> block){}
+    virtual T visit(std::shared_ptr<class Continue> block){}
+    virtual T visit(std::shared_ptr<class VarDecl> var){}
+    virtual T visit(std::shared_ptr<class Subscript> subscript){}
+    virtual T visit(std::shared_ptr<class Member> member){}
+    virtual T visit(std::shared_ptr<class Call> call){}
+    virtual T visit(std::shared_ptr<class Primary> primary){}
+    virtual T visit(std::shared_ptr<class Unary> unary){}
+    virtual T visit(std::shared_ptr<class TypeCast> typeCast){}
+    virtual T visit(std::shared_ptr<class Binary> binary){}
+    virtual T visit(std::shared_ptr<class Type> type){}
+    virtual T visit(std::shared_ptr<class FunProto> funProto){}
+    virtual T visit(std::shared_ptr<class StructDecl> funProto){}
 };
+
+class Register;
 
 struct Decl {
     Decl(){}
-    virtual void accept(Visitor& visitor) = 0;
+    virtual void accept(Visitor<void>& visitor) = 0;
+    virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
 };
 
 struct Symbol  : std::enable_shared_from_this<Symbol>{
@@ -72,22 +76,28 @@ public:
 
     std::shared_ptr<Type> copy();
 
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
 std::ostream& operator<<(std::ostream& os, const Type& type);
 
 struct Stmt {
-    virtual void accept(Visitor& visitor) = 0;
+    virtual void accept(Visitor<void>& visitor) = 0;
+    virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
 };
 
 struct Expr : Stmt{
 public:
     std::shared_ptr<Type> type;
     bool lvalue = false;
-    virtual void accept(Visitor& visitor) = 0;
+    virtual void accept(Visitor<void>& visitor) = 0;
+    virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
 };
 
 
@@ -96,8 +106,11 @@ struct Subscript : Expr, std::enable_shared_from_this<Subscript> {
     std::shared_ptr<Expr> index;
     std::shared_ptr<Token> token;
     Subscript(std::shared_ptr<Expr> array, std::shared_ptr<Expr> index, std::shared_ptr<Token> token) : array(std::move(array)), index(std::move(index)), token(std::move(token)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -106,8 +119,11 @@ struct Member : Expr, std::enable_shared_from_this<Member> {
     std::string member;
     std::shared_ptr<Token> token;
     Member(std::shared_ptr<Expr> structure, std::string member, std::shared_ptr<Token> token) : structure(std::move(structure)), member(member), token(std::move(token)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -117,8 +133,11 @@ struct Primary : Expr, std::enable_shared_from_this<Primary> {
     std::shared_ptr<Token> token; // identifier, char, int
     std::shared_ptr<Symbol> symbol;
     Primary(std::shared_ptr<Token> token) : token(std::move(token)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -127,8 +146,11 @@ struct Call : Expr, std::enable_shared_from_this<Call> {
     std::vector<std::shared_ptr<Expr>> args;
     std::shared_ptr<Symbol> symbol;
     Call(std::shared_ptr<Token> identifier) : identifier(std::move(identifier)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -136,8 +158,11 @@ struct Unary : Expr, std::enable_shared_from_this<Unary> {
     std::shared_ptr<Token> op; // The operator is held into Token.token_type
     std::shared_ptr<Expr> expr1;
     Unary(std::shared_ptr<Token> o, std::shared_ptr<Expr> e1) : op(std::move(o)), expr1(std::move(e1)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -146,8 +171,11 @@ struct TypeCast : Expr, std::enable_shared_from_this<TypeCast> {
     std::shared_ptr<Expr> expr1;
     TypeCast(std::shared_ptr<Type> typeCast, std::shared_ptr<Expr> expr1) : typeCast(std::move(typeCast)), expr1(std::move(expr1)){}
 
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -156,8 +184,11 @@ struct Binary : Expr, std::enable_shared_from_this<Binary> {
     std::shared_ptr<Token> op; // The operator is held into Token.token_type
     std::shared_ptr<Expr> expr2;
     Binary(std::shared_ptr<Expr> e1, std::shared_ptr<Token> o, std::shared_ptr<Expr> e2) : expr1(std::move(e1)), op(std::move(o)), expr2(std::move(e2)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -165,8 +196,11 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
     std::shared_ptr<Type> type;
     std::string name;
     VarDecl(std::shared_ptr<Type> t, std::string& n) : name(n), type(std::move(t)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -174,8 +208,11 @@ struct StructDecl : Decl, std::enable_shared_from_this<StructDecl> {
     std::vector<std::shared_ptr<VarDecl>> varDecls;
     std::string name;
     StructDecl(std::string& n) : name(n) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -186,8 +223,11 @@ public:
     std::shared_ptr<Token> token;
     Return(std::shared_ptr<Token> token): token(std::move(token)) {}
     Return(std::shared_ptr<Expr> e, std::shared_ptr<Token> token) : expr(std::move(e)),token(std::move(token)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -199,8 +239,11 @@ public:
     std::shared_ptr<Token> token;
     If(std::shared_ptr<Expr> e1, std::shared_ptr<Stmt> s1, std::shared_ptr<Token> token) : expr1(std::move(e1)), stmt1(std::move(s1)), token(std::move(token)) {}
     If(std::shared_ptr<Expr> e1, std::shared_ptr<Stmt> s1, std::shared_ptr<Stmt> s2, std::shared_ptr<Token> token) : expr1(std::move(e1)), stmt1(std::move(s1)), stmt2(std::move(s2)), token(std::move(token)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -210,30 +253,42 @@ public:
     std::shared_ptr<Stmt> stmt;
     std::shared_ptr<Token> token;
     While(std::shared_ptr<Expr> e, std::shared_ptr<Stmt> s, std::shared_ptr<Token> token) : expr(std::move(e)), stmt(std::move(s)), token(std::move(token)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
 struct Block : Stmt, std::enable_shared_from_this<Block> {
     std::vector<std::shared_ptr<Stmt>> stmts;
     Block(std::vector<std::shared_ptr<Stmt>> s) : stmts(std::move(s)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
 struct Continue : Stmt, std::enable_shared_from_this<Continue> {
     Continue() {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
 struct Break : Stmt, std::enable_shared_from_this<Break> {
     Break() {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -243,8 +298,11 @@ struct FuncDecl : Decl, std::enable_shared_from_this<FuncDecl> {
     std::vector<std::shared_ptr<VarDecl>> args;
     std::shared_ptr<Block> block;
     FuncDecl(std::shared_ptr<Type> t, std::string& n, std::vector<std::shared_ptr<VarDecl>> a, std::shared_ptr<Block> b) : name(n), type(std::move(t)), args(std::move(a)), block(std::move(b)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
@@ -253,20 +311,26 @@ struct FunProto : Decl, std::enable_shared_from_this<FunProto> {
     std::string name;
     std::vector<std::shared_ptr<VarDecl>> args;
     FunProto(std::shared_ptr<Type> t,std::string& n, std::vector<std::shared_ptr<VarDecl>> a) : name(n), type(std::move(t)), args(std::move(a)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
 struct Program : public std::enable_shared_from_this<Program>{
     std::vector<std::shared_ptr<Decl>> decls;
     Program(std::vector<std::shared_ptr<Decl>> d) : decls(std::move(d)) {}
-    void accept(Visitor& visitor){
+    void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
+    }
+    std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
     }
 };
 
-class PrintVisitor : public Visitor{
+class PrintVisitor : public Visitor<void>{
 
     std::string space = "    ";
     std::string indent = "";

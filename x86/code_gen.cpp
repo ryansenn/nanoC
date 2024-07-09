@@ -4,16 +4,20 @@
 
 #include "code_gen.h"
 
-void code_gen::visit(std::shared_ptr<Program> p) {
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Program> p) {
 
     file << "section .text" << std::endl;
     file << "global start" << std::endl;
+    file << "start:" << std::endl;
     for (auto d : p->decls){
         d->accept(*this);
     }
+    file << "mov rdi, rax" << std::endl;
+    file << "mov rax, 0x2000001" << std::endl;
+    file << "syscall" << std::endl;
 }
 
-void code_gen::visit(std::shared_ptr<FuncDecl> f) {
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
     if (f->name == "main"){
         file << "start:" << std::endl;
     }
@@ -23,16 +27,16 @@ void code_gen::visit(std::shared_ptr<FuncDecl> f) {
     f->block->accept(*this);
 }
 
-void code_gen::visit(std::shared_ptr<Block> f) {
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Block> f) {
     for (auto s : f->stmts){
         s->accept(*this);
     }
 }
 
-void code_gen::visit(std::shared_ptr<Return> f) {
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
 
     if (f->expr.has_value()){
-        file << "mov rax " << f->expr->get() << std::endl;
+        file << "mov rax 2" << std::endl;
     }
     file << "ret" << std::endl;
 }
