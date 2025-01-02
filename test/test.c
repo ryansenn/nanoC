@@ -1,3 +1,18 @@
+
+void a(){
+
+}
+
+struct a{
+
+};
+
+
+struct a f(struct a b){
+    return b;
+}
+
 int main(){
-    return 2;
+    a();
+    return 0;
 }

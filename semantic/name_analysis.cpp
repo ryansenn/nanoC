@@ -50,7 +50,9 @@ void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
         }
     }
     func->type->accept(*this);
-    put(func->name, std::make_shared<Symbol>(Symbol::Type::FUNC, func));
+    std::shared_ptr<Symbol> funcSymbol = std::make_shared<Symbol>(Symbol::Type::FUNC, func);
+    put(func->name, funcSymbol);
+    currFunc = funcSymbol;
 
     scopes.emplace_back();
 
@@ -108,13 +110,11 @@ void NameAnalysis::visit(std::shared_ptr<Primary> primary) {
 }
 
 void NameAnalysis::visit(std::shared_ptr<StructDecl> structDecl) {
-    for (auto pair : scopes[scopes.size()-1]){
-        if (pair.second->type == Symbol::Type::STRUCT && pair.first == structDecl->name){
-            throw semantic_exception("Struct '" + structDecl->name + "' has already been declared");
-        }
+    if (get(structDecl->name + "$struct")) {
+        throw semantic_exception("Struct '" + structDecl->name + "' has already been declared");
     }
 
-    put(structDecl->name, std::make_shared<Symbol>(Symbol::Type::STRUCT, structDecl));
+    put(structDecl->name + "$struct", std::make_shared<Symbol>(Symbol::Type::STRUCT, structDecl));
 
     scopes.emplace_back();
     for (auto v : structDecl->varDecls) {
@@ -174,13 +174,7 @@ void NameAnalysis::visit(std::shared_ptr<While> w) {
 
 void NameAnalysis::visit(std::shared_ptr<Return> ret) {
 
-    for (int i=scopes.size() - 1; i>=0; i--){
-        for (auto pair : scopes[i]){
-            if (pair.second->type == Symbol::Type::FUNC){
-                ret->funcDecl = pair.second;
-            }
-        }
-    }
+    ret->funcDecl = currFunc;
 
     if (ret->expr.has_value()) {
         ret->expr->get()->accept(*this);
@@ -198,7 +192,7 @@ void NameAnalysis::visit(std::shared_ptr<Program> program) {
 void NameAnalysis::visit(std::shared_ptr<Type> t) {
     if (t->token->token_type == TT::STRUCT){
         for (auto pair : scopes[0]){
-            if (pair.second->type == Symbol::Type::STRUCT && pair.first == t->name){
+            if (pair.second->type == Symbol::Type::STRUCT && pair.first == t->name + "$struct"){
                 t->symbol = pair.second;
                 return;
             }

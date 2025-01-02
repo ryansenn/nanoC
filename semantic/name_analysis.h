@@ -10,6 +10,7 @@
 
 class NameAnalysis : public Visitor<void> {
     std::vector<std::unordered_map<std::string, std::shared_ptr<Symbol>>> scopes;
+    std::shared_ptr<Symbol> currFunc;
 
     std::shared_ptr<Symbol> get(std::string identifier);
     std::shared_ptr<Symbol> get_local(std::string identifier);

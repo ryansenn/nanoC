@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # ANSI color codes
 GREEN='\033[0;32m'
