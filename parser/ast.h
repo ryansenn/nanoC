@@ -15,25 +15,25 @@
 template <typename T>
 class Visitor{
 public:
-    virtual T visit(std::shared_ptr<class Program> program){}
-    virtual T visit(std::shared_ptr<class FuncDecl> func){}
-    virtual T visit(std::shared_ptr<class Block> block){}
-    virtual T visit(std::shared_ptr<class Return> ret){}
-    virtual T visit(std::shared_ptr<class If> block){}
-    virtual T visit(std::shared_ptr<class While> block){}
-    virtual T visit(std::shared_ptr<class Break> block){}
-    virtual T visit(std::shared_ptr<class Continue> block){}
-    virtual T visit(std::shared_ptr<class VarDecl> var){}
-    virtual T visit(std::shared_ptr<class Subscript> subscript){}
-    virtual T visit(std::shared_ptr<class Member> member){}
-    virtual T visit(std::shared_ptr<class Call> call){}
-    virtual T visit(std::shared_ptr<class Primary> primary){}
-    virtual T visit(std::shared_ptr<class Unary> unary){}
-    virtual T visit(std::shared_ptr<class TypeCast> typeCast){}
-    virtual T visit(std::shared_ptr<class Binary> binary){}
-    virtual T visit(std::shared_ptr<class Type> type){}
-    virtual T visit(std::shared_ptr<class FunProto> funProto){}
-    virtual T visit(std::shared_ptr<class StructDecl> funProto){}
+    virtual T visit(std::shared_ptr<class Program> program) = 0;
+    virtual T visit(std::shared_ptr<class FuncDecl> func) = 0;
+    virtual T visit(std::shared_ptr<class Block> block) = 0;
+    virtual T visit(std::shared_ptr<class Return> ret) = 0;
+    virtual T visit(std::shared_ptr<class If> block) = 0;
+    virtual T visit(std::shared_ptr<class While> block) = 0;
+    virtual T visit(std::shared_ptr<class Break> block) = 0;
+    virtual T visit(std::shared_ptr<class Continue> block) = 0;
+    virtual T visit(std::shared_ptr<class VarDecl> var) = 0;
+    virtual T visit(std::shared_ptr<class Subscript> subscript) = 0;
+    virtual T visit(std::shared_ptr<class Member> member) = 0;
+    virtual T visit(std::shared_ptr<class Call> call) = 0;
+    virtual T visit(std::shared_ptr<class Primary> primary) = 0;
+    virtual T visit(std::shared_ptr<class Unary> unary) = 0;
+    virtual T visit(std::shared_ptr<class TypeCast> typeCast) = 0;
+    virtual T visit(std::shared_ptr<class Binary> binary) = 0;
+    virtual T visit(std::shared_ptr<class Type> type) = 0;
+    virtual T visit(std::shared_ptr<class FunProto> funProto) = 0;
+    virtual T visit(std::shared_ptr<class StructDecl> funProto) = 0;
 };
 
 class Register;
