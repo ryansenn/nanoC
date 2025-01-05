@@ -57,7 +57,7 @@ run_tests() {
 }
 
 # List of directories to run tests in
-test_dirs=("lexer" "lexing_error" "ast" "parsing_error" "name_analysis" "type_analysis")
+test_dirs=("lexer" "lexing_error" "ast" "parsing_error" "name_analysis" "type_analysis" "code_gen")
 
 # Loop through each directory in the list and run tests
 for dir in "${test_dirs[@]}"; do

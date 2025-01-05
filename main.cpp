@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         program->accept(t);
 
         CodeGen c("output.asm");
-        //program->accept(c);
+        program->accept(c);
 
     }
     catch(const std::exception& e) {

@@ -14,30 +14,17 @@ public:
     Register(std::string name):name(name){}
 };
 
-std::shared_ptr<Register> NO_REGISTER = std::make_shared<Register>("NO REGISTER");
-
-std::vector<std::shared_ptr<Register>> registers = {
-        std::make_shared<Register>("r10"),
-        std::make_shared<Register>("r11"),
-        std::make_shared<Register>("r12"),
-        std::make_shared<Register>("r13"),
-        std::make_shared<Register>("r9"),
-        std::make_shared<Register>("r8"),
-        std::make_shared<Register>("rcx"),
-        std::make_shared<Register>("rdx"),
-        std::make_shared<Register>("rsi"),
-        std::make_shared<Register>("rdi")
-};
-
-class VirtualRegister : public Register {
-
-};
-
 class CodeGen : public Visitor<std::shared_ptr<Register>> {
 public:
     std::ofstream file;
 
     CodeGen(std::string name) : file(name) {}
+
+    int registerCount = 0;
+
+    std::shared_ptr<Register> getRegister(){
+        return registers[registerCount++];
+    }
 
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<FuncDecl>) override;
@@ -58,6 +45,21 @@ public:
     std::shared_ptr<Register> visit(std::shared_ptr<Type>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<FunProto>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<StructDecl>) override;
+
+    std::shared_ptr<Register> NO_REGISTER = std::make_shared<Register>("NO REGISTER");
+
+    std::vector<std::shared_ptr<Register>> registers = {
+            std::make_shared<Register>("r10"),
+            std::make_shared<Register>("r11"),
+            std::make_shared<Register>("r12"),
+            std::make_shared<Register>("r13"),
+            std::make_shared<Register>("r9"),
+            std::make_shared<Register>("r8"),
+            std::make_shared<Register>("rcx"),
+            std::make_shared<Register>("rdx"),
+            std::make_shared<Register>("rsi"),
+            std::make_shared<Register>("rdi")
+    };
 };
 
 

@@ -17,7 +17,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Program> p) {
     file << "mov rax, 0x2000001" << std::endl;
     file << "syscall" << std::endl;
 
-    return NULL;
+    return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
@@ -25,7 +25,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
     file << f->name << ":" << std::endl;
     f->block->accept(*this);
 
-    return NULL;
+    return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Block> f) {
@@ -33,24 +33,22 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Block> f) {
         s->accept(*this);
     }
 
-    return NULL;
+    return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
 
-    std::shared_ptr<Register> r = NO_REGISTER;
-
     if (f->expr.has_value()){
-        r = f->expr->get()->accept(*this);
+        std::shared_ptr<Register> r = f->expr->get()->accept(*this);
         file << "mov rax, " + r->name << std::endl;
     }
     file << "ret" << std::endl;
 
-    return r;
+    return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
-    std::shared_ptr<Register> r = registers[0];
+    std::shared_ptr<Register> r = getRegister();
     file << "mov " + r->name + ", " + p->token->value << std::endl;
 
     return r;
