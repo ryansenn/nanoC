@@ -9,7 +9,24 @@
 #include "../parser/ast.h"
 
 class Register{
+public:
+    std::string name;
+    Register(std::string name):name(name){}
+};
 
+std::shared_ptr<Register> NO_REGISTER = std::make_shared<Register>("NO REGISTER");
+
+std::vector<std::shared_ptr<Register>> registers = {
+        std::make_shared<Register>("r10"),
+        std::make_shared<Register>("r11"),
+        std::make_shared<Register>("r12"),
+        std::make_shared<Register>("r13"),
+        std::make_shared<Register>("r9"),
+        std::make_shared<Register>("r8"),
+        std::make_shared<Register>("rcx"),
+        std::make_shared<Register>("rdx"),
+        std::make_shared<Register>("rsi"),
+        std::make_shared<Register>("rdi")
 };
 
 class VirtualRegister : public Register {
