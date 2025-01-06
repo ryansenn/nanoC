@@ -26,6 +26,10 @@ public:
         return registers[registerCount++];
     }
 
+    void freeRegister(std::shared_ptr<Register> r){
+        file << "xor " + r->name + ", " + r->name << std::endl;
+    }
+
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<FuncDecl>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<Block>) override;

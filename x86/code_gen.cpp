@@ -41,6 +41,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
     if (f->expr.has_value()){
         std::shared_ptr<Register> r = f->expr->get()->accept(*this);
         file << "mov rax, " + r->name << std::endl;
+        freeRegister(r);
     }
     file << "ret" << std::endl;
 
@@ -48,8 +49,66 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
+
     std::shared_ptr<Register> r = getRegister();
-    file << "mov " + r->name + ", " + p->token->value << std::endl;
+
+    switch (p->token->token_type) {
+        case TT::INT_LITERAL:
+            file << "mov " + r->name + ", " + p->token->value << std::endl;
+            break;
+        case TT::CHAR_LITERAL:
+            //file << "mov " + r->name + ", " + p->token->value << std::endl;
+            break;
+        case TT::IDENTIFIER:
+            //file << "mov " + r->name + ", " + p->token->value << std::endl;
+            break;
+    }
+
+    return r;
+}
+
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
+    std::shared_ptr<Register> r1 = b->expr1->accept(*this);
+    std::shared_ptr<Register> r2 = b->expr2->accept(*this);
+
+    std::shared_ptr<Register> r = getRegister();
+
+    switch (b->op->token_type) {
+        case TT::PLUS:
+            file << "mov " + r->name + ", " + r1->name << std::endl;
+            file << "add " + r->name + ", " + r2->name << std::endl;
+            break;
+        case TT::MINUS:
+            break;
+        case TT::ASTERISK:
+            break;
+        case TT::DIV:
+            break;
+        case TT::ASSIGN:
+            break;
+        case TT::REM:
+            break;
+        case TT::LE:
+            break;
+        case TT::LT:
+            break;
+        case TT::GE:
+            break;
+        case TT::GT:
+            break;
+        case TT::EQ:
+            break;
+        case TT::NE:
+            break;
+        case TT::LOGOR:
+            break;
+        case TT::LOGAND:
+            break;
+
+    }
+
+    freeRegister(r1);
+    freeRegister(r2);
 
     return r;
 }
@@ -84,9 +143,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary>){
     return NULL;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<TypeCast>){
-    return NULL;
-}
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary>){
     return NULL;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Type>){
