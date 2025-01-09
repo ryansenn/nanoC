@@ -298,6 +298,7 @@ struct FuncDecl : Decl, std::enable_shared_from_this<FuncDecl> {
     std::string name;
     std::vector<std::shared_ptr<VarDecl>> args;
     std::shared_ptr<Block> block;
+    int offset;
     FuncDecl(std::shared_ptr<Type> t, std::string& n, std::vector<std::shared_ptr<VarDecl>> a, std::shared_ptr<Block> b) : name(n), type(std::move(t)), args(std::move(a)), block(std::move(b)) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());

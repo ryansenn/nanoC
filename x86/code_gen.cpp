@@ -33,6 +33,8 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
         it->get()->offset = offset;
     }
 
+    f->offset = offset;
+
     f->block->accept(*this);
 
     return NO_REGISTER;
