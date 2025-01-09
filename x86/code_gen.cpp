@@ -84,9 +84,26 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
     std::shared_ptr<Register> r = NO_REGISTER;
 
+    std::shared_ptr<FuncDecl> f = std::dynamic_pointer_cast<FuncDecl>(c->symbol->decl);
+
+    if (f->type->token->token_type != TT::VOID){
+        r = reg_map["rax"];
+    }
+
+    // pushing arguments on stack
+    for (std::shared_ptr<Expr> e : c->args){
+        file << "push " + e->accept(*this)->name << std::endl;
+    }
+
+    file << "call " + c->identifier->value << std::endl;
+
+    file << "add rsp, " + f->offset  << std::endl;
+
     if (c->identifier->value == "print_i"){
 
     }
+
+    return r;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){

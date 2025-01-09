@@ -18,7 +18,11 @@ class CodeGen : public Visitor<std::shared_ptr<Register>> {
 public:
     std::ofstream file;
 
-    CodeGen(std::string name) : file(name) {}
+    CodeGen(std::string name) : file(name) {
+        for (const auto& reg : registers) {
+            reg_map[reg->name] = reg;
+        }
+    }
 
     int registerCount = 0;
 
@@ -64,6 +68,9 @@ public:
             std::make_shared<Register>("rsi"),
             std::make_shared<Register>("rdi")
     };
+
+    std::unordered_map<std::string, std::shared_ptr<Register>> reg_map;
+
 };
 
 
