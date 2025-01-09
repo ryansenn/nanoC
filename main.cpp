@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
     }
 
     try{
+        program->addStandardLibrary();
+
         NameAnalysis n;
         program->accept(n);
 

@@ -23,6 +23,16 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Program> p) {
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
 
     file << f->name << ":" << std::endl;
+    int offset = 0;
+
+    // return address
+    offset += 8;
+
+    for (auto it = f->args.end();it != f->args.begin(); it--){
+        offset += it->get()->type->size;
+        it->get()->offset = offset;
+    }
+
     f->block->accept(*this);
 
     return NO_REGISTER;
@@ -62,9 +72,19 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
         case TT::IDENTIFIER:
             //file << "mov " + r->name + ", " + p->token->value << std::endl;
             break;
+        default:
+            break;
     }
 
     return r;
+}
+
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
+    std::shared_ptr<Register> r = NO_REGISTER;
+
+    if (c->identifier->value == "print_i"){
+
+    }
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
@@ -104,6 +124,8 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             break;
         case TT::LOGAND:
             break;
+        default:
+            break;
 
     }
 
@@ -133,9 +155,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
     return NULL;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Member>){
-    return NULL;
-}
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call>){
     return NULL;
 }
 

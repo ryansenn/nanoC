@@ -199,6 +199,26 @@ void NameAnalysis::visit(std::shared_ptr<Type> t) {
         }
         throw semantic_exception("Type struct '"+ t->name +"' is not declared", t->token);
     }
+
+    // size of type
+    switch (t->token->token_type) {
+        case TT::INT:
+            t->size = 4;
+            break;
+        case TT::VOID:
+            t->size = 0;
+            break;
+        case TT::CHAR:
+            t->size = 1;
+            break;
+        case TT::STRUCT:
+            t->size = std::dynamic_pointer_cast<StructDecl>(t->symbol->decl)->size;
+            break;
+    }
+
+    if (t->pointerCount > 0){
+        t->size = 8;
+    }
 }
 
 void NameAnalysis::visit(std::shared_ptr<Continue> c) {

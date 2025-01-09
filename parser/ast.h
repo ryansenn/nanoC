@@ -61,6 +61,7 @@ public:
     int pointerCount;
     std::vector<int> arraySize;
     std::shared_ptr<Symbol> symbol;
+    int size;
 
     Type(std::shared_ptr<Token> token) : token(std::move(token)), pointerCount(0), arraySize(0) {}
 
@@ -73,8 +74,6 @@ public:
     }
 
     std::string str();
-
-    std::shared_ptr<Type> copy();
 
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
@@ -195,7 +194,8 @@ struct Binary : Expr, std::enable_shared_from_this<Binary> {
 struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
     std::shared_ptr<Type> type;
     std::string name;
-    VarDecl(std::shared_ptr<Type> t, std::string& n) : name(n), type(std::move(t)) {}
+    int offset;
+    VarDecl(std::shared_ptr<Type> t, std::string n) : name(n), type(std::move(t)) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
     }
@@ -207,6 +207,7 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
 struct StructDecl : Decl, std::enable_shared_from_this<StructDecl> {
     std::vector<std::shared_ptr<VarDecl>> varDecls;
     std::string name;
+    int size = 8; // TO CHANGE NOT HARDCODE
     StructDecl(std::string& n) : name(n) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
@@ -310,7 +311,7 @@ struct FunProto : Decl, std::enable_shared_from_this<FunProto> {
     std::shared_ptr<Type> type;
     std::string name;
     std::vector<std::shared_ptr<VarDecl>> args;
-    FunProto(std::shared_ptr<Type> t,std::string& n, std::vector<std::shared_ptr<VarDecl>> a) : name(n), type(std::move(t)), args(std::move(a)) {}
+    FunProto(std::shared_ptr<Type> t,std::string n, std::vector<std::shared_ptr<VarDecl>> a) : name(n), type(std::move(t)), args(std::move(a)) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
     }
@@ -327,6 +328,15 @@ struct Program : public std::enable_shared_from_this<Program>{
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
+    }
+    void addStandardLibrary(){
+        // Standard library functions
+        std::shared_ptr<Type> voidType = std::make_shared<Type>(std::make_shared<Token>(TT::VOID));
+
+        std::vector<std::shared_ptr<VarDecl>> intArg = {std::make_shared<VarDecl>(std::make_shared<Type>(std::make_shared<Token>(TT::INT)), "i")};
+        std::shared_ptr<Decl> print_i = std::make_shared<FunProto>(voidType,"print_i",std::move(intArg));
+
+        decls.insert(decls.begin(),print_i);
     }
 };
 
