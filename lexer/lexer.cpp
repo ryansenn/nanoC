@@ -159,10 +159,44 @@ std::shared_ptr<Token> Lexer::nextToken() {
 
         if (!reachedEnd()) {
 
-            if (peek() == '\\'){
-               consume();
+            char c;
+            if (peek() == '\\') {
+                consume();
+                switch (peek()) {
+                    case 'n':
+                        consume();
+                        c = '\n';
+                        break;
+                    case 't':
+                        consume();
+                        c = '\t';
+                        break;
+                    case 'r':
+                        consume();
+                        c = '\r';
+                        break;
+                    case '\\':
+                        consume();
+                        c = '\\';
+                        break;
+                    case '\'':
+                        consume();
+                        c = '\'';
+                        break;
+                    case '\"':
+                        consume();
+                        c = '\"';
+                        break;
+                    case '0':
+                        consume();
+                        c = '\0';
+                        break;
+                    default:
+                        throw std::runtime_error("Invalid escape sequence");
+                }
+            } else {
+                c = consume();
             }
-            char c = consume();
 
             if (peek() != '\''){
                 throw lexing_exception("Unclosed char literal", line, column);
@@ -170,7 +204,7 @@ std::shared_ptr<Token> Lexer::nextToken() {
 
             consume();
 
-            return std::make_shared<Token>(TokenType::CHAR_LITERAL, std::string(1, c), line, column);
+            return std::make_shared<Token>(TokenType::CHAR_LITERAL, std::to_string(static_cast<int>(c)), line, column);
 
         }
 

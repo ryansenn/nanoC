@@ -31,7 +31,11 @@ public:
     }
 
     void freeRegister(std::shared_ptr<Register> r){
-        file << "xor " + r->name + ", " + r->name << std::endl;
+
+    }
+
+    std::string argAddress(std::shared_ptr<VarDecl> v){
+        return "[rbp + " + std::to_string(v->offset) + "]";
     }
 
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;

@@ -35,7 +35,7 @@ Identifier c
 Semicolon
 Identifier c
 =
-Character Literal A
+Character Literal 65
 Semicolon
 char
 *
@@ -147,7 +147,7 @@ Identifier s
 .
 Identifier b
 =
-Character Literal B
+Character Literal 66
 Semicolon
 Return
 Integer Literal 0

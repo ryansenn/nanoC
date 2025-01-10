@@ -63,7 +63,7 @@ public:
     std::shared_ptr<Symbol> symbol;
     int size;
 
-    Type(std::shared_ptr<Token> token) : token(std::move(token)), pointerCount(0), arraySize(0) {}
+    Type(std::shared_ptr<Token> token) : token(token), pointerCount(0), arraySize(0) {}
 
     bool operator==(const Type& t) const {
         return token->token_type == t.token->token_type && name == t.name && pointerCount == t.pointerCount && arraySize == t.arraySize;
@@ -265,6 +265,7 @@ public:
 struct Block : Stmt, std::enable_shared_from_this<Block> {
     std::vector<std::shared_ptr<Stmt>> stmts;
     Block(std::vector<std::shared_ptr<Stmt>> s) : stmts(std::move(s)) {}
+    Block() {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
     }
@@ -299,6 +300,7 @@ struct FuncDecl : Decl, std::enable_shared_from_this<FuncDecl> {
     std::vector<std::shared_ptr<VarDecl>> args;
     std::shared_ptr<Block> block;
     int offset;
+    FuncDecl(std::shared_ptr<Type> t, const char *n, std::vector<std::shared_ptr<VarDecl>> a) : name(n), type(t), args(a), block(std::make_shared<Block>()) {}
     FuncDecl(std::shared_ptr<Type> t, std::string& n, std::vector<std::shared_ptr<VarDecl>> a, std::shared_ptr<Block> b) : name(n), type(std::move(t)), args(std::move(a)), block(std::move(b)) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
@@ -334,10 +336,10 @@ struct Program : public std::enable_shared_from_this<Program>{
         // Standard library functions
         std::shared_ptr<Type> voidType = std::make_shared<Type>(std::make_shared<Token>(TT::VOID));
 
-        std::vector<std::shared_ptr<VarDecl>> intArg = {std::make_shared<VarDecl>(std::make_shared<Type>(std::make_shared<Token>(TT::INT)), "i")};
-        std::shared_ptr<Decl> print_i = std::make_shared<FunProto>(voidType,"print_i",std::move(intArg));
+        std::vector<std::shared_ptr<VarDecl>> intArg = {std::make_shared<VarDecl>(std::make_shared<Type>(std::make_shared<Token>(TT::CHAR)), "c")};
+        std::shared_ptr<Decl> print_c = std::make_shared<FuncDecl>(voidType,"print_c",std::move(intArg));
 
-        decls.insert(decls.begin(),print_i);
+        decls.insert(decls.begin(),print_c);
     }
 };
 

@@ -203,16 +203,18 @@ void NameAnalysis::visit(std::shared_ptr<Type> t) {
     // size of type
     switch (t->token->token_type) {
         case TT::INT:
-            t->size = 4;
+            t->size = 8;
             break;
         case TT::VOID:
             t->size = 0;
             break;
         case TT::CHAR:
-            t->size = 1;
+            t->size = 8;
             break;
         case TT::STRUCT:
             t->size = std::dynamic_pointer_cast<StructDecl>(t->symbol->decl)->size;
+            break;
+        default:
             break;
     }
 

@@ -8,7 +8,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Program> p) {
 
     file << "section .text" << std::endl;
     file << "global start" << std::endl;
-    for (auto d : p->decls){
+    for (const auto d : p->decls){
         d->accept(*this);
     }
     file << "start:" << std::endl;
@@ -23,20 +23,31 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Program> p) {
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
 
     file << f->name << ":" << std::endl;
-    int offset = 0;
+    file << "push rbp" << std::endl;
+    file << "mov rbp, rsp" << std::endl;
 
-    // return address
-    offset += 8;
+    int offset = 8;
 
-    for (auto it = f->args.end();it != f->args.begin(); it--){
-        offset += it->get()->type->size;
+    for (auto it = f->args.rbegin();it != f->args.rend(); ++it){
+        offset += (*it)->type->size;
         it->get()->offset = offset;
     }
 
-    f->offset = offset;
+    f->offset = offset-8;
+
+    if (f->name == "print_c"){
+        file << "mov rax, 0x2000004" << std::endl;
+        file << "mov rdi, 1" << std::endl;
+        file << "lea rsi, " + argAddress(f->args[0]) << std::endl;
+        file << "mov rdx, 1" << std::endl;
+        file << "syscall" << std::endl;
+    }
 
     f->block->accept(*this);
 
+    file << "mov rsp, rbp" << std::endl;
+    file << "pop rbp" << std::endl;
+    file << "ret" << std::endl;
     return NO_REGISTER;
 }
 
@@ -55,7 +66,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
         file << "mov rax, " + r->name << std::endl;
         freeRegister(r);
     }
-    file << "ret" << std::endl;
 
     return NO_REGISTER;
 }
@@ -66,10 +76,8 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
 
     switch (p->token->token_type) {
         case TT::INT_LITERAL:
-            file << "mov " + r->name + ", " + p->token->value << std::endl;
-            break;
         case TT::CHAR_LITERAL:
-            //file << "mov " + r->name + ", " + p->token->value << std::endl;
+            file << "mov " + r->name + ", " + p->token->value << std::endl;
             break;
         case TT::IDENTIFIER:
             //file << "mov " + r->name + ", " + p->token->value << std::endl;
@@ -97,11 +105,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
 
     file << "call " + c->identifier->value << std::endl;
 
-    file << "add rsp, " + f->offset  << std::endl;
-
-    if (c->identifier->value == "print_i"){
-
-    }
+    file << "add rsp, " + std::to_string(f->offset)  << std::endl;
 
     return r;
 }
