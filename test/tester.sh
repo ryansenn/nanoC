@@ -31,6 +31,15 @@ run_tests() {
             actual_ast=$(../cmake-build-debug/compiler "$test_file" -lexer 2>&1)
         else
             actual_ast=$(../cmake-build-debug/compiler "$test_file" 2>&1)
+            if [ "$test_dir" = "code_gen" ]; then
+              nasm -f macho64 ./output.asm -o ./output.o
+              ld -o ./output ./output.o -macosx_version_min 10.7 -no_pie
+              chmod +x ./output
+              actual_ast=$(arch -x86_64 ./output 2>&1)
+              rm -f ./output ./output.asm ./output.o
+              #echo "$actual_ast"
+              #echo "$expected_ast"
+            fi
         fi
 
         # Compare the expected and actual AST
@@ -57,7 +66,7 @@ run_tests() {
 }
 
 # List of directories to run tests in
-test_dirs=("lexer" "lexing_error" "ast" "parsing_error" "name_analysis" "type_analysis")
+test_dirs=("lexer" "lexing_error" "ast" "parsing_error" "name_analysis" "type_analysis" "code_gen")
 
 # Loop through each directory in the list and run tests
 for dir in "${test_dirs[@]}"; do
