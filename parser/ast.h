@@ -144,7 +144,7 @@ struct Call : Expr, std::enable_shared_from_this<Call> {
     std::shared_ptr<Token> identifier; // The operator is held into Token.value
     std::vector<std::shared_ptr<Expr>> args;
     std::shared_ptr<Symbol> symbol;
-    Call(std::shared_ptr<Token> identifier) : identifier(std::move(identifier)) {}
+    Call(std::shared_ptr<Token> identifier) : identifier(identifier) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
     }
@@ -334,6 +334,7 @@ struct Program : public std::enable_shared_from_this<Program>{
     }
     void addStandardLibrary(){
 
+        /*
         std::shared_ptr<Type> voidType = std::make_shared<Type>(std::make_shared<Token>(TT::VOID));
 
         std::vector<std::shared_ptr<VarDecl>> charArg = {std::make_shared<VarDecl>(std::make_shared<Type>(std::make_shared<Token>(TT::CHAR)), "c")};
@@ -344,7 +345,14 @@ struct Program : public std::enable_shared_from_this<Program>{
 
         decls.insert(decls.begin(),print_c);
         decls.insert(decls.begin(),print_i);
+        */
 
+        std::shared_ptr<Type> voidType = std::make_shared<Type>(std::make_shared<Token>(TT::VOID));
+        std::shared_ptr<Type> t = std::make_shared<Type>(std::make_shared<Token>(TT::CHAR));
+        t->pointerCount++;
+        std::vector<std::shared_ptr<VarDecl>> stringArg = {std::make_shared<VarDecl>(t, "c")};
+        std::shared_ptr<Decl> emit_asm = std::make_shared<FuncDecl>(voidType,"emit_asm",std::move(stringArg));
+        decls.insert(decls.begin(),emit_asm);
     }
 };
 

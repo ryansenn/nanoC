@@ -35,35 +35,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
 
     f->offset = offset-8;
 
-    if (f->name == "print_c"){
-        file << "mov rax, 0x2000004" << std::endl
-             << "mov rdi, 1" << std::endl
-             << "lea rsi, " + argAddress(f->args[0]) << std::endl
-             << "mov rdx, 1" << std::endl
-             << "syscall" << std::endl;
-    }
-
-    if (f->name == "print_i"){
-        file << "sub rsp, 20" << std::endl
-             << "mov rax, [rbp+16]" << std::endl
-             << "mov rcx, 10" << std::endl
-             << "lea rdi, [rsp+19]" << std::endl
-             << "convert:" << std::endl
-             << "xor rdx, rdx" << std::endl
-             << "div rcx" << std::endl
-             << "add dl, '0'" << std::endl
-             << "dec rdi" << std::endl
-             << "mov [rdi], dl" << std::endl
-             << "test rax, rax" << std::endl
-             << "jnz convert" << std::endl
-             << "mov rax, 0x2000004" << std::endl
-             << "mov rsi, rdi" << std::endl
-             << "lea rdx, [rsp+19]" << std::endl
-             << "sub rdx, rdi" << std::endl
-             << "mov rdi, 1" << std::endl
-             << "syscall" << std::endl;
-    }
-
     f->block->accept(*this);
 
     file << "mov rsp, rbp" << std::endl;
@@ -114,6 +85,12 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
     std::shared_ptr<Register> r = NO_REGISTER;
 
     std::shared_ptr<FuncDecl> f = std::dynamic_pointer_cast<FuncDecl>(c->symbol->decl);
+
+    if (c->identifier->value == "emit_asm"){
+        std::string instruction = std::dynamic_pointer_cast<Primary>(c->args[0])->token->value;
+        file << instruction << std::endl;
+        return r;
+    }
 
     if (f->type->token->token_type != TT::VOID){
         r = reg_map["rax"];
