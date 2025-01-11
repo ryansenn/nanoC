@@ -333,13 +333,18 @@ struct Program : public std::enable_shared_from_this<Program>{
         return visitor.visit(shared_from_this());
     }
     void addStandardLibrary(){
-        // Standard library functions
+
         std::shared_ptr<Type> voidType = std::make_shared<Type>(std::make_shared<Token>(TT::VOID));
 
-        std::vector<std::shared_ptr<VarDecl>> intArg = {std::make_shared<VarDecl>(std::make_shared<Type>(std::make_shared<Token>(TT::CHAR)), "c")};
-        std::shared_ptr<Decl> print_c = std::make_shared<FuncDecl>(voidType,"print_c",std::move(intArg));
+        std::vector<std::shared_ptr<VarDecl>> charArg = {std::make_shared<VarDecl>(std::make_shared<Type>(std::make_shared<Token>(TT::CHAR)), "c")};
+        std::vector<std::shared_ptr<VarDecl>> intArg = {std::make_shared<VarDecl>(std::make_shared<Type>(std::make_shared<Token>(TT::INT)), "i")};
+
+        std::shared_ptr<Decl> print_c = std::make_shared<FuncDecl>(voidType,"print_c",std::move(charArg));
+        std::shared_ptr<Decl> print_i = std::make_shared<FuncDecl>(voidType,"print_i",std::move(intArg));
 
         decls.insert(decls.begin(),print_c);
+        decls.insert(decls.begin(),print_i);
+
     }
 };
 

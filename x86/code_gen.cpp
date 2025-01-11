@@ -36,11 +36,32 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
     f->offset = offset-8;
 
     if (f->name == "print_c"){
-        file << "mov rax, 0x2000004" << std::endl;
-        file << "mov rdi, 1" << std::endl;
-        file << "lea rsi, " + argAddress(f->args[0]) << std::endl;
-        file << "mov rdx, 1" << std::endl;
-        file << "syscall" << std::endl;
+        file << "mov rax, 0x2000004" << std::endl
+             << "mov rdi, 1" << std::endl
+             << "lea rsi, " + argAddress(f->args[0]) << std::endl
+             << "mov rdx, 1" << std::endl
+             << "syscall" << std::endl;
+    }
+
+    if (f->name == "print_i"){
+        file << "sub rsp, 20" << std::endl
+             << "mov rax, [rbp+16]" << std::endl
+             << "mov rcx, 10" << std::endl
+             << "lea rdi, [rsp+19]" << std::endl
+             << "convert:" << std::endl
+             << "xor rdx, rdx" << std::endl
+             << "div rcx" << std::endl
+             << "add dl, '0'" << std::endl
+             << "dec rdi" << std::endl
+             << "mov [rdi], dl" << std::endl
+             << "test rax, rax" << std::endl
+             << "jnz convert" << std::endl
+             << "mov rax, 0x2000004" << std::endl
+             << "mov rsi, rdi" << std::endl
+             << "lea rdx, [rsp+19]" << std::endl
+             << "sub rdx, rdi" << std::endl
+             << "mov rdi, 1" << std::endl
+             << "syscall" << std::endl;
     }
 
     f->block->accept(*this);
