@@ -195,7 +195,8 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
     std::shared_ptr<Type> type;
     std::string name;
     int offset;
-    VarDecl(std::shared_ptr<Type> t, std::string n) : name(n), type(std::move(t)) {}
+    bool is_local;
+    VarDecl(std::shared_ptr<Type> t, std::string n, bool is_local) : name(n), type(std::move(t)), is_local(is_local) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
     }
@@ -300,6 +301,7 @@ struct FuncDecl : Decl, std::enable_shared_from_this<FuncDecl> {
     std::vector<std::shared_ptr<VarDecl>> args;
     std::shared_ptr<Block> block;
     int offset;
+    int local_offset = 0;
     FuncDecl(std::shared_ptr<Type> t, const char *n, std::vector<std::shared_ptr<VarDecl>> a) : name(n), type(t), args(a), block(std::make_shared<Block>()) {}
     FuncDecl(std::shared_ptr<Type> t, std::string& n, std::vector<std::shared_ptr<VarDecl>> a, std::shared_ptr<Block> b) : name(n), type(std::move(t)), args(std::move(a)), block(std::move(b)) {}
     void accept(Visitor<void>& visitor){
@@ -350,7 +352,7 @@ struct Program : public std::enable_shared_from_this<Program>{
         std::shared_ptr<Type> voidType = std::make_shared<Type>(std::make_shared<Token>(TT::VOID));
         std::shared_ptr<Type> t = std::make_shared<Type>(std::make_shared<Token>(TT::CHAR));
         t->pointerCount++;
-        std::vector<std::shared_ptr<VarDecl>> stringArg = {std::make_shared<VarDecl>(t, "c")};
+        std::vector<std::shared_ptr<VarDecl>> stringArg = {std::make_shared<VarDecl>(t, "c", false)};
         std::shared_ptr<Decl> emit_asm = std::make_shared<FuncDecl>(voidType,"emit_asm",std::move(stringArg));
         decls.insert(decls.begin(),emit_asm);
     }

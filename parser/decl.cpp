@@ -43,7 +43,7 @@ std::vector<std::shared_ptr<VarDecl>> Parser::args(){
         std::shared_ptr<Type> t = type();
         std::string name = consume(TT::IDENTIFIER, "Expected identifier in function declaration args")->value;
         array(t);
-        vardecls.push_back(std::make_shared<VarDecl>(std::move(t), name));
+        vardecls.push_back(std::make_shared<VarDecl>(std::move(t), name,false));
         if (accept(TT::RPAR)){
             break;
         }
@@ -75,7 +75,7 @@ std::shared_ptr<VarDecl> Parser::vardecl(){
     std::string name = consume(TT::IDENTIFIER, "Expected identifier in variable declaration")->value;
     array(t);
     consume(TT::SC, "Expected ';' after variable declaration");
-    return std::make_shared<VarDecl>(std::move(t), name);
+    return std::make_shared<VarDecl>(std::move(t), name, true);
 }
 
 std::shared_ptr<StructDecl> Parser::structdecl(){
@@ -109,7 +109,7 @@ std::shared_ptr<Decl> Parser::decl(){
 
     if (accept(TT::SC)){
         consume(TT::SC, "");
-        return std::make_shared<VarDecl>(t, name);
+        return std::make_shared<VarDecl>(t, name, true);
     }
 
     if (accept(TT::LPAR)){

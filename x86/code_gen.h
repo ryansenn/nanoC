@@ -11,6 +11,7 @@
 class Register{
 public:
     std::string name;
+    std::string value;
     Register(std::string name):name(name){}
 };
 
@@ -27,7 +28,7 @@ public:
     int registerCount = 0;
 
     std::shared_ptr<Register> getRegister(){
-        return registers[registerCount++];
+        return registers[registerCount++ % registers.size()];
     }
 
     void freeRegister(std::shared_ptr<Register> r){

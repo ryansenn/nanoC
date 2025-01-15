@@ -5,6 +5,7 @@
 #include "parser/parser.h"
 #include "semantic/name_analysis.h"
 #include "semantic/type_analysis.h"
+#include "memory/memory_allocation.h"
 #include "x86/code_gen.h"
 
 void printTokens(Lexer& lexer){
@@ -81,6 +82,9 @@ int main(int argc, char *argv[]) {
 
         TypeAnalysis t;
         program->accept(t);
+
+        MemoryAllocation m;
+        program->accept(m);
 
         CodeGen c("output.asm");
         program->accept(c);

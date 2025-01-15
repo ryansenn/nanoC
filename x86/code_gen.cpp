@@ -22,6 +22,10 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Program> p) {
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
 
+    if (f->name == "emit_asm"){
+        return NO_REGISTER;
+    }
+
     file << f->name << ":" << std::endl;
     file << "push rbp" << std::endl;
     file << "mov rbp, rsp" << std::endl;
@@ -84,13 +88,13 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
     std::shared_ptr<Register> r = NO_REGISTER;
 
-    std::shared_ptr<FuncDecl> f = std::dynamic_pointer_cast<FuncDecl>(c->symbol->decl);
-
     if (c->identifier->value == "emit_asm"){
         std::string instruction = std::dynamic_pointer_cast<Primary>(c->args[0])->token->value;
         file << instruction << std::endl;
         return r;
     }
+
+    std::shared_ptr<FuncDecl> f = std::dynamic_pointer_cast<FuncDecl>(c->symbol->decl);
 
     if (f->type->token->token_type != TT::VOID){
         r = reg_map["rax"];
@@ -120,13 +124,19 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             file << "add " + r->name + ", " + r2->name << std::endl;
             break;
         case TT::MINUS:
+            file << "mov " + r->name + ", " + r1->name << std::endl;
+            file << "sub " + r->name + ", " + r2->name << std::endl;
             break;
         case TT::ASTERISK:
+            file << "mov " + r->name + ", " + r1->name << std::endl;
+            file << "imul " + r->name + ", " + r2->name << std::endl;
             break;
         case TT::DIV:
             break;
         case TT::ASSIGN:
-            break;
+            file << "mov " + r1->name + ", " + r2->name << std::endl;
+            freeRegister(r);
+            return r1;
         case TT::REM:
             break;
         case TT::LE:
@@ -156,6 +166,13 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
     return r;
 }
 
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl> v){
+    if (v->is_local){
+
+    }
+    return NO_REGISTER;
+}
+
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<If> f) {
     return NULL;
 }
@@ -167,9 +184,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Break>){
     return NULL;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Continue>){
-    return NULL;
-}
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl>){
     return NULL;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
