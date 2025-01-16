@@ -265,6 +265,7 @@ public:
 
 struct Block : Stmt, std::enable_shared_from_this<Block> {
     std::vector<std::shared_ptr<Stmt>> stmts;
+    int offset = 0;
     Block(std::vector<std::shared_ptr<Stmt>> s) : stmts(std::move(s)) {}
     Block() {}
     void accept(Visitor<void>& visitor){
@@ -300,8 +301,6 @@ struct FuncDecl : Decl, std::enable_shared_from_this<FuncDecl> {
     std::string name;
     std::vector<std::shared_ptr<VarDecl>> args;
     std::shared_ptr<Block> block;
-    int offset;
-    int local_offset = 0;
     FuncDecl(std::shared_ptr<Type> t, const char *n, std::vector<std::shared_ptr<VarDecl>> a) : name(n), type(t), args(a), block(std::make_shared<Block>()) {}
     FuncDecl(std::shared_ptr<Type> t, std::string& n, std::vector<std::shared_ptr<VarDecl>> a, std::shared_ptr<Block> b) : name(n), type(std::move(t)), args(std::move(a)), block(std::move(b)) {}
     void accept(Visitor<void>& visitor){

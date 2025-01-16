@@ -9,6 +9,8 @@
 
 
 class MemoryAllocation : public Visitor<void> {
+    std::vector<std::shared_ptr<Block>> scopes = {std::make_shared<Block>()};
+
     void visit(std::shared_ptr<Program>) override;
     void visit(std::shared_ptr<FuncDecl>) override;
     void visit(std::shared_ptr<Block>) override;

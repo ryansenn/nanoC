@@ -30,15 +30,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
     file << "push rbp" << std::endl;
     file << "mov rbp, rsp" << std::endl;
 
-    int offset = 8;
-
-    for (auto it = f->args.rbegin();it != f->args.rend(); ++it){
-        offset += (*it)->type->size;
-        it->get()->offset = offset;
-    }
-
-    f->offset = offset-8;
-
     f->block->accept(*this);
 
     file << "mov rsp, rbp" << std::endl;
@@ -105,9 +96,14 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
         file << "push " + e->accept(*this)->name << std::endl;
     }
 
+    file << "push rbp" << std::endl;
+    file << "mov rbp, rsp" << std::endl;
+
     file << "call " + c->identifier->value << std::endl;
 
-    file << "add rsp, " + std::to_string(f->offset)  << std::endl;
+    file << "mov rsp, rbp" << std::endl;
+    file << "pop rbp" << std::endl;
+
 
     return r;
 }
