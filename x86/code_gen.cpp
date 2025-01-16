@@ -96,14 +96,9 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
         file << "push " + e->accept(*this)->name << std::endl;
     }
 
-    file << "push rbp" << std::endl;
-    file << "mov rbp, rsp" << std::endl;
-
     file << "call " + c->identifier->value << std::endl;
 
-    file << "mov rsp, rbp" << std::endl;
-    file << "pop rbp" << std::endl;
-
+    file << "add rsp, " + std::to_string(f->arg_offset)  << std::endl;
 
     return r;
 }

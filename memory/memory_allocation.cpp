@@ -25,6 +25,8 @@ void MemoryAllocation::visit(std::shared_ptr<FuncDecl> f) {
         it->get()->offset = offset;
     }
 
+    f->arg_offset = offset - 8;
+
     f->block->accept(*this);
 
 }
@@ -40,6 +42,12 @@ void MemoryAllocation::visit(std::shared_ptr<Block> b) {
     scopes.pop_back();
 }
 
+void MemoryAllocation::visit(std::shared_ptr<VarDecl> v){
+    if (v->is_local){
+
+    }
+}
+
 void MemoryAllocation::visit(std::shared_ptr<Return> f) {
 
 }
@@ -53,10 +61,6 @@ void MemoryAllocation::visit(std::shared_ptr<Call> c){
 }
 
 void MemoryAllocation::visit(std::shared_ptr<Binary> b){
-
-}
-
-void MemoryAllocation::visit(std::shared_ptr<VarDecl> v){
 
 }
 
