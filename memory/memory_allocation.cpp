@@ -43,8 +43,11 @@ void MemoryAllocation::visit(std::shared_ptr<Block> b) {
 }
 
 void MemoryAllocation::visit(std::shared_ptr<VarDecl> v){
-    if (v->is_local){
+    v->type->accept(*this);
 
+    if (v->is_local){
+        v->offset = -scopes.back()->offset - 8;
+        scopes.back()->offset += v->type->size;
     }
 }
 

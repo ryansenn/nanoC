@@ -66,9 +66,11 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
         case TT::CHAR_LITERAL:
             file << "mov " + r->name + ", " + p->token->value << std::endl;
             break;
-        case TT::IDENTIFIER:
-            //file << "mov " + r->name + ", " + p->token->value << std::endl;
+        case TT::IDENTIFIER: {
+            std::shared_ptr<VarDecl> v = std::dynamic_pointer_cast<VarDecl>(p->symbol->decl);
+            file << "mov " + r->name + ", " + v->getAddress() << std::endl;
             break;
+        }
         default:
             break;
     }
@@ -159,7 +161,9 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl> v){
     if (v->is_local){
-
+        std::shared_ptr<Register> r = getRegister();
+        file << "sub rsp, " + std::to_string(v->type->size) << std::endl;
+        return r;
     }
     return NO_REGISTER;
 }

@@ -35,10 +35,6 @@ public:
 
     }
 
-    std::string argAddress(std::shared_ptr<VarDecl> v){
-        return "[rbp + " + std::to_string(v->offset) + "]";
-    }
-
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<FuncDecl>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<Block>) override;

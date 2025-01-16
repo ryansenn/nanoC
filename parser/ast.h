@@ -197,6 +197,14 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
     int offset;
     bool is_local;
     VarDecl(std::shared_ptr<Type> t, std::string n, bool is_local) : name(n), type(std::move(t)), is_local(is_local) {}
+
+    std::string getAddress(){
+        if (offset < 0){
+            return "[rbp" + std::to_string(offset) + "]";
+        }
+        return "[rbp+" + std::to_string(offset) + "]";
+    }
+
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
     }
