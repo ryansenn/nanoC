@@ -1,23 +1,19 @@
 //
-// Created by Ryan Senoune on 2024-07-08.
+// Created by Ryan Senoune on 2025-01-17.
 //
 
-#ifndef COMPILER_CODE_GEN_H
-#define COMPILER_CODE_GEN_H
+#ifndef COMPILER_ADDR_GEN_H
+#define COMPILER_ADDR_GEN_H
 
+#include "asm_context.h"
 #include "fstream"
-#include "addr_gen.h"
 
+class AddrGen : public Visitor<std::shared_ptr<Register>>{
 
-
-class CodeGen : public Visitor<std::shared_ptr<Register>> {
-public:
     std::ofstream file;
-    AddrGen addrGen;
 
-    CodeGen(std::string name) : file(name), addrGen(file){
-        initRegistersMap();
-    }
+    AddrGen(std::ofstream file) : file(file) {}
+
 
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<FuncDecl>) override;
@@ -38,8 +34,7 @@ public:
     std::shared_ptr<Register> visit(std::shared_ptr<Type>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<FunProto>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<StructDecl>) override;
-
 };
 
 
-#endif //COMPILER_CODE_GEN_H
+#endif //COMPILER_ADDR_GEN_H
