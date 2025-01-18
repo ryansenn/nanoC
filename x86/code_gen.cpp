@@ -5,36 +5,34 @@
 #include "code_gen.h"
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Program> p) {
-
-    file << "section .text" << std::endl;
-    file << "global start" << std::endl;
+    asmContext->emit("section .text");
+    asmContext->emit("global start");
     for (const auto d : p->decls){
         d->accept(*this);
     }
-    file << "start:" << std::endl;
-    file << "call main" << std::endl;
-    file << "mov rdi, rax" << std::endl;
-    file << "mov rax, 0x2000001" << std::endl;
-    file << "syscall" << std::endl;
+    asmContext->emit("start:");
+    asmContext->emit("call main");
+    asmContext->emit("mov rdi, rax");
+    asmContext->emit("mov rax, 0x2000001");
+    asmContext->emit("syscall");
 
     return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
-
     if (f->name == "emit_asm"){
         return NO_REGISTER;
     }
 
-    file << f->name << ":" << std::endl;
-    file << "push rbp" << std::endl;
-    file << "mov rbp, rsp" << std::endl;
+    asmContext->emit(f->name + ":");
+    asmContext->emit("push rbp");
+    asmContext->emit("mov rbp, rsp");
 
     f->block->accept(*this);
 
-    file << "mov rsp, rbp" << std::endl;
-    file << "pop rbp" << std::endl;
-    file << "ret" << std::endl;
+    asmContext->emit("mov rsp, rbp");
+    asmContext->emit("pop rbp");
+    asmContext->emit("ret");
     return NO_REGISTER;
 }
 
@@ -47,28 +45,26 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Block> f) {
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
-
     if (f->expr.has_value()){
         std::shared_ptr<Register> r = f->expr->get()->accept(*this);
-        file << "mov rax, " + r->name << std::endl;
-        freeRegister(r);
+        asmContext->emit("mov rax, " + r->name);
+        asmContext->freeRegister(r);
     }
 
     return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
-
-    std::shared_ptr<Register> r = getRegister();
+    std::shared_ptr<Register> r = asmContext->getRegister();
 
     switch (p->token->token_type) {
         case TT::INT_LITERAL:
         case TT::CHAR_LITERAL:
-            file << "mov " + r->name + ", " + p->token->value << std::endl;
+            asmContext->emit("mov " + r->name + ", " + p->token->value);
             break;
         case TT::IDENTIFIER: {
             std::shared_ptr<VarDecl> v = std::dynamic_pointer_cast<VarDecl>(p->symbol->decl);
-            file << "mov " + r->name + ", " + v->getAddress() << std::endl;
+            asmContext->emit("mov " + r->name + ", " + v->getAddress());
             break;
         }
         default:
@@ -83,24 +79,22 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
 
     if (c->identifier->value == "emit_asm"){
         std::string instruction = std::dynamic_pointer_cast<Primary>(c->args[0])->token->value;
-        file << instruction << std::endl;
+        asmContext->emit(instruction);
         return r;
     }
 
     std::shared_ptr<FuncDecl> f = std::dynamic_pointer_cast<FuncDecl>(c->symbol->decl);
 
     if (f->type->token->token_type != TT::VOID){
-        r = reg_map["rax"];
+        r = asmContext->reg_map["rax"];
     }
 
-    // pushing arguments on stack
     for (std::shared_ptr<Expr> e : c->args){
-        file << "push " + e->accept(*this)->name << std::endl;
+        asmContext->emit("push " + e->accept(*this)->name);
     }
 
-    file << "call " + c->identifier->value << std::endl;
-
-    file << "add rsp, " + std::to_string(f->arg_offset)  << std::endl;
+    asmContext->emit("call " + c->identifier->value);
+    asmContext->emit("add rsp, " + std::to_string(f->arg_offset));
 
     return r;
 }
@@ -109,26 +103,26 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
     std::shared_ptr<Register> r1 = b->expr1->accept(*this);
     std::shared_ptr<Register> r2 = b->expr2->accept(*this);
 
-    std::shared_ptr<Register> r = getRegister();
+    std::shared_ptr<Register> r = asmContext->getRegister();
 
     switch (b->op->token_type) {
         case TT::PLUS:
-            file << "mov " + r->name + ", " + r1->name << std::endl;
-            file << "add " + r->name + ", " + r2->name << std::endl;
+            asmContext->emit("mov " + r->name + ", " + r1->name);
+            asmContext->emit("add " + r->name + ", " + r2->name);
             break;
         case TT::MINUS:
-            file << "mov " + r->name + ", " + r1->name << std::endl;
-            file << "sub " + r->name + ", " + r2->name << std::endl;
+            asmContext->emit("mov " + r->name + ", " + r1->name);
+            asmContext->emit("sub " + r->name + ", " + r2->name);
             break;
         case TT::ASTERISK:
-            file << "mov " + r->name + ", " + r1->name << std::endl;
-            file << "imul " + r->name + ", " + r2->name << std::endl;
+            asmContext->emit("mov " + r->name + ", " + r1->name);
+            asmContext->emit("imul " + r->name + ", " + r2->name);
             break;
         case TT::DIV:
             break;
         case TT::ASSIGN:
-            file << "mov " + r1->name + ", " + r2->name << std::endl;
-            freeRegister(r);
+            asmContext->emit("mov " + r1->name + ", " + r2->name);
+            asmContext->freeRegister(r);
             return r1;
         case TT::REM:
             break;
@@ -150,19 +144,18 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             break;
         default:
             break;
-
     }
 
-    freeRegister(r1);
-    freeRegister(r2);
+    asmContext->freeRegister(r1);
+    asmContext->freeRegister(r2);
 
     return r;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl> v){
     if (v->is_local){
-        std::shared_ptr<Register> r = getRegister();
-        file << "sub rsp, " + std::to_string(v->type->size) << std::endl;
+        std::shared_ptr<Register> r = asmContext->getRegister();
+        asmContext->emit("sub rsp, " + std::to_string(v->type->size));
         return r;
     }
     return NO_REGISTER;

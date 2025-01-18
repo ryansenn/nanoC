@@ -9,10 +9,10 @@
 #include "fstream"
 
 class AddrGen : public Visitor<std::shared_ptr<Register>>{
-
-    std::ofstream file;
-
-    AddrGen(std::ofstream file) : file(file) {}
+public:
+    std::shared_ptr<AsmContext> asmContext;
+    std::shared_ptr<Register> NO_REGISTER = asmContext->NO_REGISTER;
+    AddrGen(std::shared_ptr<AsmContext> asmContext) : asmContext(asmContext) {}
 
 
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;

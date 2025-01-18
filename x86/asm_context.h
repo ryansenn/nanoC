@@ -16,7 +16,7 @@ public:
 };
 
 class AsmContext {
-private:
+public:
     std::ofstream file;
     std::vector<std::shared_ptr<Register>> registers;
     std::unordered_map<std::string, std::shared_ptr<Register>> reg_map;
@@ -29,7 +29,6 @@ private:
         }
     }
 
-public:
     AsmContext(const std::string& filename) :
             file(filename),
             NO_REGISTER(std::make_shared<Register>("NO REGISTER")) {
@@ -55,10 +54,8 @@ public:
 
     void freeRegister(std::shared_ptr<Register>) {}
 
-    std::ofstream& getFile() { return file; }
-
-    const std::shared_ptr<Register>& getNullRegister() const {
-        return NO_REGISTER;
+    void emit(std::string s){
+        file << s << std::endl;
     }
 
     ~AsmContext() {

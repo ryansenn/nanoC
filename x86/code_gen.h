@@ -7,16 +7,19 @@
 
 #include "fstream"
 #include "addr_gen.h"
+#include "asm_context.h"
 
 
 
 class CodeGen : public Visitor<std::shared_ptr<Register>> {
 public:
-    std::ofstream file;
-    AddrGen addrGen;
 
-    CodeGen(std::string name) : file(name), addrGen(file){
-        initRegistersMap();
+    std::shared_ptr<AddrGen> addrGen;
+    std::shared_ptr<AsmContext> asmContext;
+    std::shared_ptr<Register> NO_REGISTER = asmContext->NO_REGISTER;
+
+    CodeGen(std::string name) : asmContext(std::make_shared<AsmContext>(name)), addrGen(std::make_shared<AddrGen>(asmContext)){
+
     }
 
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;

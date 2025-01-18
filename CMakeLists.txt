@@ -15,4 +15,5 @@ add_executable(compiler main.cpp
         semantic/type_analysis.cpp
         x86/code_gen.cpp
         memory/memory_allocation.cpp
+        x86/addr_gen.cpp
 )
