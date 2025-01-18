@@ -36,10 +36,15 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
     return NO_REGISTER;
 }
 
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Block> f) {
-    for (auto s : f->stmts){
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Block> b) {
+
+    asmContext->emit("sub rsp, " + std::to_string(b->offset));
+
+    for (auto s : b->stmts){
         s->accept(*this);
     }
+
+    asmContext->emit("add rsp, " + std::to_string(b->offset));
 
     return NO_REGISTER;
 }
@@ -158,11 +163,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl> v){
-    if (v->is_local){
-        std::shared_ptr<Register> r = asmContext->getRegister();
-        asmContext->emit("sub rsp, " + std::to_string(v->type->size));
-        return r;
-    }
     return NO_REGISTER;
 }
 
