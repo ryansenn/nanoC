@@ -100,6 +100,15 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
+
+
+    if (b->op->token_type == TT::ASSIGN){
+        std::string a1 = b->expr1->accept(*addrGen);
+        std::shared_ptr<Register> r2 = b->expr2->accept(*this);
+        asmContext->emit("mov " + a1 + ", " + r2->name);
+        return r2;
+    }
+
     std::shared_ptr<Register> r1 = b->expr1->accept(*this);
     std::shared_ptr<Register> r2 = b->expr2->accept(*this);
 
@@ -120,10 +129,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             break;
         case TT::DIV:
             break;
-        case TT::ASSIGN:
-            asmContext->emit("mov " + r1->name + ", " + r2->name);
-            asmContext->freeRegister(r);
-            return r1;
         case TT::REM:
             break;
         case TT::LE:

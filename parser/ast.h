@@ -82,6 +82,10 @@ public:
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 std::ostream& operator<<(std::ostream& os, const Type& type);
@@ -89,6 +93,7 @@ std::ostream& operator<<(std::ostream& os, const Type& type);
 struct Stmt {
     virtual void accept(Visitor<void>& visitor) = 0;
     virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
+    virtual std::string accept(Visitor<std::string>& visitor)=0;
 };
 
 struct Expr : Stmt{
@@ -97,6 +102,7 @@ public:
     bool lvalue = false;
     virtual void accept(Visitor<void>& visitor) = 0;
     virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
+    virtual std::string accept(Visitor<std::string>& visitor)=0;
 };
 
 
@@ -111,6 +117,10 @@ struct Subscript : Expr, std::enable_shared_from_this<Subscript> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 struct Member : Expr, std::enable_shared_from_this<Member> {
@@ -122,6 +132,10 @@ struct Member : Expr, std::enable_shared_from_this<Member> {
         visitor.visit(shared_from_this());
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
+    std::string accept(Visitor<std::string>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -138,7 +152,12 @@ struct Primary : Expr, std::enable_shared_from_this<Primary> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
+
 
 struct Call : Expr, std::enable_shared_from_this<Call> {
     std::shared_ptr<Token> identifier; // The operator is held into Token.value
@@ -151,6 +170,11 @@ struct Call : Expr, std::enable_shared_from_this<Call> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
 };
 
 struct Unary : Expr, std::enable_shared_from_this<Unary> {
@@ -161,6 +185,10 @@ struct Unary : Expr, std::enable_shared_from_this<Unary> {
         visitor.visit(shared_from_this());
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
+    std::string accept(Visitor<std::string>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -176,6 +204,10 @@ struct TypeCast : Expr, std::enable_shared_from_this<TypeCast> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 struct Binary : Expr, std::enable_shared_from_this<Binary> {
@@ -187,6 +219,10 @@ struct Binary : Expr, std::enable_shared_from_this<Binary> {
         visitor.visit(shared_from_this());
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
+    std::string accept(Visitor<std::string>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -211,6 +247,10 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 struct StructDecl : Decl, std::enable_shared_from_this<StructDecl> {
@@ -222,6 +262,10 @@ struct StructDecl : Decl, std::enable_shared_from_this<StructDecl> {
         visitor.visit(shared_from_this());
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
+    std::string accept(Visitor<std::string>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -237,6 +281,10 @@ public:
         visitor.visit(shared_from_this());
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
+    std::string accept(Visitor<std::string>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -255,6 +303,10 @@ public:
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 struct While : Stmt, std::enable_shared_from_this<While> {
@@ -267,6 +319,10 @@ public:
         visitor.visit(shared_from_this());
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
+    std::string accept(Visitor<std::string>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -282,6 +338,10 @@ struct Block : Stmt, std::enable_shared_from_this<Block> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 struct Continue : Stmt, std::enable_shared_from_this<Continue> {
@@ -292,6 +352,10 @@ struct Continue : Stmt, std::enable_shared_from_this<Continue> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 struct Break : Stmt, std::enable_shared_from_this<Break> {
@@ -300,6 +364,10 @@ struct Break : Stmt, std::enable_shared_from_this<Break> {
         visitor.visit(shared_from_this());
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
+    std::string accept(Visitor<std::string>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -318,6 +386,10 @@ struct FuncDecl : Decl, std::enable_shared_from_this<FuncDecl> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 struct FunProto : Decl, std::enable_shared_from_this<FunProto> {
@@ -331,6 +403,10 @@ struct FunProto : Decl, std::enable_shared_from_this<FunProto> {
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
         return visitor.visit(shared_from_this());
     }
+
+    std::string accept(Visitor<std::string>& visitor){
+        return visitor.visit(shared_from_this());
+    }
 };
 
 struct Program : public std::enable_shared_from_this<Program>{
@@ -340,6 +416,10 @@ struct Program : public std::enable_shared_from_this<Program>{
         visitor.visit(shared_from_this());
     }
     std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor){
+        return visitor.visit(shared_from_this());
+    }
+
+    std::string accept(Visitor<std::string>& visitor){
         return visitor.visit(shared_from_this());
     }
     void addStandardLibrary(){

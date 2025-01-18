@@ -5,70 +5,72 @@
 #include "addr_gen.h"
 
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Program> p) {
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Program> p) {
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<FuncDecl> f) {
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<FuncDecl> f) {
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Block> f) {
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Block> f) {
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Return> f) {
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Return> f) {
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Primary> p){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Primary> p){
+
+    std::shared_ptr<VarDecl> v = std::dynamic_pointer_cast<VarDecl>(p->symbol->decl);
+    return v->getAddress();
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Call> c){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Call> c){
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Binary> b){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Binary> b){
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<VarDecl> v){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<VarDecl> v){
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<If> f) {
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<If> f) {
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<While>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<While>){
+    return "";
 }
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Break>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Break>){
+    return "";
 }
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Continue>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Continue>){
+    return "";
 }
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Subscript>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Subscript>){
+    return "";
 }
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Member>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Member>){
+    return "";
 }
 
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Unary>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Unary>){
+    return "";
 }
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<TypeCast>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<TypeCast>){
+    return "";
 }
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Type>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<Type>){
+    return "";
 }
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<FunProto>){
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<FunProto>){
+    return "";
 }
-std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<StructDecl>) {
-    return NO_REGISTER;
+std::string AddrGen::visit(std::shared_ptr<StructDecl>) {
+    return "";
 }
