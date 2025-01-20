@@ -117,20 +117,15 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
     std::shared_ptr<Register> r1 = b->expr1->accept(*this);
     std::shared_ptr<Register> r2 = b->expr2->accept(*this);
 
-    std::shared_ptr<Register> r = asmContext->getRegister();
-
     switch (b->op->token_type) {
         case TT::PLUS:
-            asmContext->emit("mov " + r->name + ", " + r1->name);
-            asmContext->emit("add " + r->name + ", " + r2->name);
+            asmContext->emit("add " + r1->name + ", " + r2->name);
             break;
         case TT::MINUS:
-            asmContext->emit("mov " + r->name + ", " + r1->name);
-            asmContext->emit("sub " + r->name + ", " + r2->name);
+            asmContext->emit("sub " + r1->name + ", " + r2->name);
             break;
         case TT::ASTERISK:
-            asmContext->emit("mov " + r->name + ", " + r1->name);
-            asmContext->emit("imul " + r->name + ", " + r2->name);
+            asmContext->emit("imul " + r1->name + ", " + r2->name);
             break;
         case TT::DIV:
             break;
@@ -139,6 +134,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
         case TT::LE:
             break;
         case TT::LT:
+
             break;
         case TT::GE:
             break;
@@ -156,10 +152,9 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             break;
     }
 
-    asmContext->freeRegister(r1);
     asmContext->freeRegister(r2);
 
-    return r;
+    return r1;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl> v){

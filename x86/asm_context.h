@@ -11,8 +11,13 @@
 class Register {
 public:
     std::string name;
+    std::string name_d;
+    std::string name_w;
+    std::string name_b;
     std::string value;
-    Register(std::string name) : name(name) {}
+
+    Register(std::string name, std::string name_d, std::string name_w, std::string name_b)
+            : name(name), name_d(name_d), name_w(name_w), name_b(name_b) {}
 };
 
 class AsmContext {
@@ -31,19 +36,19 @@ public:
 
     AsmContext(const std::string& filename) :
             file(filename),
-            NO_REGISTER(std::make_shared<Register>("NO REGISTER")) {
+            NO_REGISTER(std::make_shared<Register>("NO REGISTER", "", "", "")) {
 
         registers = {
-                std::make_shared<Register>("r10"),
-                std::make_shared<Register>("r11"),
-                std::make_shared<Register>("r12"),
-                std::make_shared<Register>("r13"),
-                std::make_shared<Register>("r9"),
-                std::make_shared<Register>("r8"),
-                std::make_shared<Register>("rcx"),
-                std::make_shared<Register>("rdx"),
-                std::make_shared<Register>("rsi"),
-                std::make_shared<Register>("rdi")
+                std::make_shared<Register>("r10", "r10d", "r10w", "r10b"),
+                std::make_shared<Register>("r11", "r11d", "r11w", "r11b"),
+                std::make_shared<Register>("r12", "r12d", "r12w", "r12b"),
+                std::make_shared<Register>("r13", "r13d", "r13w", "r13b"),
+                std::make_shared<Register>("r9", "r9d", "r9w", "r9b"),
+                std::make_shared<Register>("r8", "r8d", "r8w", "r8b"),
+                std::make_shared<Register>("rcx", "ecx", "cx", "cl"),
+                std::make_shared<Register>("rdx", "edx", "dx", "dl"),
+                std::make_shared<Register>("rsi", "esi", "si", "sil"),
+                std::make_shared<Register>("rdi", "edi", "di", "dil")
         };
         initRegistersMap();
     }
@@ -54,7 +59,7 @@ public:
 
     void freeRegister(std::shared_ptr<Register>) {}
 
-    void emit(std::string s){
+    void emit(std::string s) {
         file << s << std::endl;
     }
 
