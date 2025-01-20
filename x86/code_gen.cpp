@@ -134,6 +134,9 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
         case TT::REM:
             break;
         case TT::LE:
+            asmContext->emit("cmp " + r1->name + ", " + r2->name);
+            asmContext->emit("setle " + r1->name_b);
+            asmContext->emit("movzx " + r1->name + ", " + r1->name_b);
             break;
         case TT::LT:
             asmContext->emit("cmp " + r1->name + ", " + r2->name);
@@ -141,12 +144,24 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             asmContext->emit("movzx " + r1->name + ", " + r1->name_b);
             break;
         case TT::GE:
+            asmContext->emit("cmp " + r1->name + ", " + r2->name);
+            asmContext->emit("setge " + r1->name_b);
+            asmContext->emit("movzx " + r1->name + ", " + r1->name_b);
             break;
         case TT::GT:
+            asmContext->emit("cmp " + r1->name + ", " + r2->name);
+            asmContext->emit("setg " + r1->name_b);
+            asmContext->emit("movzx " + r1->name + ", " + r1->name_b);
             break;
         case TT::EQ:
+            asmContext->emit("cmp " + r1->name + ", " + r2->name);
+            asmContext->emit("sete " + r1->name_b);
+            asmContext->emit("movzx " + r1->name + ", " + r1->name_b);
             break;
         case TT::NE:
+            asmContext->emit("cmp " + r1->name + ", " + r2->name);
+            asmContext->emit("setne " + r1->name_b);
+            asmContext->emit("movzx " + r1->name + ", " + r1->name_b);
             break;
         case TT::LOGOR:
             break;
