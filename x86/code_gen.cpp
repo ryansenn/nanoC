@@ -38,13 +38,15 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Block> b) {
 
-    asmContext->emit("sub rsp, " + std::to_string(b->offset));
+    if (b->offset)
+        asmContext->emit("sub rsp, " + std::to_string(b->offset));
 
     for (auto s : b->stmts){
         s->accept(*this);
     }
 
-    asmContext->emit("add rsp, " + std::to_string(b->offset));
+    if (b->offset)
+        asmContext->emit("add rsp, " + std::to_string(b->offset));
 
     return NO_REGISTER;
 }
@@ -134,7 +136,9 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
         case TT::LE:
             break;
         case TT::LT:
-
+            asmContext->emit("cmp " + r1->name + ", " + r2->name);
+            asmContext->emit("setl " + r1->name_b);
+            asmContext->emit("movzx " + r1->name + ", " + r1->name_b);
             break;
         case TT::GE:
             break;
