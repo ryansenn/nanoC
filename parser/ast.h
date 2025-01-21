@@ -66,7 +66,17 @@ public:
     Type(std::shared_ptr<Token> token) : token(token), pointerCount(0), arraySize(0) {}
 
     bool operator==(const Type& t) const {
-        return token->token_type == t.token->token_type && name == t.name && pointerCount == t.pointerCount && arraySize == t.arraySize;
+        bool s1 = token->token_type == t.token->token_type
+                && name == t.name
+                && pointerCount == t.pointerCount
+                && arraySize == t.arraySize;
+
+        // array decay
+        bool s2 = token->token_type == t.token->token_type
+                  && name == t.name
+                  && (pointerCount == t.arraySize.size() || t.pointerCount == arraySize.size());
+
+        return s1 || s2;
     }
 
     bool operator!=(const Type& t) const {

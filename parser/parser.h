@@ -10,6 +10,7 @@
 #include "parsing_exception.h"
 #include <deque>
 #include <vector>
+#include <fstream>
 
 class Parser{
 
@@ -37,7 +38,7 @@ public:
     std::shared_ptr<StructDecl> structdecl();
     std::shared_ptr<Decl> funcdecl(std::shared_ptr<Type> t, std::string& name);
     std::shared_ptr<Block> block();
-    void include();
+    std::vector<std::shared_ptr<Decl>> include();
     std::shared_ptr<Program> program();
     std::shared_ptr<Token> consume(TT expected, const std::string& message);
     std::shared_ptr<Token> consume(std::vector<TT> expected, const std::string& message);

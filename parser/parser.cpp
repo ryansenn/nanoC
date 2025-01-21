@@ -7,11 +7,13 @@
 Parser::Parser(Lexer &lexer):lexer(lexer) {}
 
 std::shared_ptr<Program> Parser::program(){
-    while (accept(TT::INCLUDE)){
-        include();
-    }
 
     std::vector<std::shared_ptr<Decl>> decls;
+
+    while (accept(TT::INCLUDE)){
+        std::vector<std::shared_ptr<Decl>> ext = include();
+        decls.insert(decls.end(), ext.begin(), ext.end());
+    }
 
     while (!accept(TT::END_OF_FILE)){
         decls.push_back(decl());
@@ -20,8 +22,34 @@ std::shared_ptr<Program> Parser::program(){
     return std::make_shared<Program>(std::move(decls));
 }
 
-void Parser::include(){
-    consume(TT::INCLUDE, "Expected #include directive");
+std::vector<std::shared_ptr<Decl>> Parser::include(){
+    std::string f = consume(TT::INCLUDE, "Expected #include directive")->value;
+    std::string path = "../std/" + f + ".c";
+    std::ifstream file(path);
+    std::string content;
+
+    if (file){
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        content = buffer.str();
+
+        Lexer lexer(content);
+
+        Parser parser(lexer);
+        std::shared_ptr<Program> program;
+        try{
+            program = parser.program();
+        }
+        catch(const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
+
+        return program->decls;
+
+    }
+    else{
+        throw parsing_exception("Invalid include path", peek(0));
+    }
 }
 
 std::shared_ptr<Token> Parser::consume(TT expected, const std::string& message){

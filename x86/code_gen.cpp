@@ -227,9 +227,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Member>){
     return NULL;
 }
 
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary>){
-    return NULL;
-}
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<TypeCast>){
     return NULL;
 }
