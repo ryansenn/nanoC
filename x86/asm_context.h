@@ -20,6 +20,7 @@ public:
             : name(name), name_d(name_d), name_w(name_w), name_b(name_b) {}
 };
 
+
 class AsmContext {
 public:
     std::ofstream file;
@@ -27,6 +28,7 @@ public:
     std::unordered_map<std::string, std::shared_ptr<Register>> reg_map;
     int registerCount = 0;
     std::shared_ptr<Register> NO_REGISTER;
+    int labelCounter = 0;
 
     void initRegistersMap() {
         for (const auto& reg : registers) {
@@ -55,6 +57,10 @@ public:
 
     std::shared_ptr<Register> getRegister() {
         return registers[registerCount++ % registers.size()];
+    }
+
+    std::string getLabel(std::string s){
+        return s + std::to_string(labelCounter++);
     }
 
     void freeRegister(std::shared_ptr<Register>) {}
