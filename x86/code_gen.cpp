@@ -30,9 +30,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
 
     f->block->accept(*this);
 
-    asmContext->emit("mov rsp, rbp");
-    asmContext->emit("pop rbp");
-    asmContext->emit("ret");
     return NO_REGISTER;
 }
 
@@ -168,15 +165,22 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<If> f) {
 
-    std::string b1 = asmContext->getLabel("if");
-    std::string b2 = asmContext->getLabel("else");
-    std::string b3 = asmContext->getLabel("end");
+    if (f->stmt2.has_value()){
+        std::string b1 = asmContext->getLabel("if");
+        std::string b2 = asmContext->getLabel("else");
+        std::string b3 = asmContext->getLabel("end");
+    }
+    else{
+        std::string b1 = asmContext->getLabel("if");
+        std::string b3 = asmContext->getLabel("end");
 
-    std::shared_ptr<Register> r = f->expr1->accept(*this);
-    asmContext->emit("cmp " + r->name + ", 1");
-    asmContext->emit("jne " + b2);
-    asmContext->emit(b1+":");
-    f->stmt1->accept(*this);
+        std::shared_ptr<Register> r = f->expr1->accept(*this);
+        asmContext->emit("cmp " + r->name + ", 1");
+        asmContext->emit("jne " + b3);
+        asmContext->emit(b1+":");
+        f->stmt1->accept(*this);
+        asmContext->emit(b3+":");
+    }
 
 
     return NO_REGISTER;
@@ -224,6 +228,9 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
         asmContext->emit("mov rax, " + r->name);
         asmContext->freeRegister(r);
     }
+    asmContext->emit("mov rsp, rbp");
+    asmContext->emit("pop rbp");
+    asmContext->emit("ret");
 
     return NO_REGISTER;
 }
