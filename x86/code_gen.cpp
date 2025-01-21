@@ -28,7 +28,14 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FuncDecl> f) {
     asmContext->emit("push rbp");
     asmContext->emit("mov rbp, rsp");
 
+    returnLabel = asmContext->getLabel("return");
+
     f->block->accept(*this);
+
+    asmContext->emit(returnLabel + ":");
+    asmContext->emit("mov rsp, rbp");
+    asmContext->emit("pop rbp");
+    asmContext->emit("ret");
 
     return NO_REGISTER;
 }
@@ -190,8 +197,22 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl> v){
     return NO_REGISTER;
 }
 
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<While>){
-    return NULL;
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<While> w){
+
+    std::string start = asmContext->getLabel("while");
+    std::string end = asmContext->getLabel("end");
+
+    asmContext->emit(start+":");
+    std::shared_ptr<Register> r = w->expr->accept(*this);
+    asmContext->emit("cmp " + r->name + ", 1");
+    asmContext->emit("jne " + end);
+
+    w->stmt->accept(*this);
+
+    asmContext->emit("jmp " + start);
+    asmContext->emit(end+":");
+
+    return NO_REGISTER;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Break>){
     return NULL;
@@ -228,9 +249,8 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
         asmContext->emit("mov rax, " + r->name);
         asmContext->freeRegister(r);
     }
-    asmContext->emit("mov rsp, rbp");
-    asmContext->emit("pop rbp");
-    asmContext->emit("ret");
+
+    asmContext->emit("jmp " + returnLabel);
 
     return NO_REGISTER;
 }

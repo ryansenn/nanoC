@@ -16,11 +16,10 @@ public:
 
     std::shared_ptr<AddrGen> addrGen;
     std::shared_ptr<AsmContext> asmContext;
-    std::shared_ptr<Register> NO_REGISTER = asmContext->NO_REGISTER;
+    std::shared_ptr<Register> NO_REGISTER;
+    std::string returnLabel = "";
 
-    CodeGen(std::string name) : asmContext(std::make_shared<AsmContext>(name)), addrGen(std::make_shared<AddrGen>(asmContext)){
-
-    }
+    CodeGen(std::string name) : asmContext(std::make_shared<AsmContext>(name)), addrGen(std::make_shared<AddrGen>(asmContext)), NO_REGISTER(asmContext->NO_REGISTER){}
 
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<FuncDecl>) override;

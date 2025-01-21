@@ -11,7 +11,6 @@
 class AddrGen : public Visitor<std::string>{
 public:
     std::shared_ptr<AsmContext> asmContext;
-    std::shared_ptr<Register> NO_REGISTER = asmContext->NO_REGISTER;
     AddrGen(std::shared_ptr<AsmContext> asmContext) : asmContext(asmContext) {}
 
 
