@@ -170,6 +170,20 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
     return r1;
 }
 
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary> u){
+    switch (u->op->token_type) {
+        case TT::MINUS: {
+            std::shared_ptr<Register> r = u->expr1->accept(*this);
+            asmContext->emit("neg " + r->name);
+            return r;
+        }
+        default:
+            break;
+    }
+
+    return NO_REGISTER;
+}
+
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<If> f) {
 
     if (f->stmt2.has_value()){
