@@ -2,7 +2,7 @@
 aB
 8]
 */
-
+#include <print>
 
 int main(){
     print_c('a');
