@@ -50,13 +50,14 @@ public:
                 std::make_shared<Register>("rcx", "ecx", "cx", "cl"),
                 std::make_shared<Register>("rdx", "edx", "dx", "dl"),
                 std::make_shared<Register>("rsi", "esi", "si", "sil"),
-                std::make_shared<Register>("rdi", "edi", "di", "dil")
+                std::make_shared<Register>("rdi", "edi", "di", "dil"),
+                std::make_shared<Register>("rax", "eax", "ax", "al")
         };
         initRegistersMap();
     }
 
     std::shared_ptr<Register> getRegister() {
-        return registers[registerCount++ % registers.size()];
+        return registers[registerCount++ % 10];
     }
 
     std::string getLabel(std::string s){
