@@ -18,6 +18,7 @@ public:
     std::shared_ptr<AsmContext> asmContext;
     std::shared_ptr<Register> NO_REGISTER;
     std::string returnLabel = "";
+    std::vector<std::pair<std::string,std::string>> loopLabels;
 
     CodeGen(std::string name) : asmContext(std::make_shared<AsmContext>(name)), addrGen(std::make_shared<AddrGen>(asmContext)), NO_REGISTER(asmContext->NO_REGISTER){}
 

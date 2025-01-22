@@ -216,6 +216,8 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<While> w){
     std::string start = asmContext->getLabel("while");
     std::string end = asmContext->getLabel("end");
 
+    loopLabels.push_back(std::make_pair(start,end));
+
     asmContext->emit(start+":");
     std::shared_ptr<Register> r = w->expr->accept(*this);
     asmContext->emit("cmp " + r->name + ", 1");
@@ -226,13 +228,21 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<While> w){
     asmContext->emit("jmp " + start);
     asmContext->emit(end+":");
 
+    loopLabels.pop_back();
+
     return NO_REGISTER;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Break>){
-    return NULL;
+
+    asmContext->emit("jmp " + loopLabels.back().second);
+
+    return NO_REGISTER;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Continue>){
-    return NULL;
+
+    asmContext->emit("jmp " + loopLabels.back().first);
+
+    return NO_REGISTER;
 }
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
     return NULL;
