@@ -63,6 +63,7 @@ void TypeAnalysis::visit(std::shared_ptr<Binary> b) {
         case TT::MINUS:
         case TT::ASTERISK:
         case TT::DIV:
+        case TT::REM:
         case TT::LOGAND:
         case TT::LOGOR:
         case TT::GT:

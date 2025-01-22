@@ -124,9 +124,15 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             asmContext->emit("imul " + r1->name + ", " + r2->name);
             break;
         case TT::DIV:
-            break;
+            asmContext->emit("mov rax, " + r1->name);
+            asmContext->emit("cqo");
+            asmContext->emit("idiv " + r2->name);
+            return asmContext->reg_map["rax"];
         case TT::REM:
-            break;
+            asmContext->emit("mov rax, " + r1->name);
+            asmContext->emit("cqo");
+            asmContext->emit("idiv " + r2->name);
+            return asmContext->reg_map["rdx"];
         case TT::LE:
             asmContext->emit("cmp " + r1->name + ", " + r2->name);
             asmContext->emit("setle " + r1->name_b);
