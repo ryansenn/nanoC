@@ -164,8 +164,10 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             asmContext->emit("movzx " + r1->name + ", " + r1->name_b);
             break;
         case TT::LOGOR:
+            asmContext->emit("or " + r1->name + ", " + r2->name);
             break;
         case TT::LOGAND:
+            asmContext->emit("and " + r1->name + ", " + r2->name);
             break;
         default:
             break;

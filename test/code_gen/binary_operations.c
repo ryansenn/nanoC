@@ -5,48 +5,40 @@
 -2
 1
 111110
+1001
 */
 #include <print>
 
 int main(){
-    int a;
-    a = 1+6;
-    print_i(a);
+
+    print_i(1+6);
     print_c('\n');
 
-    a = 9 - 3;
-    print_i(a);
+    print_i(9 - 3);
     print_c('\n');
 
-    a = 2 * 5;
-    print_i(a);
+    print_i(2 * 5);
     print_c('\n');
 
-    a = -5 / 2;
-    print_i(a);
+    print_i(-5 / 2);
     print_c('\n');
 
-    a = 5 % 2;
-    print_i(a);
+    print_i(5 % 2);
     print_c('\n');
 
-    a = 1 < 2;
-    print_i(a);
+    print_i(1 < 2);
+    print_i(2 > 1);
+    print_i(1 >= 1);
+    print_i(1 <= 1);
+    print_i(1 == 1);
+    print_i(1 != 1);
 
-    a = 2 > 1;
-    print_i(a);
+    print_c('\n');
 
-    a = 1 >= 1;
-    print_i(a);
-
-    a = 1 <= 1;
-    print_i(a);
-
-    a = 1 == 1;
-    print_i(a);
-
-    a = 1 != 1;
-    print_i(a);
+    print_i(1 || 0);
+    print_i(0 || 0);
+    print_i(1 && 0);
+    print_i(1 && 1);
 
     return 0;
 }
