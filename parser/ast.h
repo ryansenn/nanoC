@@ -188,7 +188,7 @@ struct Call : Expr, std::enable_shared_from_this<Call> {
 };
 
 struct Unary : Expr, std::enable_shared_from_this<Unary> {
-    std::shared_ptr<Token> op; // The operator is held into Token.token_type
+    std::shared_ptr<Token> op; // The operator is held into Token.token_type (- MINUS, * ASTERISK, & AND, ! NOT)
     std::shared_ptr<Expr> expr1;
     Unary(std::shared_ptr<Token> o, std::shared_ptr<Expr> e1) : op(std::move(o)), expr1(std::move(e1)) {}
     void accept(Visitor<void>& visitor){

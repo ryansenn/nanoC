@@ -179,17 +179,27 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary> u){
+
+    std::shared_ptr<Register> r = u->expr1->accept(*this);
+
     switch (u->op->token_type) {
-        case TT::MINUS: {
-            std::shared_ptr<Register> r = u->expr1->accept(*this);
+        case TT::MINUS:
             asmContext->emit("neg " + r->name);
-            return r;
-        }
+            break;
+        case TT::NOT:
+            asmContext->emit("test " + r->name + ", " + r->name);
+            asmContext->emit("sete " + r->name_b);
+            asmContext->emit("movzx " + r->name + ", " + r->name_b);
+            break;
+        case TT::ASTERISK:
+            break;
+        case TT::AND:
+            break;
         default:
             break;
     }
 
-    return NO_REGISTER;
+    return r;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<If> f) {
@@ -215,10 +225,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<If> f) {
     return NO_REGISTER;
 }
 
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl> v){
-    return NO_REGISTER;
-}
-
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<While> w){
 
     std::string start = asmContext->getLabel("while");
@@ -240,35 +246,16 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<While> w){
 
     return NO_REGISTER;
 }
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Break>){
 
-    asmContext->emit("jmp " + loopLabels.back().second);
-
-    return NO_REGISTER;
-}
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Continue>){
-
-    asmContext->emit("jmp " + loopLabels.back().first);
-
-    return NO_REGISTER;
-}
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
     return NULL;
 }
+
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Member>){
     return NULL;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<TypeCast>){
-    return NULL;
-}
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Type>){
-    return NULL;
-}
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FunProto>){
-    return NULL;
-}
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<StructDecl>){
     return NULL;
 }
 
@@ -281,5 +268,34 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
 
     asmContext->emit("jmp " + returnLabel);
 
+    return NO_REGISTER;
+}
+
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Break>){
+
+    asmContext->emit("jmp " + loopLabels.back().second);
+
+    return NO_REGISTER;
+}
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Continue>){
+
+    asmContext->emit("jmp " + loopLabels.back().first);
+
+    return NO_REGISTER;
+}
+
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FunProto>){
+    return NO_REGISTER;
+}
+
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<VarDecl> v){
+    return NO_REGISTER;
+}
+
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<StructDecl>){
+    return NO_REGISTER;
+}
+
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Type>){
     return NO_REGISTER;
 }
