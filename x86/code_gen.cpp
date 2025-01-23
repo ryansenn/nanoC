@@ -180,6 +180,13 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary> u){
 
+    if (u->op->token_type == TT::AND){
+        std::string a = u->expr1->accept(*addrGen);
+        std::shared_ptr<Register> r = asmContext->getRegister();
+        asmContext->emit("lea " + r->name + ", " + a);
+        return r;
+    }
+
     std::shared_ptr<Register> r = u->expr1->accept(*this);
 
     switch (u->op->token_type) {
@@ -192,8 +199,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary> u){
             asmContext->emit("movzx " + r->name + ", " + r->name_b);
             break;
         case TT::ASTERISK:
-            break;
-        case TT::AND:
             break;
         default:
             break;
