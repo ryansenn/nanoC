@@ -211,20 +211,29 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary> u){
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<If> f) {
 
     if (f->stmt2.has_value()){
-        std::string b1 = asmContext->getLabel("if");
-        std::string b2 = asmContext->getLabel("else");
-        std::string b3 = asmContext->getLabel("end");
-    }
-    else{
-        std::string b1 = asmContext->getLabel("if");
-        std::string b3 = asmContext->getLabel("end");
+        std::string else_label = asmContext->getLabel("else");
+        std::string end = asmContext->getLabel("end");
 
         std::shared_ptr<Register> r = f->expr1->accept(*this);
         asmContext->emit("cmp " + r->name + ", 1");
-        asmContext->emit("jne " + b3);
-        asmContext->emit(b1+":");
+        asmContext->emit("jne " + else_label);
+
         f->stmt1->accept(*this);
-        asmContext->emit(b3+":");
+        asmContext->emit("jmp " + end);
+
+        asmContext->emit(else_label+":");
+        f->stmt2->get()->accept(*this);
+
+        asmContext->emit(end+":");
+    }
+    else{
+        std::string end = asmContext->getLabel("end");
+
+        std::shared_ptr<Register> r = f->expr1->accept(*this);
+        asmContext->emit("cmp " + r->name + ", 1");
+        asmContext->emit("jne " + end);
+        f->stmt1->accept(*this);
+        asmContext->emit(end+":");
     }
 
 
