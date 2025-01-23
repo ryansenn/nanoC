@@ -199,6 +199,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary> u){
             asmContext->emit("movzx " + r->name + ", " + r->name_b);
             break;
         case TT::ASTERISK:
+            asmContext->emit("mov " + r->name + ", [" + r->name + "]");
             break;
         default:
             break;
