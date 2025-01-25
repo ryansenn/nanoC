@@ -263,15 +263,15 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<While> w){
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
-    return NULL;
+    return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Member>){
-    return NULL;
+    return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<TypeCast>){
-    return NULL;
+    return NO_REGISTER;
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {

@@ -4,11 +4,25 @@
 
 #include "memory_allocation.h"
 
-void MemoryAllocation::visit(std::shared_ptr<Program> p) {
-    for(auto s : p->decls){
-        s->accept(*this);
+
+void MemoryAllocation::visit(std::shared_ptr<StructDecl> s){
+    int alignment = 0;
+
+    for (auto v : s->varDecls){
+        v->accept(*this);
+        alignment = std::max(alignment, v->type->size);
+    }
+
+    int offset = 0;
+
+    for (auto v : s->varDecls){
+        v->offset = offset;
+        offset += v->type->size;
+        // padding
+        offset += (offset + alignment) % alignment;
     }
 }
+
 
 void MemoryAllocation::visit(std::shared_ptr<FuncDecl> f) {
 
@@ -119,6 +133,9 @@ void MemoryAllocation::visit(std::shared_ptr<Type> t){
 void MemoryAllocation::visit(std::shared_ptr<FunProto>){
 
 }
-void MemoryAllocation::visit(std::shared_ptr<StructDecl>){
 
+void MemoryAllocation::visit(std::shared_ptr<Program> p) {
+    for(auto s : p->decls){
+        s->accept(*this);
+    }
 }
