@@ -110,6 +110,7 @@ struct Expr : Stmt{
 public:
     std::shared_ptr<Type> type;
     bool lvalue = false;
+    std::shared_ptr<Symbol> symbol;
     virtual void accept(Visitor<void>& visitor) = 0;
     virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
     virtual std::string accept(Visitor<std::string>& visitor)=0;
@@ -154,7 +155,6 @@ struct Member : Expr, std::enable_shared_from_this<Member> {
 struct Primary : Expr, std::enable_shared_from_this<Primary> {
     // Inside of the token, we find the type (token.token_type) and value (token.value)
     std::shared_ptr<Token> token; // identifier, char, int
-    std::shared_ptr<Symbol> symbol;
     Primary(std::shared_ptr<Token> token) : token(std::move(token)) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());

@@ -7,20 +7,22 @@
 
 void MemoryAllocation::visit(std::shared_ptr<StructDecl> s){
     int alignment = 0;
-
-    for (auto v : s->varDecls){
-        v->accept(*this);
-        alignment = std::max(alignment, v->type->size);
-    }
-
+    int maxAlignment = 0;
     int offset = 0;
 
     for (auto v : s->varDecls){
+        v->accept(*this);
+        alignment = v->type->size;
+        maxAlignment = std::max(maxAlignment, alignment);
+
+        offset += (alignment - (offset % alignment)) % alignment;
         v->offset = offset;
+        std::cout << offset << std::endl;
         offset += v->type->size;
-        // padding
-        offset += (offset + alignment) % alignment;
     }
+
+    offset += (maxAlignment - (offset % maxAlignment)) % maxAlignment;
+    s->size = offset;
 }
 
 
@@ -39,9 +41,11 @@ void MemoryAllocation::visit(std::shared_ptr<FuncDecl> f) {
         it->get()->offset = offset;
     }
 
+
     f->arg_offset = offset - 8;
 
     f->block->accept(*this);
+
 
 }
 
@@ -58,7 +62,6 @@ void MemoryAllocation::visit(std::shared_ptr<Block> b) {
 
 void MemoryAllocation::visit(std::shared_ptr<VarDecl> v){
     v->type->accept(*this);
-
     if (v->is_local){
         v->offset = -scopes.back()->offset - 8;
         scopes.back()->offset += v->type->size;
@@ -111,13 +114,13 @@ void MemoryAllocation::visit(std::shared_ptr<Type> t){
     // size of type
     switch (t->token->token_type) {
         case TT::INT:
-            t->size = 8;
+            t->size = 4;
             break;
         case TT::VOID:
             t->size = 0;
             break;
         case TT::CHAR:
-            t->size = 8;
+            t->size = 1;
             break;
         case TT::STRUCT:
             t->size = std::dynamic_pointer_cast<StructDecl>(t->symbol->decl)->size;

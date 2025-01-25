@@ -24,7 +24,9 @@ std::shared_ptr<Stmt> Parser::stmt(){
         case TT::VOID:
         case TT::STRUCT:
         {
-            return vardecl();
+            std::shared_ptr<VarDecl> v = vardecl();
+            v->is_local = true;
+            return v;
         }
         case TT::LBRA:
             return block();

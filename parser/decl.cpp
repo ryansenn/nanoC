@@ -75,7 +75,7 @@ std::shared_ptr<VarDecl> Parser::vardecl(){
     std::string name = consume(TT::IDENTIFIER, "Expected identifier in variable declaration")->value;
     array(t);
     consume(TT::SC, "Expected ';' after variable declaration");
-    return std::make_shared<VarDecl>(std::move(t), name, true);
+    return std::make_shared<VarDecl>(std::move(t), name, false);
 }
 
 std::shared_ptr<StructDecl> Parser::structdecl(){

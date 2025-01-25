@@ -266,7 +266,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
     return NO_REGISTER;
 }
 
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Member>){
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Member> m){
     return NO_REGISTER;
 }
 
