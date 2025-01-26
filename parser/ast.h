@@ -12,6 +12,7 @@
 #include <sstream>
 #include "../lexer/token.h"
 
+
 template <typename T>
 class Visitor{
 public:
@@ -38,10 +39,27 @@ public:
 
 class Register;
 
+class Address {
+
+public:
+    std::string base;
+    int offset;
+
+    Address(std::string base, int offset) : base(base), offset(offset) {}
+
+    std::string str(){
+        if (offset < 0){
+            return "[" + base + std::to_string(offset) + "]";
+        }
+        return "[" + base + "+" + std::to_string(offset) + "]";
+    }
+};
+
 struct Decl {
     Decl(){}
     virtual void accept(Visitor<void>& visitor) = 0;
-    virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
+    virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor) = 0;
+    virtual Address accept(Visitor<Address>& visitor) = 0;
 };
 
 struct Symbol  : std::enable_shared_from_this<Symbol>{
@@ -93,7 +111,7 @@ public:
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -103,7 +121,7 @@ std::ostream& operator<<(std::ostream& os, const Type& type);
 struct Stmt {
     virtual void accept(Visitor<void>& visitor) = 0;
     virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
-    virtual std::string accept(Visitor<std::string>& visitor)=0;
+    virtual Address accept(Visitor<Address>& visitor)=0;
 };
 
 struct Expr : Stmt{
@@ -113,7 +131,7 @@ public:
     std::shared_ptr<Symbol> symbol;
     virtual void accept(Visitor<void>& visitor) = 0;
     virtual std::shared_ptr<Register> accept(Visitor<std::shared_ptr<Register>>& visitor)=0;
-    virtual std::string accept(Visitor<std::string>& visitor)=0;
+    virtual Address accept(Visitor<Address>& visitor)=0;
 };
 
 
@@ -129,7 +147,7 @@ struct Subscript : Expr, std::enable_shared_from_this<Subscript> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -146,7 +164,7 @@ struct Member : Expr, std::enable_shared_from_this<Member> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -163,7 +181,7 @@ struct Primary : Expr, std::enable_shared_from_this<Primary> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -181,7 +199,7 @@ struct Call : Expr, std::enable_shared_from_this<Call> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 
@@ -198,7 +216,7 @@ struct Unary : Expr, std::enable_shared_from_this<Unary> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -215,7 +233,7 @@ struct TypeCast : Expr, std::enable_shared_from_this<TypeCast> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -232,7 +250,7 @@ struct Binary : Expr, std::enable_shared_from_this<Binary> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -244,13 +262,6 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
     bool is_local;
     VarDecl(std::shared_ptr<Type> t, std::string n, bool is_local) : name(n), type(std::move(t)), is_local(is_local) {}
 
-    std::string getAddress(){
-        if (offset < 0){
-            return "[rbp" + std::to_string(offset) + "]";
-        }
-        return "[rbp+" + std::to_string(offset) + "]";
-    }
-
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
     }
@@ -258,7 +269,7 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -266,7 +277,7 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
 struct StructDecl : Decl, std::enable_shared_from_this<StructDecl> {
     std::vector<std::shared_ptr<VarDecl>> varDecls;
     std::string name;
-    int size = 8; // TO CHANGE NOT HARDCODE
+    int size;
     StructDecl(std::string& n) : name(n) {}
     void accept(Visitor<void>& visitor){
         visitor.visit(shared_from_this());
@@ -275,7 +286,7 @@ struct StructDecl : Decl, std::enable_shared_from_this<StructDecl> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -294,7 +305,7 @@ public:
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -314,7 +325,7 @@ public:
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -332,7 +343,7 @@ public:
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -349,7 +360,7 @@ struct Block : Stmt, std::enable_shared_from_this<Block> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -363,7 +374,7 @@ struct Continue : Stmt, std::enable_shared_from_this<Continue> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -377,7 +388,7 @@ struct Break : Stmt, std::enable_shared_from_this<Break> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -397,7 +408,7 @@ struct FuncDecl : Decl, std::enable_shared_from_this<FuncDecl> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -414,7 +425,7 @@ struct FunProto : Decl, std::enable_shared_from_this<FunProto> {
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
 };
@@ -429,7 +440,7 @@ struct Program : public std::enable_shared_from_this<Program>{
         return visitor.visit(shared_from_this());
     }
 
-    std::string accept(Visitor<std::string>& visitor){
+    Address accept(Visitor<Address>& visitor){
         return visitor.visit(shared_from_this());
     }
     void addStandardLibrary(){

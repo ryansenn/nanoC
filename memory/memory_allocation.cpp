@@ -5,8 +5,12 @@
 #include "memory_allocation.h"
 
 
+int MemoryAllocation::align(int offset, int alignment) {
+    return offset + ((alignment - (offset % alignment)) % alignment);
+}
+
 void MemoryAllocation::visit(std::shared_ptr<StructDecl> s){
-    int alignment = 0;
+    int alignment;
     int maxAlignment = 0;
     int offset = 0;
 
@@ -15,13 +19,12 @@ void MemoryAllocation::visit(std::shared_ptr<StructDecl> s){
         alignment = v->type->size;
         maxAlignment = std::max(maxAlignment, alignment);
 
-        offset += (alignment - (offset % alignment)) % alignment;
+        offset = align(offset, alignment);
         v->offset = offset;
-        std::cout << offset << std::endl;
         offset += v->type->size;
     }
 
-    offset += (maxAlignment - (offset % maxAlignment)) % maxAlignment;
+    offset = align(offset, maxAlignment);
     s->size = offset;
 }
 
@@ -42,6 +45,7 @@ void MemoryAllocation::visit(std::shared_ptr<FuncDecl> f) {
     }
 
 
+    //f->arg_offset = align(offset - 8, 8);
     f->arg_offset = offset - 8;
 
     f->block->accept(*this);
@@ -50,12 +54,17 @@ void MemoryAllocation::visit(std::shared_ptr<FuncDecl> f) {
 }
 
 void MemoryAllocation::visit(std::shared_ptr<Block> b) {
+    //scopes.back()->offset = align(scopes.back()->offset, 8);
+
     b->offset = scopes.back()->offset;
+
     scopes.push_back(b);
 
     for (auto s : b->stmts){
         s->accept(*this);
     }
+
+    //scopes.back()->offset = align(scopes.back()->offset, 8);
 
     scopes.pop_back();
 }
@@ -63,8 +72,8 @@ void MemoryAllocation::visit(std::shared_ptr<Block> b) {
 void MemoryAllocation::visit(std::shared_ptr<VarDecl> v){
     v->type->accept(*this);
     if (v->is_local){
-        v->offset = -scopes.back()->offset - 8;
         scopes.back()->offset += v->type->size;
+        v->offset = -scopes.back()->offset;
     }
 }
 
@@ -110,17 +119,20 @@ void MemoryAllocation::visit(std::shared_ptr<Unary>){
 void MemoryAllocation::visit(std::shared_ptr<TypeCast>){
 
 }
+
+// TODO Change type size by using subset of registers
+// TODO or write directly in stack instead of using push instruction
 void MemoryAllocation::visit(std::shared_ptr<Type> t){
     // size of type
     switch (t->token->token_type) {
         case TT::INT:
-            t->size = 4;
+            t->size = 8;
             break;
         case TT::VOID:
             t->size = 0;
             break;
         case TT::CHAR:
-            t->size = 1;
+            t->size = 8;
             break;
         case TT::STRUCT:
             t->size = std::dynamic_pointer_cast<StructDecl>(t->symbol->decl)->size;

@@ -126,6 +126,7 @@ void TypeAnalysis::visit(std::shared_ptr<Member> m) {
     for (auto v : structDecl->varDecls){
         if (v->name == m->member){
             m->type = std::make_shared<Type>(*(v->type));
+            m->symbol = std::make_shared<Symbol>(Symbol::Type::VAR, v);
             return;
         }
     }
