@@ -18,13 +18,45 @@ public:
 
     Register(std::string name, std::string name_d, std::string name_w, std::string name_b)
             : name(name), name_d(name_d), name_w(name_w), name_b(name_b) {}
+
+    std::string addr(){
+        return "[" + name  + "]";
+    }
+};
+
+class Address {
+
+public:
+    std::string base;
+    int offset;
+
+    Address(std::string base, int offset) : base(base), offset(offset) {}
+
+    std::string str(){
+        if (offset < 0){
+            return "[" + base + std::to_string(offset) + "]";
+        }
+        return "[" + base + "+" + std::to_string(offset) + "]";
+    }
 };
 
 
 class AsmContext {
 public:
     std::ofstream file;
-    std::vector<std::shared_ptr<Register>> registers;
+    std::vector<std::shared_ptr<Register>> registers = {
+            std::make_shared<Register>("r10", "r10d", "r10w", "r10b"),
+            std::make_shared<Register>("r11", "r11d", "r11w", "r11b"),
+            std::make_shared<Register>("r12", "r12d", "r12w", "r12b"),
+            std::make_shared<Register>("r13", "r13d", "r13w", "r13b"),
+            std::make_shared<Register>("r9", "r9d", "r9w", "r9b"),
+            std::make_shared<Register>("r8", "r8d", "r8w", "r8b"),
+            std::make_shared<Register>("rcx", "ecx", "cx", "cl"),
+            std::make_shared<Register>("rsi", "esi", "si", "sil"),
+            std::make_shared<Register>("rdi", "edi", "di", "dil"),
+            std::make_shared<Register>("rdx", "edx", "dx", "dl"),
+            std::make_shared<Register>("rax", "eax", "ax", "al")
+    };
     std::unordered_map<std::string, std::shared_ptr<Register>> reg_map;
     int registerCount = 0;
     std::shared_ptr<Register> NO_REGISTER;
@@ -40,19 +72,6 @@ public:
             file(filename),
             NO_REGISTER(std::make_shared<Register>("NO REGISTER", "", "", "")) {
 
-        registers = {
-                std::make_shared<Register>("r10", "r10d", "r10w", "r10b"),
-                std::make_shared<Register>("r11", "r11d", "r11w", "r11b"),
-                std::make_shared<Register>("r12", "r12d", "r12w", "r12b"),
-                std::make_shared<Register>("r13", "r13d", "r13w", "r13b"),
-                std::make_shared<Register>("r9", "r9d", "r9w", "r9b"),
-                std::make_shared<Register>("r8", "r8d", "r8w", "r8b"),
-                std::make_shared<Register>("rcx", "ecx", "cx", "cl"),
-                std::make_shared<Register>("rsi", "esi", "si", "sil"),
-                std::make_shared<Register>("rdi", "edi", "di", "dil"),
-                std::make_shared<Register>("rdx", "edx", "dx", "dl"),
-                std::make_shared<Register>("rax", "eax", "ax", "al")
-        };
         initRegistersMap();
     }
 

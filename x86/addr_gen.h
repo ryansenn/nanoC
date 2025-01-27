@@ -11,31 +11,38 @@
 
 
 
-class AddrGen : public Visitor<Address>{
+class AddrGen : public Visitor<std::shared_ptr<Register>>{
 public:
     std::shared_ptr<AsmContext> asmContext;
-    AddrGen(std::shared_ptr<AsmContext> asmContext) : asmContext(asmContext) {}
+    std::shared_ptr<Register> NO_REGISTER;
+    AddrGen(std::shared_ptr<AsmContext> asmContext) : asmContext(asmContext), NO_REGISTER(asmContext->NO_REGISTER) {}
 
+    std::string address(int offset){
+        if (offset < 0){
+            return "[rbp" + std::to_string(offset) + "]";
+        }
+        return "[rbp+" + std::to_string(offset) + "]";
+    }
 
-    Address visit(std::shared_ptr<Program>) override;
-    Address visit(std::shared_ptr<FuncDecl>) override;
-    Address visit(std::shared_ptr<Block>) override;
-    Address visit(std::shared_ptr<Return>) override;
-    Address visit(std::shared_ptr<If>) override;
-    Address visit(std::shared_ptr<While>) override;
-    Address visit(std::shared_ptr<Break>) override;
-    Address visit(std::shared_ptr<Continue>) override;
-    Address visit(std::shared_ptr<VarDecl>) override;
-    Address visit(std::shared_ptr<Subscript>) override;
-    Address visit(std::shared_ptr<Member>) override;
-    Address visit(std::shared_ptr<Call>) override;
-    Address visit(std::shared_ptr<Primary>) override;
-    Address visit(std::shared_ptr<Unary>) override;
-    Address visit(std::shared_ptr<TypeCast>) override;
-    Address visit(std::shared_ptr<Binary>) override;
-    Address visit(std::shared_ptr<Type>) override;
-    Address visit(std::shared_ptr<FunProto>) override;
-    Address visit(std::shared_ptr<StructDecl>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<FuncDecl>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Block>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Return>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<If>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<While>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Break>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Continue>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<VarDecl>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Subscript>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Member>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Call>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Primary>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Unary>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<TypeCast>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Binary>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<Type>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<FunProto>) override;
+    std::shared_ptr<Register> visit(std::shared_ptr<StructDecl>) override;
 };
 
 

@@ -64,9 +64,8 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
             asmContext->emit("mov " + r->name + ", " + p->token->value);
             break;
         case TT::IDENTIFIER: {
-            std::shared_ptr<VarDecl> v = std::dynamic_pointer_cast<VarDecl>(p->symbol->decl);
-            Address a = v->accept(*addrGen);
-            asmContext->emit("mov " + r->name + ", " + a.str());
+            std::shared_ptr<Register> a = p->accept(*addrGen);
+            asmContext->emit("mov " + r->name + ", " + a->addr());
             break;
         }
         default:
@@ -105,7 +104,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
 
 
     if (b->op->token_type == TT::ASSIGN){
-        std::string a1 = b->expr1->accept(*addrGen).str();
+        std::string a1 = b->expr1->accept(*addrGen)->addr();
         std::shared_ptr<Register> r2 = b->expr2->accept(*this);
         asmContext->emit("mov " + a1 + ", " + r2->name);
         return r2;
@@ -182,10 +181,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary> u){
 
     if (u->op->token_type == TT::AND){
-        std::string a = u->expr1->accept(*addrGen).str();
-        std::shared_ptr<Register> r = asmContext->getRegister();
-        asmContext->emit("lea " + r->name + ", " + a);
-        return r;
+        return u->expr1->accept(*addrGen);
     }
 
     std::shared_ptr<Register> r = u->expr1->accept(*this);
@@ -269,7 +265,7 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Member> m){
     std::shared_ptr<Register> r = asmContext->getRegister();
-    asmContext->emit("mov " + r->name + ", " + m->accept(*addrGen).str());
+    asmContext->emit("mov " + r->name + ", " + m->accept(*addrGen)->addr());
     return r;
 }
 
