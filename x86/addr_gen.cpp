@@ -40,11 +40,6 @@ std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Member> m){
 }
 
 std::shared_ptr<Register> AddrGen::visit(std::shared_ptr<Unary> u){
-
-    if (u->op->token_type == TT::ASTERISK && u->expr1->type->token->token_type == TT::STRUCT) {
-        return u->expr1->accept(*this);
-    }
-
     return NO_REGISTER;
 }
 

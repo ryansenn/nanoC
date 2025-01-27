@@ -1,5 +1,5 @@
 /*
-12b1
+12b12
 */
 
 #include <print>
@@ -22,15 +22,15 @@ int main(){
     a.a1 = 'b';
     a.p = &a.i1;
 
-    //print_i(a.i1);
-    //print_i(a.i2);
-    //print_c(a.a1);
-    //print_i(*a.p);
+    print_i(a.i1);
+    print_i(a.i2);
+    print_c(a.a1);
+    print_i(*(a.p));
 
     struct B b;
     b.p = &a;
 
-    print_i((*b.p).a2);
+    print_i((*(b.p)).i2);
 
     return 0;
 }

@@ -56,6 +56,12 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Block> b) {
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Primary> p){
+
+    // For struct, we return address instead of value
+    if (p->token->token_type == TT::IDENTIFIER && p->type->token->token_type == TT::STRUCT){
+        return p->accept(*addrGen);
+    }
+
     std::shared_ptr<Register> r = asmContext->getRegister();
 
     switch (p->token->token_type) {
@@ -196,6 +202,9 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Unary> u){
             asmContext->emit("movzx " + r->name + ", " + r->name_b);
             break;
         case TT::ASTERISK:
+            if (u->expr1->type->token->token_type == TT::STRUCT){
+                return r;
+            }
             asmContext->emit("mov " + r->name + ", [" + r->name + "]");
             break;
         default:
@@ -264,8 +273,10 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
 }
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Member> m){
-    std::shared_ptr<Register> r = asmContext->getRegister();
-    asmContext->emit("mov " + r->name + ", " + m->accept(*addrGen)->addr());
+    std::shared_ptr<Register> r = m->structure->accept(*this);
+    int offset = std::dynamic_pointer_cast<VarDecl>( m->symbol->decl)->offset;
+    asmContext->emit("add " + r->name + ", " + std::to_string(offset));
+    asmContext->emit("mov " + r->name + ", " + r->addr());
     return r;
 }
 

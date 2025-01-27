@@ -24,22 +24,6 @@ public:
     }
 };
 
-class Address {
-
-public:
-    std::string base;
-    int offset;
-
-    Address(std::string base, int offset) : base(base), offset(offset) {}
-
-    std::string str(){
-        if (offset < 0){
-            return "[" + base + std::to_string(offset) + "]";
-        }
-        return "[" + base + "+" + std::to_string(offset) + "]";
-    }
-};
-
 
 class AsmContext {
 public:
