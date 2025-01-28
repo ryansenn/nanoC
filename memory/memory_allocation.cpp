@@ -36,17 +36,18 @@ void MemoryAllocation::visit(std::shared_ptr<FuncDecl> f) {
     }
 
 
-    // accounting for return address
-    int offset = 8;
+    // accounting for return address and pushed rbp
+    int offset = 16;
 
     for (auto it = f->args.rbegin();it != f->args.rend(); ++it){
-        offset += (*it)->type->size;
         it->get()->offset = offset;
+        offset += (*it)->type->size;
+        std::cout << f->name + " " << it->get()->name + " " + std::to_string(it->get()->offset) << std::endl;
     }
 
 
     //f->arg_offset = align(offset - 8, 8);
-    f->arg_offset = offset - 8;
+    f->arg_offset = offset - 16;
 
     f->block->accept(*this);
 

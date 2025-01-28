@@ -97,7 +97,19 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Call> c){
     }
 
     for (std::shared_ptr<Expr> e : c->args){
-        asmContext->emit("push " + e->accept(*this)->name);
+        if (e->type->token->token_type == TT::STRUCT && e->type->pointerCount == 0){
+            std::shared_ptr<Register> r = e->accept(*this);
+            int size = std::dynamic_pointer_cast<StructDecl>(e->type->symbol->decl)->size;
+            asmContext->emit("sub rsp, " + std::to_string(size));
+            asmContext->emit("mov rsi, " + r->name);
+            asmContext->emit("mov rdi, rsp");
+            asmContext->emit("mov rcx, " + std::to_string(size/8));
+            asmContext->emit("cld");
+            asmContext->emit("rep movsq");
+        }
+        else{
+            asmContext->emit("push " + e->accept(*this)->name);
+        }
     }
 
     asmContext->emit("call " + c->identifier->value);
