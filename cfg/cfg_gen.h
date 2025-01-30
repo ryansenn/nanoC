@@ -8,79 +8,94 @@
 
 #include "../parser/ast.h"
 
-class CFGNode {
-public:
-    int id;
-    std::vector<std::shared_ptr<CFGNode>> successors;
-    CFGNode(int i) : id(i) {}
-};
-
 class BasicBlock {
 public:
     int id;
-    std::vector<std::shared_ptr<CFGNode>> nodes;
+    std::vector<std::shared_ptr<BasicBlock>> predecessors;
+    std::vector<std::shared_ptr<BasicBlock>> successors;
     BasicBlock(int i) : id(i) {}
 };
 
-class cfg_gen : public Visitor<std::shared_ptr<BasicBlock>> {
+class CFG {
+public:
+    std::string name;
+    std::shared_ptr<BasicBlock> entry;
+    std::shared_ptr<BasicBlock> exit;
+    CFG(std::string name) : name(name) {}
+};
+
+class cfg_gen : public Visitor<void> {
 public:
 
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Program> program) override {
-        return nullptr;
+    std::vector<std::shared_ptr<CFG>> results;
+
+    std::shared_ptr<CFG> curr_cfg;
+    std::shared_ptr<BasicBlock> curr_block;
+
+    void visit(std::shared_ptr<Program> p) override {
+        for (auto d : p->decls){
+            d->accept(*this);
+        }
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<FuncDecl> func) override {
-        return nullptr;
+
+    void visit(std::shared_ptr<FuncDecl> f) override {
+        curr_cfg = std::make_shared<CFG>(f->name);
+        f->block->accept(*this);
+        results.push_back(curr_cfg);
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Block> block) override {
-        return nullptr;
+
+    void visit(std::shared_ptr<Block> b) override {
+        for (auto s : b->stmts){
+            s->accept(*this);
+        }
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Return> ret) override {
-        return nullptr;
+    void visit(std::shared_ptr<Return> ret) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<If> ifStmt) override {
-        return nullptr;
+    void visit(std::shared_ptr<If> ifStmt) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<While> whileStmt) override {
-        return nullptr;
+    void visit(std::shared_ptr<While> whileStmt) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Break> breakStmt) override {
-        return nullptr;
+    void visit(std::shared_ptr<Break> breakStmt) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Continue> continueStmt) override {
-        return nullptr;
+    void visit(std::shared_ptr<Continue> continueStmt) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<VarDecl> varDecl) override {
-        return nullptr;
+    void visit(std::shared_ptr<VarDecl> varDecl) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Subscript> subscript) override {
-        return nullptr;
+    void visit(std::shared_ptr<Subscript> subscript) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Member> member) override {
-        return nullptr;
+    void visit(std::shared_ptr<Member> member) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Call> call) override {
-        return nullptr;
+    void visit(std::shared_ptr<Call> call) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Primary> primary) override {
-        return nullptr;
+    void visit(std::shared_ptr<Primary> primary) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Unary> unary) override {
-        return nullptr;
+    void visit(std::shared_ptr<Unary> unary) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<TypeCast> typeCast) override {
-        return nullptr;
+    void visit(std::shared_ptr<TypeCast> typeCast) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Binary> binary) override {
-        return nullptr;
+    void visit(std::shared_ptr<Binary> binary) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<Type> type) override {
-        return nullptr;
+    void visit(std::shared_ptr<Type> type) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<FunProto> funProto) override {
-        return nullptr;
+    void visit(std::shared_ptr<FunProto> funProto) override {
+
     }
-    std::shared_ptr<BasicBlock> visit(std::shared_ptr<StructDecl> structDecl) override {
-        return nullptr;
+    void visit(std::shared_ptr<StructDecl> structDecl) override {
+
     }
 };
 
