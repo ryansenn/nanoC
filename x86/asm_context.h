@@ -41,10 +41,34 @@ public:
             std::make_shared<Register>("rdx", "edx", "dx", "dl"),
             std::make_shared<Register>("rax", "eax", "ax", "al")
     };
+
     std::unordered_map<std::string, std::shared_ptr<Register>> reg_map;
-    int registerCount = 0;
     std::shared_ptr<Register> NO_REGISTER;
-    int labelCounter = 0;
+
+    int MAX_REGISTER = 9;
+    int curr_register = 0;
+    int curr_label = 0;
+
+    std::shared_ptr<Register> getRegister() {
+        if (curr_register >= MAX_REGISTER){
+            spill();
+        }
+        return registers[curr_register++ % MAX_REGISTER];
+    }
+
+    void freeRegister(std::shared_ptr<Register> r) {
+        if (curr_register >= MAX_REGISTER){
+
+        }
+    }
+
+    std::string getLabel(std::string s){
+        return s + std::to_string(curr_label++);
+    }
+
+    void emit(std::string s) {
+        file << s << std::endl;
+    }
 
     void initRegistersMap() {
         for (const auto& reg : registers) {
@@ -57,20 +81,6 @@ public:
             NO_REGISTER(std::make_shared<Register>("NO REGISTER", "", "", "")) {
 
         initRegistersMap();
-    }
-
-    std::shared_ptr<Register> getRegister() {
-        return registers[registerCount++ % 9];
-    }
-
-    std::string getLabel(std::string s){
-        return s + std::to_string(labelCounter++);
-    }
-
-    void freeRegister(std::shared_ptr<Register>) {}
-
-    void emit(std::string s) {
-        file << s << std::endl;
     }
 
     ~AsmContext() {

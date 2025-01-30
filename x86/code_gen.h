@@ -17,6 +17,7 @@ public:
     std::shared_ptr<AsmContext> asmContext;
     std::shared_ptr<Register> NO_REGISTER;
     std::shared_ptr<AddrGen> addrGen;
+
     std::string returnLabel = "";
     std::vector<std::pair<std::string,std::string>> loopLabels;
 
