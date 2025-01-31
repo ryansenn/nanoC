@@ -7,6 +7,7 @@
 int VirtualRegister::count = 0;
 int BasicBlock::count = 0;
 
+
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Program> p) {
     for (auto d : p->decls){
         d->accept(*this);
@@ -73,4 +74,15 @@ std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<FunProto> funPro
 }
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<StructDecl> structDecl) {
 
+}
+
+void cfg_gen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::shared_ptr<VirtualRegister> r2){
+    std::vector<std::shared_ptr<VirtualRegister>> r = {r1,r2};
+    std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r);
+    curr_block->instructions.push_back(i);
+}
+void cfg_gen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1){
+    std::vector<std::shared_ptr<VirtualRegister>> r = {r1};
+    std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r);
+    curr_block->instructions.push_back(i);
 }

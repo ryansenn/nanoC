@@ -16,9 +16,10 @@ public:
 };
 
 class Instruction{
+public:
     std::string opcode;
     std::vector<std::shared_ptr<VirtualRegister>> registers;
-    Instruction(std::string opcode) : opcode(opcode) {}
+    Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers) : opcode(opcode), registers(registers) {}
 };
 
 class BasicBlock {
@@ -46,6 +47,9 @@ public:
 
     std::shared_ptr<CFG> curr_cfg;
     std::shared_ptr<BasicBlock> curr_block;
+
+    void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::shared_ptr<VirtualRegister> r2);
+    void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1);
 
     std::shared_ptr<VirtualRegister> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<VirtualRegister> visit(std::shared_ptr<FuncDecl>) override;
