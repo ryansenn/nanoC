@@ -3,3 +3,6 @@
 //
 
 #include "cfg_gen.h"
+
+int VirtualRegister::count = 0;
+int BasicBlock::count = 0;

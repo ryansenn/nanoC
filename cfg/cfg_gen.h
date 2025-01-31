@@ -8,12 +8,27 @@
 
 #include "../parser/ast.h"
 
+class VirtualRegister {
+public:
+    static int count;
+    int id;
+    VirtualRegister() : id(count++) {}
+};
+
+class Instruction{
+    std::string opcode;
+    std::vector<std::shared_ptr<VirtualRegister>> registers;
+    Instruction(std::string opcode) : opcode(opcode) {}
+};
+
 class BasicBlock {
 public:
+    static int count;
     int id;
+    std::vector<std::shared_ptr<Instruction>> instructions;
     std::vector<std::shared_ptr<BasicBlock>> predecessors;
     std::vector<std::shared_ptr<BasicBlock>> successors;
-    BasicBlock(int i) : id(i) {}
+    BasicBlock() : id(count++) {}
 };
 
 class CFG {
