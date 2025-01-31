@@ -19,7 +19,13 @@ class Instruction{
 public:
     std::string opcode;
     std::vector<std::shared_ptr<VirtualRegister>> registers;
-    Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers) : opcode(opcode), registers(registers) {}
+    std::string value;
+    std::string label;
+    Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers) :
+                opcode(opcode), registers(registers) {}
+    Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers, std::string value) :
+                opcode(opcode), registers(registers), value(value) {}
+
 };
 
 class BasicBlock {
@@ -48,8 +54,13 @@ public:
     std::shared_ptr<CFG> curr_cfg;
     std::shared_ptr<BasicBlock> curr_block;
 
+    std::unordered_map<std::shared_ptr<VarDecl>, std::shared_ptr<VirtualRegister>> symbol_table;
+
     void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::shared_ptr<VirtualRegister> r2);
     void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1);
+    void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::string value);
+
+    std::shared_ptr<VirtualRegister> getRegister();
 
     std::shared_ptr<VirtualRegister> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<VirtualRegister> visit(std::shared_ptr<FuncDecl>) override;

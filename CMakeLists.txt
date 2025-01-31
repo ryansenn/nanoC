@@ -16,4 +16,5 @@ add_executable(compiler main.cpp
         x86/code_gen.cpp
         memory/memory_allocation.cpp
         x86/addr_gen.cpp
+        cfg/cfg_gen.cpp
 )

@@ -250,7 +250,6 @@ struct Binary : Expr, std::enable_shared_from_this<Binary> {
 struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
     std::shared_ptr<Type> type;
     std::string name;
-    int offset;
     bool is_local;
     VarDecl(std::shared_ptr<Type> t, std::string n, bool is_local) : name(n), type(std::move(t)), is_local(is_local) {}
 
