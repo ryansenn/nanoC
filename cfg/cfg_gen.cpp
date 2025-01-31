@@ -12,24 +12,41 @@ std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Program> p) {
     for (auto d : p->decls){
         d->accept(*this);
     }
+
+    return NO_REGISTER;
 }
 
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<FuncDecl> f) {
     curr_cfg = std::make_shared<CFG>(f->name);
+
+    std::shared_ptr<BasicBlock> entry = std::make_shared<BasicBlock>();
+    curr_cfg->entry = entry;
+    curr_block = entry;
+
     f->block->accept(*this);
+
+    std::shared_ptr<BasicBlock> exit = std::make_shared<BasicBlock>();
+    curr_cfg->exit = exit;
+
     results.push_back(curr_cfg);
+
+    return NO_REGISTER;
 }
 
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Block> b) {
     for (auto s : b->stmts){
         s->accept(*this);
     }
+
+    return NO_REGISTER;
 }
 
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<VarDecl> v) {
     if (v->is_local){
         symbol_table[v] = getRegister();
     }
+
+    return NO_REGISTER;
 }
 
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Primary> p) {
@@ -51,6 +68,10 @@ std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Primary> p) {
     }
 
     return r;
+}
+
+std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Binary> b) {
+
 }
 
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Return> ret) {
@@ -84,9 +105,7 @@ std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Unary> unary) {
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<TypeCast> typeCast) {
 
 }
-std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Binary> binary) {
 
-}
 std::shared_ptr<VirtualRegister> cfg_gen::visit(std::shared_ptr<Type> type) {
 
 }

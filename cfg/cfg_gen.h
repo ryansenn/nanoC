@@ -21,8 +21,10 @@ public:
     std::vector<std::shared_ptr<VirtualRegister>> registers;
     std::string value;
     std::string label;
+
     Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers) :
                 opcode(opcode), registers(registers) {}
+
     Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers, std::string value) :
                 opcode(opcode), registers(registers), value(value) {}
 
@@ -33,7 +35,6 @@ public:
     static int count;
     int id;
     std::vector<std::shared_ptr<Instruction>> instructions;
-    std::vector<std::shared_ptr<BasicBlock>> predecessors;
     std::vector<std::shared_ptr<BasicBlock>> successors;
     BasicBlock() : id(count++) {}
 };
@@ -53,6 +54,7 @@ public:
 
     std::shared_ptr<CFG> curr_cfg;
     std::shared_ptr<BasicBlock> curr_block;
+    std::shared_ptr<VirtualRegister> NO_REGISTER = nullptr;
 
     std::unordered_map<std::shared_ptr<VarDecl>, std::shared_ptr<VirtualRegister>> symbol_table;
 
