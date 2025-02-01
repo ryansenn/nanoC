@@ -1,9 +1,9 @@
 //
-// Created by Ryan Senoune on 2025-01-29.
+// Created by Ryan Senoune on 2025-02-01.
 //
 
-#ifndef COMPILER_CFG_GEN_H
-#define COMPILER_CFG_GEN_H
+#ifndef COMPILER_INSTRUCTION_GEN_H
+#define COMPILER_INSTRUCTION_GEN_H
 
 
 #include "../parser/ast.h"
@@ -23,37 +23,17 @@ public:
     std::string label;
 
     Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers) :
-                opcode(opcode), registers(registers) {}
+            opcode(opcode), registers(registers) {}
 
     Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers, std::string value) :
-                opcode(opcode), registers(registers), value(value) {}
+            opcode(opcode), registers(registers), value(value) {}
 
 };
 
-class BasicBlock {
+class instruction_gen : public Visitor<std::shared_ptr<VirtualRegister>>{
 public:
-    static int count;
-    int id;
+
     std::vector<std::shared_ptr<Instruction>> instructions;
-    std::vector<std::shared_ptr<BasicBlock>> successors;
-    BasicBlock() : id(count++) {}
-};
-
-class CFG {
-public:
-    std::string name;
-    std::shared_ptr<BasicBlock> entry;
-    std::shared_ptr<BasicBlock> exit;
-    CFG(std::string name) : name(name) {}
-};
-
-class cfg_gen : public Visitor<std::shared_ptr<VirtualRegister>> {
-public:
-
-    std::vector<std::shared_ptr<CFG>> results;
-
-    std::shared_ptr<CFG> curr_cfg;
-    std::shared_ptr<BasicBlock> curr_block;
     std::shared_ptr<VirtualRegister> NO_REGISTER = nullptr;
 
     std::unordered_map<std::shared_ptr<VarDecl>, std::shared_ptr<VirtualRegister>> symbol_table;
@@ -86,5 +66,4 @@ public:
 };
 
 
-
-#endif //COMPILER_CFG_GEN_H
+#endif //COMPILER_INSTRUCTION_GEN_H
