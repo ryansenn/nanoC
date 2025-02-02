@@ -251,6 +251,7 @@ struct VarDecl : Decl, Stmt, std::enable_shared_from_this<VarDecl> {
     std::shared_ptr<Type> type;
     std::string name;
     bool is_local;
+    int offset = 0;
     VarDecl(std::shared_ptr<Type> t, std::string n, bool is_local) : name(n), type(std::move(t)), is_local(is_local) {}
 
     void accept(Visitor<void>& visitor){

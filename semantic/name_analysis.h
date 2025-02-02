@@ -16,6 +16,8 @@ class NameAnalysis : public Visitor<void> {
     std::shared_ptr<Symbol> get_local(std::string identifier);
     void put(std::string identifier, std::shared_ptr<Symbol> symbol);
 
+    int align(int offset, int alignment);
+
     void visit(std::shared_ptr<FuncDecl> func) override;
     void visit(std::shared_ptr<FunProto> funProto) override;
     void visit(std::shared_ptr<Call> call) override;

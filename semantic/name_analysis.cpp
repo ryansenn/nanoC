@@ -24,6 +24,10 @@ void NameAnalysis::put(std::string identifier, std::shared_ptr<Symbol> symbol) {
     scopes[scopes.size() - 1][identifier] = symbol;
 }
 
+int NameAnalysis::align(int offset, int alignment) {
+    return offset + ((alignment - (offset % alignment)) % alignment);
+}
+
 void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
     if (get_local(func->name)) {
         if (get_local(func->name)->type == Symbol::Type::PROTO) {
@@ -120,6 +124,26 @@ void NameAnalysis::visit(std::shared_ptr<StructDecl> structDecl) {
     for (auto v : structDecl->varDecls) {
         v->accept(*this);
     }
+
+
+    // assigning offsets
+    int alignment;
+    int maxAlignment = 0;
+    int offset = 0;
+
+    for (auto v : structDecl->varDecls){
+        v->accept(*this);
+        alignment = v->type->size;
+        maxAlignment = std::max(maxAlignment, alignment);
+
+        offset = align(offset, alignment);
+        v->offset = offset;
+        offset += v->type->size;
+    }
+
+    offset = align(offset, maxAlignment);
+    structDecl->size = offset;
+
     scopes.pop_back();
 }
 
@@ -198,6 +222,28 @@ void NameAnalysis::visit(std::shared_ptr<Type> t) {
             }
         }
         throw semantic_exception("Type struct '"+ t->name +"' is not declared", t->token);
+    }
+
+    // size of type
+    switch (t->token->token_type) {
+        case TT::INT:
+            t->size = 8;
+            break;
+        case TT::VOID:
+            t->size = 0;
+            break;
+        case TT::CHAR:
+            t->size = 8;
+            break;
+        case TT::STRUCT:
+            t->size = std::dynamic_pointer_cast<StructDecl>(t->symbol->decl)->size;
+            break;
+        default:
+            break;
+    }
+
+    if (t->pointerCount > 0){
+        t->size = 8;
     }
 }
 
