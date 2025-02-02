@@ -35,6 +35,7 @@ public:
 
     std::vector<std::shared_ptr<Instruction>> instructions;
     std::shared_ptr<VirtualRegister> NO_REGISTER = nullptr;
+    int label_id = 0;
 
     std::unordered_map<std::shared_ptr<VarDecl>, std::shared_ptr<VirtualRegister>> symbol_table;
 
@@ -43,6 +44,7 @@ public:
     void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::string value);
 
     std::shared_ptr<VirtualRegister> getRegister();
+    std::string getLabel(std::string name);
 
     std::shared_ptr<VirtualRegister> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<VirtualRegister> visit(std::shared_ptr<FuncDecl>) override;

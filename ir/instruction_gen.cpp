@@ -123,3 +123,7 @@ void instruction_gen::emit(std::string opcode, std::shared_ptr<VirtualRegister> 
 std::shared_ptr<VirtualRegister> instruction_gen::getRegister(){
     return std::make_shared<VirtualRegister>();
 }
+
+std::string instruction_gen::getLabel(std::string name) {
+    return name + std::to_string(label_id++);
+}
