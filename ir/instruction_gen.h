@@ -30,7 +30,7 @@ public:
 
 };
 
-class instruction_gen : public Visitor<std::shared_ptr<VirtualRegister>>{
+class InstructionGen : public Visitor<std::shared_ptr<VirtualRegister>>{
 public:
 
     std::vector<std::shared_ptr<Instruction>> instructions;
@@ -42,6 +42,7 @@ public:
     void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::shared_ptr<VirtualRegister> r2);
     void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1);
     void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::string value);
+    void emit(std::string opcode);
 
     std::shared_ptr<VirtualRegister> getRegister();
     std::string getLabel(std::string name);

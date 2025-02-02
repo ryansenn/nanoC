@@ -6,7 +6,7 @@
 
 int VirtualRegister::count = 0;
 
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Program> p) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Program> p) {
     for (auto d : p->decls){
         d->accept(*this);
     }
@@ -14,13 +14,13 @@ std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Program>
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<FuncDecl> f) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
 
 
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Block> b) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Block> b) {
     for (auto s : b->stmts){
         s->accept(*this);
     }
@@ -28,7 +28,7 @@ std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Block> b
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<VarDecl> v) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<VarDecl> v) {
     if (v->is_local){
         symbol_table[v] = getRegister();
     }
@@ -36,7 +36,7 @@ std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<VarDecl>
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Primary> p) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Primary> p) {
 
     std::shared_ptr<VirtualRegister> r;
 
@@ -57,73 +57,88 @@ std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Primary>
     return r;
 }
 
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Binary> b) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Return> r) {
+
+    if (r->expr.has_value()){
+        std::shared_ptr<VirtualRegister> v = r->expr->get()->accept(*this);
+        emit("ret", v);
+        return NO_REGISTER;
+    }
+    emit("ret");
+
+    return NO_REGISTER;
+}
+
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Binary> b) {
 
 }
 
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Return> ret) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<If> ifStmt) {
 
 }
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<If> ifStmt) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<While> whileStmt) {
 
 }
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<While> whileStmt) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Break> breakStmt) {
 
 }
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Break> breakStmt) {
-
-}
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Continue> continueStmt) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Continue> continueStmt) {
 
 }
 
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Subscript> subscript) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Subscript> subscript) {
 
 }
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Member> member) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Member> member) {
 
 }
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Call> call) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Call> call) {
 
 }
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Unary> unary) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Unary> unary) {
 
 }
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<TypeCast> typeCast) {
-
-}
-
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<Type> type) {
-
-}
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<FunProto> funProto) {
-
-}
-std::shared_ptr<VirtualRegister> instruction_gen::visit(std::shared_ptr<StructDecl> structDecl) {
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<TypeCast> typeCast) {
 
 }
 
-void instruction_gen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::shared_ptr<VirtualRegister> r2){
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Type> type) {
+
+}
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<FunProto> funProto) {
+
+}
+std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<StructDecl> structDecl) {
+
+}
+
+void InstructionGen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::shared_ptr<VirtualRegister> r2){
     std::vector<std::shared_ptr<VirtualRegister>> r = {r1,r2};
     std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r);
     instructions.push_back(i);
 }
-void instruction_gen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1){
+void InstructionGen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1){
     std::vector<std::shared_ptr<VirtualRegister>> r = {r1};
     std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r);
     instructions.push_back(i);
 }
 
-void instruction_gen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::string value){
+void InstructionGen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::string value){
     std::vector<std::shared_ptr<VirtualRegister>> r = {r1};
     std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r, value);
     instructions.push_back(i);
 }
 
-std::shared_ptr<VirtualRegister> instruction_gen::getRegister(){
+void InstructionGen::emit(std::string opcode){
+    std::vector<std::shared_ptr<VirtualRegister>> r;
+    std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r);
+    instructions.push_back(i);
+}
+
+std::shared_ptr<VirtualRegister> InstructionGen::getRegister(){
     return std::make_shared<VirtualRegister>();
 }
 
-std::string instruction_gen::getLabel(std::string name) {
+std::string InstructionGen::getLabel(std::string name) {
     return name + std::to_string(label_id++);
 }
