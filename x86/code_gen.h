@@ -12,11 +12,19 @@ class CodeGen {
 public:
 
     std::ofstream file;
-    std::vector<std::shared_ptr<Instruction>>& instructions;
+    std::vector<std::shared_ptr<Instruction>> instructions;
+    int index = 0;
+    std::unordered_map<int, int> reg_alloc;
 
 
-    CodeGen(const std::string& filename, std::vector<std::shared_ptr<Instruction>> instructions) :
-            file(filename), instructions(instructions) {}
+    CodeGen(const std::string& filename,
+            std::vector<std::shared_ptr<Instruction>>&& instructions,
+            std::unordered_map<int, int>&& reg_alloc) :
+            file(filename), instructions(instructions), reg_alloc(reg_alloc) {}
+
+    std::shared_ptr<Instruction> curr(){
+        return instructions[index];
+    }
 
     void generate();
 

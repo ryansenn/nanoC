@@ -24,7 +24,7 @@ std::unordered_map<int, int> naive_reg_alloc(std::vector<std::shared_ptr<Instruc
     if (offset > 0) {
 
         auto data_array = std::make_shared<Instruction>(
-                "space",
+                "global",
                 std::vector<std::shared_ptr<VirtualRegister>>{},
                 std::to_string(offset)
         );

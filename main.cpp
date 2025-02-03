@@ -6,6 +6,7 @@
 #include "semantic/name_analysis.h"
 #include "semantic/type_analysis.h"
 #include "ir/instruction_gen.h"
+#include "ir/reg_alloc.h"
 #include "x86/code_gen.h"
 
 void printTokens(Lexer& lexer){
@@ -85,9 +86,9 @@ int main(int argc, char *argv[]) {
 
         InstructionGen i;
         program->accept(i);
-        std::vector<std::shared_ptr<Instruction>> instructions = i.instructions;
+        std::unordered_map<int, int> reg_alloc = naive_reg_alloc(i.instructions);
 
-        CodeGen c("output.asm", instructions);
+        CodeGen c("output.asm", std::move(i.instructions), std::move(reg_alloc));
         c.generate();
 
     }

@@ -7,4 +7,16 @@
 
 void CodeGen::generate(){
 
+    if (curr()->opcode == "global"){
+        file << "section .data" << std::endl;
+
+        while (curr()->opcode == "global"){
+            file << curr()->label << ": resq " << std::to_string(std::stoi(curr()->value)/8) << std::endl;
+        }
+
+    }
+
+    file << "section .text" << std::endl;
+
+
 }

@@ -30,6 +30,9 @@ public:
     Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers, std::string value) :
             opcode(opcode), registers(registers), value(value) {}
 
+    Instruction(std::string opcode) :
+            opcode(opcode) {}
+
 };
 
 #endif //COMPILER_IR_H
