@@ -18,9 +18,7 @@ public:
     CodeGen(const std::string& filename, std::vector<std::shared_ptr<Instruction>> instructions) :
             file(filename), instructions(instructions) {}
 
-    void generate(){
-
-    }
+    void generate();
 
 };
 

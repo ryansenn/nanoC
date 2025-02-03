@@ -3,3 +3,8 @@
 //
 
 #include "code_gen.h"
+
+
+void CodeGen::generate(){
+
+}

@@ -7,28 +7,7 @@
 
 
 #include "../parser/ast.h"
-
-class VirtualRegister {
-public:
-    static int count;
-    int id;
-    VirtualRegister() : id(count++) {}
-};
-
-class Instruction{
-public:
-    std::string opcode;
-    std::vector<std::shared_ptr<VirtualRegister>> registers;
-    std::string value;
-    std::string label;
-
-    Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers) :
-            opcode(opcode), registers(registers) {}
-
-    Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers, std::string value) :
-            opcode(opcode), registers(registers), value(value) {}
-
-};
+#include "ir.h"
 
 class InstructionGen : public Visitor<std::shared_ptr<VirtualRegister>>{
 public:

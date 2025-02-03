@@ -14,7 +14,7 @@ add_executable(compiler main.cpp
         parser/ast.cc
         semantic/type_analysis.cpp
         x86/code_gen_deprecate.cpp
-        memory/memory_allocation.cpp
         x86/addr_gen.cpp
         ir/cfg_gen.cpp
+        ir/ir.h
 )
