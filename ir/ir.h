@@ -35,4 +35,25 @@ public:
 
 };
 
+class BranchInstruction : public Instruction {
+    std::string label;
+
+    BranchInstruction(std::string opcode, std::string label)
+            : Instruction(opcode), label(label) {}
+
+    BranchInstruction(std::string opcode,
+                      std::vector<std::shared_ptr<VirtualRegister>> registers,
+                      std::string label)
+            : Instruction(opcode, registers), label(label) {}
+};
+
+class Label : public Instruction {
+    std::string label;
+    bool funcDecl;
+
+    Label(std::string label, bool funcDecl)
+            : Instruction("LABEL"), label(std::move(label)), funcDecl(funcDecl) {}
+
+};
+
 #endif //COMPILER_IR_H
