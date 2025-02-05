@@ -61,10 +61,10 @@ std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Return> r
 
     if (r->expr.has_value()){
         std::shared_ptr<VirtualRegister> v = r->expr->get()->accept(*this);
-        emit("ret", v);
+        emit_branch("ret", v);
         return NO_REGISTER;
     }
-    emit("ret");
+    emit_branch("ret", "");
 
     return NO_REGISTER;
 }
@@ -135,19 +135,14 @@ void InstructionGen::emit(std::string opcode){
     instructions.push_back(i);
 }
 
-void InstructionGen::emit_branch(std::string opcode, std::string label, std::shared_ptr<VirtualRegister> r1) {
-    std::vector<std::shared_ptr<VirtualRegister>> r = {r1};
-    std::shared_ptr<BranchInstruction> i = std::make_shared<BranchInstruction>(opcode, r, label);
-    instructions.push_back(i);
-}
-
 void InstructionGen::emit_branch(std::string opcode, std::string label) {
     std::shared_ptr<BranchInstruction> i = std::make_shared<BranchInstruction>(opcode, label);
     instructions.push_back(i);
 }
 
-void InstructionGen::emit_branch(std::string opcode) {
-    std::shared_ptr<BranchInstruction> i = std::make_shared<BranchInstruction>(opcode, "");
+void InstructionGen::emit_branch(std::string opcode, std::shared_ptr<VirtualRegister> r1) {
+    std::vector<std::shared_ptr<VirtualRegister>> r = {r1};
+    std::shared_ptr<BranchInstruction> i = std::make_shared<BranchInstruction>(opcode, r);
     instructions.push_back(i);
 }
 

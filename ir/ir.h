@@ -43,9 +43,8 @@ public:
             : Instruction(opcode), label(label) {}
 
     BranchInstruction(std::string opcode,
-                      std::vector<std::shared_ptr<VirtualRegister>> registers,
-                      std::string label)
-            : Instruction(opcode, registers), label(label) {}
+                      std::vector<std::shared_ptr<VirtualRegister>> registers)
+            : Instruction(opcode, registers){}
 };
 
 class Label : public Instruction {
