@@ -22,14 +22,7 @@ std::unordered_map<int, int> naive_reg_alloc(std::vector<std::shared_ptr<Instruc
     }
 
     if (offset > 0) {
-
-        auto data_array = std::make_shared<Instruction>(
-                "global",
-                std::vector<std::shared_ptr<VirtualRegister>>{},
-                std::to_string(offset)
-        );
-        data_array->label = "reg_alloc";
-
+        std::shared_ptr<GlobalVariable> data_array = std::make_shared<GlobalVariable>("reg_alloc","resq",offset);
         instructions.insert(instructions.begin(), data_array);
     }
 

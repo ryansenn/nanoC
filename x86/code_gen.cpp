@@ -4,44 +4,59 @@
 
 #include "code_gen.h"
 
-void CodeGen::generate_instruction(){
-    std::shared_ptr<Instruction> i = curr();
-    file << i->opcode << " ";
-    for (auto r : i->registers){
-        file << reg_alloc[r->id] << " ";
+
+void CodeGen::generate(std::shared_ptr<BasicInstruction> i){
+
+}
+void CodeGen::generate(std::shared_ptr<GlobalVariable> i){
+
+}
+void CodeGen::generate(std::shared_ptr<BranchInstruction> i){
+
+}
+void CodeGen::generate(std::shared_ptr<Label> i){
+
+}
+
+void CodeGen::generate(std::shared_ptr<Instruction> i) {
+    if (auto basic = std::dynamic_pointer_cast<BasicInstruction>(i)) {
+        generate(basic);
     }
-    file << i->value;
-    file << std::endl;
+    else if (auto global = std::dynamic_pointer_cast<GlobalVariable>(i)) {
+        generate(global);
+    }
+    else if (auto branch = std::dynamic_pointer_cast<BranchInstruction>(i)) {
+        generate(branch);
+    }
+    else if (auto label = std::dynamic_pointer_cast<Label>(i)) {
+        generate(label);
+    }
 }
 
 void CodeGen::generate(){
 
-    if (curr()->opcode == "global"){
-        file << "section .data" << std::endl;
+    if (std::dynamic_pointer_cast<GlobalVariable>(curr()) ){
+        emit("section .data");
 
-        while (curr()->opcode == "global"){
-            file << curr()->label << ": resq " << std::to_string(std::stoi(curr()->value)/8) << std::endl;
+        while (std::dynamic_pointer_cast<GlobalVariable>(curr())){
+            generate(curr());
             index++;
         }
     }
 
-    file << "section .text" << std::endl;
-    file << "global main" << std::endl;
-    file << "main:" << std::endl;
-
-
-    file << "    push rbp" << std::endl;
-    file << "    mov rbp, rsp" << std::endl;
-
+    emit("section .text");
+    emit("global start");
 
     while (index < instructions.size()) {
-        generate_instruction();
+        generate(curr());
         index++;
     }
 
-
-    file << "    mov rsp, rbp" << std::endl;
-    file << "    pop rbp" << std::endl;
-    file << "    ret" << std::endl;
+    emit("start:");
+    emit("call main");
+    emit("mov rdi, rax");
+    emit("mov rax, 0x2000001");
+    emit("syscall");
 
 }
+

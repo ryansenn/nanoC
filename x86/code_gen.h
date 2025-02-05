@@ -6,7 +6,7 @@
 #define COMPILER_CODE_GEN_H
 
 #include <fstream>
-#include "../ir/instruction_gen.h"
+#include "../ir/ir.h"
 
 class CodeGen {
 public:
@@ -26,8 +26,17 @@ public:
         return instructions[index];
     }
 
+    void emit(std::string s) {
+        file << s << std::endl;
+    }
+
     void generate();
-    void generate(std::shared_ptr<Instruction>);
+    void generate(std::shared_ptr<Instruction> i);
+    void generate(std::shared_ptr<BasicInstruction> i);
+    void generate(std::shared_ptr<GlobalVariable> i);
+    void generate(std::shared_ptr<BranchInstruction> i);
+    void generate(std::shared_ptr<Label> i);
+
 
 };
 #endif //COMPILER_CODE_GEN_H

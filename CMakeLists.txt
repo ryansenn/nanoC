@@ -17,4 +17,5 @@ add_executable(compiler main.cpp
         x86/addr_gen.cpp
         ir/cfg_gen.cpp
         ir/ir.h
+        x86/code_gen.cpp
 )
