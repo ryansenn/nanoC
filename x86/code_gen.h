@@ -17,18 +17,17 @@ public:
     std::unordered_map<int, int> reg_alloc;
 
 
-    CodeGen(const std::string& filename,
-            std::vector<std::shared_ptr<Instruction>>&& instructions,
-            std::unordered_map<int, int>&& reg_alloc) :
+    CodeGen(const std::string &filename,
+            std::vector<std::shared_ptr<Instruction>> &&instructions,
+            std::unordered_map<int, int> &&reg_alloc) :
             file(filename), instructions(instructions), reg_alloc(reg_alloc) {}
 
-    std::shared_ptr<Instruction> curr(){
+    std::shared_ptr<Instruction> curr() {
         return instructions[index];
     }
 
     void generate();
+    void generate_instruction();
 
 };
-
-
 #endif //COMPILER_CODE_GEN_H

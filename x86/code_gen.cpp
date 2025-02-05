@@ -4,6 +4,15 @@
 
 #include "code_gen.h"
 
+void CodeGen::generate_instruction(){
+    std::shared_ptr<Instruction> i = curr();
+    file << i->opcode << " ";
+    for (auto r : i->registers){
+        file << reg_alloc[r->id] << " ";
+    }
+    file << i->value;
+    file << std::endl;
+}
 
 void CodeGen::generate(){
 
@@ -26,7 +35,7 @@ void CodeGen::generate(){
 
 
     while (index < instructions.size()) {
-
+        generate_instruction();
         index++;
     }
 
@@ -34,6 +43,5 @@ void CodeGen::generate(){
     file << "    mov rsp, rbp" << std::endl;
     file << "    pop rbp" << std::endl;
     file << "    ret" << std::endl;
-
 
 }
