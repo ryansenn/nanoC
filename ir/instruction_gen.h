@@ -22,6 +22,10 @@ public:
     void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1);
     void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::string value);
     void emit(std::string opcode);
+    void emit_branch(std::string opcode, std::string label, std::shared_ptr<VirtualRegister> r1);
+    void emit_branch(std::string opcode, std::string label);
+    void emit_branch(std::string opcode);
+    void emit_label(std::string label, bool isFunc);
 
     std::shared_ptr<VirtualRegister> getRegister();
     std::string getLabel(std::string name);

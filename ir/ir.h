@@ -36,6 +36,7 @@ public:
 };
 
 class BranchInstruction : public Instruction {
+public:
     std::string label;
 
     BranchInstruction(std::string opcode, std::string label)
@@ -48,6 +49,7 @@ class BranchInstruction : public Instruction {
 };
 
 class Label : public Instruction {
+public:
     std::string label;
     bool funcDecl;
 

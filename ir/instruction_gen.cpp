@@ -135,6 +135,27 @@ void InstructionGen::emit(std::string opcode){
     instructions.push_back(i);
 }
 
+void InstructionGen::emit_branch(std::string opcode, std::string label, std::shared_ptr<VirtualRegister> r1) {
+    std::vector<std::shared_ptr<VirtualRegister>> r = {r1};
+    std::shared_ptr<BranchInstruction> i = std::make_shared<BranchInstruction>(opcode, r, label);
+    instructions.push_back(i);
+}
+
+void InstructionGen::emit_branch(std::string opcode, std::string label) {
+    std::shared_ptr<BranchInstruction> i = std::make_shared<BranchInstruction>(opcode, label);
+    instructions.push_back(i);
+}
+
+void InstructionGen::emit_branch(std::string opcode) {
+    std::shared_ptr<BranchInstruction> i = std::make_shared<BranchInstruction>(opcode, "");
+    instructions.push_back(i);
+}
+
+void InstructionGen::emit_label(std::string label, bool isFunc) {
+    std::shared_ptr<Label> i = std::make_shared<Label>(label, isFunc);
+    instructions.push_back(i);
+}
+
 std::shared_ptr<VirtualRegister> InstructionGen::getRegister(){
     return std::make_shared<VirtualRegister>();
 }
