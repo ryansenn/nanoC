@@ -63,4 +63,16 @@ public:
             : opcode("LABEL"), label(std::move(label)), funcDecl(funcDecl) {}
 };
 
+class GlobalVariable : public Instruction {
+public:
+    std::string label;
+    std::string directive;
+    std::string value;
+    int size;
+
+    // Constructor for uninitialized variables (e.g., resq 4)
+    GlobalVariable(std::string directive, std::string label, int size)
+            : directive(std::move(directive)), label(std::move(label)), value(""), size(size) {}
+};
+
 #endif //COMPILER_IR_H
