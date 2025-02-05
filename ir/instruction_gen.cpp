@@ -15,7 +15,7 @@ std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Program> 
 }
 
 std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
-
+    emit_label(f->name, true);
 
     return NO_REGISTER;
 }
