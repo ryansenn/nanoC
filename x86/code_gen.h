@@ -27,7 +27,7 @@ public:
     }
 
     void generate();
-    void generate_instruction();
+    void generate(std::shared_ptr<Instruction>);
 
 };
 #endif //COMPILER_CODE_GEN_H

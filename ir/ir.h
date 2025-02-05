@@ -17,44 +17,50 @@ public:
     VirtualRegister() : id(count++) {}
 };
 
-class Instruction{
+
+class Instruction {
+public:
+    virtual ~Instruction() = default;  // Virtual destructor for polymorphism
+};
+
+class BasicInstruction : public Instruction {
 public:
     std::string opcode;
     std::vector<std::shared_ptr<VirtualRegister>> registers;
     std::string value;
-    std::string label;
 
-    Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers) :
+    BasicInstruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers) :
             opcode(opcode), registers(registers) {}
 
-    Instruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers, std::string value) :
+    BasicInstruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> registers, std::string value) :
             opcode(opcode), registers(registers), value(value) {}
 
-    Instruction(std::string opcode) :
+    BasicInstruction(std::string opcode) :
             opcode(opcode) {}
-
 };
 
 class BranchInstruction : public Instruction {
 public:
+    std::string opcode;
     std::string label;
+    std::vector<std::shared_ptr<VirtualRegister>> registers;
 
     BranchInstruction(std::string opcode, std::string label)
-            : Instruction(opcode), label(label) {}
+            : opcode(opcode), label(label) {}
 
     BranchInstruction(std::string opcode,
                       std::vector<std::shared_ptr<VirtualRegister>> registers)
-            : Instruction(opcode, registers){}
+            : opcode(opcode), registers(registers) {}
 };
 
 class Label : public Instruction {
 public:
+    std::string opcode;
     std::string label;
     bool funcDecl;
 
     Label(std::string label, bool funcDecl)
-            : Instruction("LABEL"), label(std::move(label)), funcDecl(funcDecl) {}
-
+            : opcode("LABEL"), label(std::move(label)), funcDecl(funcDecl) {}
 };
 
 #endif //COMPILER_IR_H
