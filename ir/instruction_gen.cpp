@@ -114,24 +114,24 @@ std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<StructDec
 
 void InstructionGen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::shared_ptr<VirtualRegister> r2){
     std::vector<std::shared_ptr<VirtualRegister>> r = {r1,r2};
-    std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r);
+    std::shared_ptr<Instruction> i = std::make_shared<BasicInstruction>(opcode, r);
     instructions.push_back(i);
 }
 void InstructionGen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1){
     std::vector<std::shared_ptr<VirtualRegister>> r = {r1};
-    std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r);
+    std::shared_ptr<Instruction> i = std::make_shared<BasicInstruction>(opcode, r);
     instructions.push_back(i);
 }
 
 void InstructionGen::emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::string value){
     std::vector<std::shared_ptr<VirtualRegister>> r = {r1};
-    std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r, value);
+    std::shared_ptr<Instruction> i = std::make_shared<BasicInstruction>(opcode, r, value);
     instructions.push_back(i);
 }
 
 void InstructionGen::emit(std::string opcode){
     std::vector<std::shared_ptr<VirtualRegister>> r;
-    std::shared_ptr<Instruction> i = std::make_shared<Instruction>(opcode, r);
+    std::shared_ptr<Instruction> i = std::make_shared<BasicInstruction>(opcode, r);
     instructions.push_back(i);
 }
 
