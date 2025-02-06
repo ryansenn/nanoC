@@ -28,8 +28,9 @@ public:
     void emit_branch(std::string opcode, std::shared_ptr<Register> r1);
     void emit_label(std::string label, bool isFunc);
 
-    std::shared_ptr<VirtualRegister> getRegister();
-    std::string getLabel(std::string name);
+    std::shared_ptr<VirtualRegister> gen_register();
+    std::string gen_label(std::string name);
+    std::shared_ptr<Register> get_address(std::shared_ptr<Expr> e);
 
     std::shared_ptr<Register> visit(std::shared_ptr<Program>) override;
     std::shared_ptr<Register> visit(std::shared_ptr<FuncDecl>) override;

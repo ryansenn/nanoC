@@ -34,7 +34,7 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
 
     emit_label(f->name, true);
 
-    return_label = getLabel("ret");
+    return_label = gen_label("ret");
 
     f->block->accept(*this);
 
@@ -53,7 +53,7 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Block> b) {
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<VarDecl> v) {
     if (v->is_local){
-        symbol_table[v] = getRegister();
+        symbol_table[v] = gen_register();
     }
 
     return NO_REGISTER;
@@ -66,7 +66,7 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Primary> p) {
     switch (p->token->token_type) {
         case TT::INT_LITERAL:
         case TT::CHAR_LITERAL:
-            r = getRegister();
+            r = gen_register();
             emit("mov", r, p->token->value);
             break;
         case TT::IDENTIFIER: {
@@ -102,6 +102,84 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Return> r) {
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Binary> b) {
+
+    if (b->op->token_type == TT::ASSIGN){
+        std::shared_ptr<Register> r1 = get_address(b->expr1);
+        std::shared_ptr<Register> r2 = b->expr2->accept(*this);
+        emit("mov", r1, r2);
+        return r2;
+    }
+
+    std::shared_ptr<Register> r1 = b->expr1->accept(*this);
+    std::shared_ptr<Register> r2 = b->expr2->accept(*this);
+    std::shared_ptr<Register> res = gen_register();
+
+    emit("mov", res, r1);
+
+    switch (b->op->token_type) {
+        case TT::PLUS:
+            emit("add", res, r2);
+            break;
+        case TT::MINUS:
+            emit("sub", res, r2);
+            break;
+        case TT::ASTERISK:
+            emit("imul", res, r2);
+            break;
+        case TT::DIV:
+            emit("mov", Register::get_physical_register("rax"), res);
+            emit("cqo");
+            emit("idiv", r2);
+            emit("mov", res, Register::get_physical_register("rax"));
+            break;
+        case TT::REM:
+            emit("mov", Register::get_physical_register("rax"), res);
+            emit("cqo");
+            emit("idiv", r2);
+            emit("mov", res, Register::get_physical_register("rdx"));
+            break;
+        case TT::LE:
+            emit("cmp", res, r2);
+            emit("setle", res);
+            emit("movzx", res, res);
+            break;
+        case TT::LT:
+            emit("cmp", res, r2);
+            emit("setl", res);
+            emit("movzx", res, res);
+            break;
+        case TT::GE:
+            emit("cmp", res, r2);
+            emit("setge", res);
+            emit("movzx", res, res);
+            break;
+        case TT::GT:
+            emit("cmp", res, r2);
+            emit("setg", res);
+            emit("movzx", res, res);
+            break;
+        case TT::EQ:
+            emit("cmp", res, r2);
+            emit("sete", res);
+            emit("movzx", res, res);
+            break;
+        case TT::NE:
+            emit("cmp", res, r2);
+            emit("setne", res);
+            emit("movzx", res, res);
+            break;
+        case TT::LOGOR:
+            emit("or", res, r2);
+            break;
+        case TT::LOGAND:
+            emit("and", res, r2);
+            break;
+        default:
+            break;
+    }
+
+    return res;
+
 
 }
 
@@ -180,10 +258,39 @@ void InstructionGen::emit_label(std::string label, bool isFunc) {
     instructions.push_back(i);
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::getRegister(){
+std::shared_ptr<VirtualRegister> InstructionGen::gen_register(){
     return std::make_shared<VirtualRegister>();
 }
 
-std::string InstructionGen::getLabel(std::string name) {
+std::string InstructionGen::gen_label(std::string name) {
     return name + std::to_string(label_id++);
+}
+
+std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
+    if (auto p = std::dynamic_pointer_cast<Primary>(e)) {
+        return symbol_table[std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)];
+    }
+    else if (auto s = std::dynamic_pointer_cast<Subscript>(e)) {
+        std::shared_ptr<Register> base = get_address(s->array);
+        std::shared_ptr<Register> index = s->index->accept(*this);
+        std::shared_ptr<Register> res = gen_register();
+        emit("mov", res, base);
+        emit("imul", index, std::to_string(s->type->size));
+        emit("add", res, index);
+        return res;
+    }
+    else if (auto m = std::dynamic_pointer_cast<Member>(e)) {
+        std::shared_ptr<Register> base = m->structure->accept(*this);
+        std::shared_ptr<VirtualRegister> res = gen_register();
+        emit("mov", res, base);
+        emit("add", res, std::to_string(std::dynamic_pointer_cast<VarDecl>(m->symbol->decl)->offset));
+        return res;
+    }
+    else if (auto u = std::dynamic_pointer_cast<Unary>(e)) {
+        if(u->op->token_type == TT::ASTERISK) {
+            return u->expr1->accept(*this);
+        }
+    }
+
+    return nullptr;
 }
