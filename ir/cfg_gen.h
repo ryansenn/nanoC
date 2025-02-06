@@ -5,8 +5,7 @@
 #ifndef COMPILER_CFG_GEN_H
 #define COMPILER_CFG_GEN_H
 
-
-#include "instruction_gen.h"
+#include "ir.h"
 
 
 class BasicBlock {

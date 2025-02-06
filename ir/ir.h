@@ -11,18 +11,45 @@
 #include <string>
 
 
-class VirtualRegister {
+class Register {
+public:
+    std::string name;
+    std::string name_d;
+    std::string name_w;
+    std::string name_b;
+    std::string value;
+    bool isVirtual = false;
+
+    Register(std::string name, std::string name_d, std::string name_w, std::string name_b)
+            : name(name), name_d(name_d), name_w(name_w), name_b(name_b) {}
+
+    static std::vector<std::shared_ptr<Register>> registers;
+
+    static std::shared_ptr<Register> get_physical_register(std::string name){
+        for (auto r : registers){
+            if (r->name == name){
+                return r;
+            }
+        }
+        return nullptr;
+    }
+
+};
+
+class VirtualRegister : public Register{
 public:
     static int count;
-    int id;
-    VirtualRegister() : id(count++) {}
+
+    VirtualRegister() : Register(std::to_string(count++), "", "", "") {
+        isVirtual = true;
+    }
 };
 
 class CodeGen;
 
 class Instruction {
 public:
-    std::vector<std::shared_ptr<VirtualRegister>> registers;
+    std::vector<std::shared_ptr<Register>> registers;
     virtual ~Instruction() = default;
 };
 
@@ -31,12 +58,12 @@ public:
     std::string opcode;
     std::string value;
 
-    BasicInstruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> regs) :
+    BasicInstruction(std::string opcode, std::vector<std::shared_ptr<Register>> regs) :
             opcode(opcode) {
         registers = regs;
     }
 
-    BasicInstruction(std::string opcode, std::vector<std::shared_ptr<VirtualRegister>> regs, std::string value) :
+    BasicInstruction(std::string opcode, std::vector<std::shared_ptr<Register>> regs, std::string value) :
             opcode(opcode), value(value) {
         registers = regs;
     }
@@ -55,7 +82,7 @@ public:
             : opcode(opcode), label(label) {}
 
     BranchInstruction(std::string opcode,
-                      std::vector<std::shared_ptr<VirtualRegister>> regs)
+                      std::vector<std::shared_ptr<Register>> regs)
             : opcode(opcode) {
         registers = regs;
     }
@@ -84,5 +111,6 @@ public:
             : directive(std::move(directive)), label(std::move(label)), value(""), size(size) {}
 
 };
+
 
 #endif //COMPILER_IR_H

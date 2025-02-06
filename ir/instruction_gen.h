@@ -14,16 +14,18 @@ public:
 
     std::vector<std::shared_ptr<Instruction>> instructions;
     std::shared_ptr<VirtualRegister> NO_REGISTER = nullptr;
+
     int label_id = 0;
+    std::string return_label = "";
 
     std::unordered_map<std::shared_ptr<VarDecl>, std::shared_ptr<VirtualRegister>> symbol_table;
 
-    void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::shared_ptr<VirtualRegister> r2);
-    void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1);
-    void emit(std::string opcode, std::shared_ptr<VirtualRegister> r1, std::string value);
+    void emit(std::string opcode, std::shared_ptr<Register> r1, std::shared_ptr<Register> r2);
+    void emit(std::string opcode, std::shared_ptr<Register> r1);
+    void emit(std::string opcode, std::shared_ptr<Register> r1, std::string value);
     void emit(std::string opcode);
     void emit_branch(std::string opcode, std::string label);
-    void emit_branch(std::string opcode, std::shared_ptr<VirtualRegister> r1);
+    void emit_branch(std::string opcode, std::shared_ptr<Register> r1);
     void emit_label(std::string label, bool isFunc);
 
     std::shared_ptr<VirtualRegister> getRegister();

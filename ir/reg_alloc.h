@@ -7,16 +7,18 @@
 
 #include "ir.h"
 
-std::unordered_map<int, int> naive_reg_alloc(std::vector<std::shared_ptr<Instruction>>& instructions) {
+std::unordered_map<std::string, int> naive_reg_alloc(std::vector<std::shared_ptr<Instruction>>& instructions) {
 
-    std::unordered_map<int, int> reg_to_mem;
+    std::unordered_map<std::string, int> reg_to_mem;
     int offset = 0;
 
     for (const auto& inst : instructions) {
         for (const auto& reg : inst->registers) {
-            if (reg && reg_to_mem.find(reg->id) == reg_to_mem.end()) {
-                reg_to_mem[reg->id] = offset;
-                offset += 8;
+            if (reg->isVirtual){
+                if (reg && reg_to_mem.find(reg->name) == reg_to_mem.end()) {
+                    reg_to_mem[reg->name] = offset;
+                    offset += 8;
+                }
             }
         }
     }

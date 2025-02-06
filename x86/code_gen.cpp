@@ -15,6 +15,7 @@ void CodeGen::generate(std::shared_ptr<BranchInstruction> i){
 
 }
 void CodeGen::generate(std::shared_ptr<Label> i){
+    emit(i->label + ":");
 
 }
 

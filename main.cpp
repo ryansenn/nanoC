@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
         InstructionGen i;
         program->accept(i);
-        std::unordered_map<int, int> reg_alloc = naive_reg_alloc(i.instructions);
+        std::unordered_map<std::string, int> reg_alloc = naive_reg_alloc(i.instructions);
 
         CodeGen c("output.asm", std::move(i.instructions), std::move(reg_alloc));
         c.generate();
