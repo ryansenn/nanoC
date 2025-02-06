@@ -6,17 +6,27 @@
 
 
 void CodeGen::generate(std::shared_ptr<BasicInstruction> i){
+    if (i->registers.size() == 1) {
+        emit(i->opcode + " " + i->registers[0]->name + ", " + i->value);
+        return;
+    }
 
+    if (i->registers.size() == 2) {
+        emit(i->opcode + " " + i->registers[0]->name + ", " + i->registers[1]->name);
+        return;
+    }
+
+    emit(i->opcode);
 }
 void CodeGen::generate(std::shared_ptr<GlobalVariable> i){
-
+    emit(i->label + ":");
+    emit("    " + i->directive + " " + std::to_string(i->size));
 }
 void CodeGen::generate(std::shared_ptr<BranchInstruction> i){
-
+    emit(i->opcode + " " + i->label);
 }
 void CodeGen::generate(std::shared_ptr<Label> i){
     emit(i->label + ":");
-
 }
 
 void CodeGen::generate(std::shared_ptr<Instruction> i) {
