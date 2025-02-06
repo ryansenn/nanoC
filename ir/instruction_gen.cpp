@@ -19,7 +19,7 @@ std::vector<std::shared_ptr<Register>> Register::registers = {
         std::make_shared<Register>("rax", "eax", "ax", "al")
 };
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Program> p) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Program> p) {
     for (auto d : p->decls){
         d->accept(*this);
     }
@@ -27,7 +27,11 @@ std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Program> 
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
+    if (f->name == "emit_asm"){
+        return NO_REGISTER;
+    }
+
     emit_label(f->name, true);
 
     return_label = getLabel("ret");
@@ -39,7 +43,7 @@ std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<FuncDecl>
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Block> b) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Block> b) {
     for (auto s : b->stmts){
         s->accept(*this);
     }
@@ -47,7 +51,7 @@ std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Block> b)
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<VarDecl> v) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<VarDecl> v) {
     if (v->is_local){
         symbol_table[v] = getRegister();
     }
@@ -55,7 +59,7 @@ std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<VarDecl> 
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Primary> p) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Primary> p) {
 
     std::shared_ptr<VirtualRegister> r;
 
@@ -76,57 +80,64 @@ std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Primary> 
     return r;
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Return> r) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Call> c) {
+    for (auto arg : c->args) {
+        std::shared_ptr<Register> arg_reg = arg->accept(*this);
+    }
+
+    emit_branch("call", c->identifier->value);
+
+    return Register::get_physical_register("rax");
+}
+
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Return> r) {
 
     if (r->expr.has_value()){
-        std::shared_ptr<VirtualRegister> v = r->expr->get()->accept(*this);
-        emit("mov", Register::get_physical_register(return_label), v);
+        std::shared_ptr<Register> v = r->expr->get()->accept(*this);
+        emit("mov", Register::get_physical_register("rax"), v);
     }
 
     emit_branch("jmp", return_label);
     return NO_REGISTER;
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Binary> b) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Binary> b) {
 
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<If> ifStmt) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<If> ifStmt) {
 
 }
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<While> whileStmt) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<While> whileStmt) {
 
 }
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Break> breakStmt) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Break> breakStmt) {
 
 }
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Continue> continueStmt) {
-
-}
-
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Subscript> subscript) {
-
-}
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Member> member) {
-
-}
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Call> call) {
-
-}
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Unary> unary) {
-
-}
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<TypeCast> typeCast) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Continue> continueStmt) {
 
 }
 
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<Type> type) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Subscript> subscript) {
 
 }
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<FunProto> funProto) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Member> member) {
 
 }
-std::shared_ptr<VirtualRegister> InstructionGen::visit(std::shared_ptr<StructDecl> structDecl) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Unary> unary) {
+
+}
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<TypeCast> typeCast) {
+
+}
+
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Type> type) {
+
+}
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FunProto> funProto) {
+
+}
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<StructDecl> structDecl) {
 
 }
 

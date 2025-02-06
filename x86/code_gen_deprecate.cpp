@@ -191,8 +191,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Binary> b){
             break;
     }
 
-    asmContext->freeRegister(r2);
-
     return r1;
 }
 

@@ -14,12 +14,12 @@ public:
     std::ofstream file;
     std::vector<std::shared_ptr<Instruction>> instructions;
     int index = 0;
-    std::unordered_map<std::string, int> reg_alloc;
+    std::unordered_map<std::string, std::string> reg_alloc;
 
 
     CodeGen(const std::string &filename,
             std::vector<std::shared_ptr<Instruction>> &&instructions,
-            std::unordered_map<std::string, int> &&reg_alloc) :
+            std::unordered_map<std::string, std::string> &&reg_alloc) :
             file(filename), instructions(instructions), reg_alloc(reg_alloc) {}
 
     std::shared_ptr<Instruction> curr() {
@@ -36,6 +36,8 @@ public:
     void generate(std::shared_ptr<GlobalVariable> i);
     void generate(std::shared_ptr<BranchInstruction> i);
     void generate(std::shared_ptr<Label> i);
+
+    std::string get_reg(std::shared_ptr<Register> r);
 
 
 };

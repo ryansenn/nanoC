@@ -5,27 +5,29 @@
 #include "code_gen.h"
 
 
-void CodeGen::generate(std::shared_ptr<BasicInstruction> i){
+void CodeGen::generate(std::shared_ptr<BasicInstruction> i) {
     if (i->registers.size() == 1) {
-        emit(i->opcode + " " + i->registers[0]->name + ", " + i->value);
+        emit(i->opcode + " " + get_reg(i->registers[0]) + ", " + i->value);
         return;
     }
 
     if (i->registers.size() == 2) {
-        emit(i->opcode + " " + i->registers[0]->name + ", " + i->registers[1]->name);
+        emit(i->opcode + " " + get_reg(i->registers[0]) + ", " + get_reg(i->registers[1]));
         return;
     }
 
     emit(i->opcode);
 }
 void CodeGen::generate(std::shared_ptr<GlobalVariable> i){
-    emit(i->label + ":");
-    emit("    " + i->directive + " " + std::to_string(i->size));
+    emit(i->label + ": " + i->directive + " " + std::to_string(i->size));
 }
 void CodeGen::generate(std::shared_ptr<BranchInstruction> i){
     emit(i->opcode + " " + i->label);
 }
 void CodeGen::generate(std::shared_ptr<Label> i){
+    if (i->funcDecl){
+        emit("");
+    }
     emit(i->label + ":");
 }
 
@@ -53,6 +55,7 @@ void CodeGen::generate(){
             generate(curr());
             index++;
         }
+        emit("");
     }
 
     emit("section .text");
@@ -63,6 +66,7 @@ void CodeGen::generate(){
         index++;
     }
 
+    emit("");
     emit("start:");
     emit("call main");
     emit("mov rdi, rax");
@@ -70,4 +74,12 @@ void CodeGen::generate(){
     emit("syscall");
 
 }
+
+std::string CodeGen::get_reg(std::shared_ptr<Register> r){
+    if (r->isVirtual){
+        return reg_alloc[r->name];
+    }
+    return r->name;
+}
+
 
