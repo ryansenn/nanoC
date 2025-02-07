@@ -215,8 +215,34 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Unary> u) {
     return res;
 }
 
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<If> ifStmt) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<If> f) {
+    if (f->stmt2.has_value()){
+        std::string else_label = gen_label("else");
+        std::string end = gen_label("end");
 
+        std::shared_ptr<Register> r = f->expr1->accept(*this);
+        emit("cmp", r,"1");
+        emit_branch("jne", else_label);
+
+        f->stmt1->accept(*this);
+        emit_branch("jmp", end);
+
+        emit_label(else_label, false);
+        f->stmt2->get()->accept(*this);
+
+        emit_label(end, false);
+    }
+    else{
+        std::string end = gen_label("end");
+
+        std::shared_ptr<Register> r = f->expr1->accept(*this);
+        emit("cmp", r, "1");
+        emit_branch("jne ", end);
+        f->stmt1->accept(*this);
+        emit_label(end, false);
+    }
+
+    return NO_REGISTER;
 }
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<While> whileStmt) {
 
