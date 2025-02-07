@@ -183,6 +183,10 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Binary> b) {
 
 }
 
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Unary> u) {
+
+}
+
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<If> ifStmt) {
 
 }
@@ -200,9 +204,6 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Subscript> subsc
 
 }
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Member> member) {
-
-}
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Unary> unary) {
 
 }
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<TypeCast> typeCast) {

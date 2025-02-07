@@ -17,7 +17,7 @@ public:
     std::string name_d;
     std::string name_w;
     std::string name_b;
-    std::string value;
+
     bool isVirtual = false;
 
     Register(std::string name, std::string name_d, std::string name_w, std::string name_b)
@@ -39,9 +39,23 @@ public:
 class VirtualRegister : public Register{
 public:
     static int count;
+    int size = 8;
 
     VirtualRegister() : Register(std::to_string(count++), "", "", "") {
         isVirtual = true;
+    }
+    VirtualRegister(std::string name, int size) : Register(name,"","",""), size(size) {}
+
+    std::shared_ptr<VirtualRegister> d(){
+        return std::make_shared<VirtualRegister>(name, 4);
+    }
+
+    std::shared_ptr<VirtualRegister> w(){
+        return std::make_shared<VirtualRegister>(name, 2);
+    }
+
+    std::shared_ptr<VirtualRegister> b(){
+        return std::make_shared<VirtualRegister>(name, 1);
     }
 };
 
