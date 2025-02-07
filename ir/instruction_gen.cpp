@@ -184,7 +184,35 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Binary> b) {
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Unary> u) {
+    if (u->op->token_type == TT::AND){
+        return get_address(u->expr1);
+    }
 
+    std::shared_ptr<Register> r = u->expr1->accept(*this);
+    std::shared_ptr<Register> res = gen_register();
+
+    emit("mov", res, r);
+
+    switch (u->op->token_type) {
+        case TT::MINUS:
+            emit("neg ", res);
+            break;
+        case TT::NOT:
+            emit("test", res, res);
+            emit("sete", res->b());
+            emit("movzx", res, res->b());
+            break;
+        case TT::ASTERISK:
+            if (u->expr1->type->token->token_type == TT::STRUCT){
+                return res;
+            }
+            emit("mov ", res, res->mem());
+            break;
+        default:
+            break;
+    }
+
+    return res;
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<If> ifStmt) {

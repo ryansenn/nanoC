@@ -17,11 +17,32 @@ public:
     std::string name_d;
     std::string name_w;
     std::string name_b;
-
+    int size = 8;
     bool isVirtual = false;
+    bool isMemoryOperand = false;
 
     Register(std::string name, std::string name_d, std::string name_w, std::string name_b)
             : name(name), name_d(name_d), name_w(name_w), name_b(name_b) {}
+
+    Register(std::string name, std::string name_d, std::string name_w, std::string name_b, int size, bool virt, bool mem)
+            : name(name), name_d(name_d), name_w(name_w), name_b(name_b), size(size), isVirtual(virt), isMemoryOperand(mem) {}
+
+    std::shared_ptr<Register> d(){
+        return std::make_shared<Register>(name, name_d, name_w, name_b, 4, isVirtual, isMemoryOperand);
+    }
+
+    std::shared_ptr<Register> w(){
+        return std::make_shared<Register>(name, name_d, name_w, name_b, 4, isVirtual, isMemoryOperand);
+    }
+
+    std::shared_ptr<Register> b(){
+        return std::make_shared<Register>(name, name_d, name_w, name_b, 4, isVirtual, isMemoryOperand);
+    }
+
+    std::shared_ptr<Register> mem(){
+        return std::make_shared<Register>(name, name_d, name_w, name_b, size, isVirtual, true);
+    }
+
 
     static std::vector<std::shared_ptr<Register>> registers;
 
@@ -39,24 +60,11 @@ public:
 class VirtualRegister : public Register{
 public:
     static int count;
-    int size = 8;
 
     VirtualRegister() : Register(std::to_string(count++), "", "", "") {
         isVirtual = true;
     }
-    VirtualRegister(std::string name, int size) : Register(name,"","",""), size(size) {}
 
-    std::shared_ptr<VirtualRegister> d(){
-        return std::make_shared<VirtualRegister>(name, 4);
-    }
-
-    std::shared_ptr<VirtualRegister> w(){
-        return std::make_shared<VirtualRegister>(name, 2);
-    }
-
-    std::shared_ptr<VirtualRegister> b(){
-        return std::make_shared<VirtualRegister>(name, 1);
-    }
 };
 
 class CodeGen;
