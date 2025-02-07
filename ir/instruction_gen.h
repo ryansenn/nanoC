@@ -17,6 +17,7 @@ public:
 
     int label_id = 0;
     std::string return_label = "";
+    std::vector<std::pair<std::string,std::string>> loop_labels;
 
     std::unordered_map<std::shared_ptr<VarDecl>, std::shared_ptr<VirtualRegister>> symbol_table;
 

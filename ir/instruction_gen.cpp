@@ -244,34 +244,53 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<If> f) {
 
     return NO_REGISTER;
 }
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<While> whileStmt) {
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<While> w) {
+    std::string start = gen_label("while");
+    std::string end = gen_label("end");
+
+    loop_labels.push_back(std::make_pair(start, end));
+
+    emit_label(start, false);
+
+    std::shared_ptr<Register> r = w->expr->accept(*this);
+    emit("cmp", r, "1");
+    emit_branch("jne", end);
+
+    w->stmt->accept(*this);
+
+    emit_branch("jmp", start);
+    emit_label(end, false);
+
+    loop_labels.pop_back();
+
+    return NO_REGISTER;
 
 }
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Break> breakStmt) {
 
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Break> b) {
+    emit_branch("jmp", loop_labels.back().second);
+    return NO_REGISTER;
 }
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Continue> continueStmt) {
 
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Continue>) {
+    emit_branch("jmp", loop_labels.back().first);
+    return NO_REGISTER;
+}
+
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Member> m) {
+    std::shared_ptr<Register> r = m->structure->accept(*this);
+    int offset = std::dynamic_pointer_cast<VarDecl>(m->symbol->decl)->offset;
+
+    emit("add", r, std::to_string(offset));
+
+    std::shared_ptr<VirtualRegister> res = gen_register();
+    emit("mov", res, r->mem());
+
+    return res;
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Subscript> subscript) {
-
-}
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Member> member) {
-
-}
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<TypeCast> typeCast) {
-
-}
-
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Type> type) {
-
-}
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FunProto> funProto) {
-
-}
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<StructDecl> structDecl) {
-
+    return NO_REGISTER;
 }
 
 void InstructionGen::emit(std::string opcode, std::shared_ptr<Register> r1, std::shared_ptr<Register> r2){
@@ -348,4 +367,18 @@ std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
     }
 
     return nullptr;
+}
+
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<TypeCast> typeCast) {
+    return NO_REGISTER;
+}
+
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Type> type) {
+    return NO_REGISTER;
+}
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FunProto> funProto) {
+    return NO_REGISTER;
+}
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<StructDecl> structDecl) {
+    return NO_REGISTER;
 }

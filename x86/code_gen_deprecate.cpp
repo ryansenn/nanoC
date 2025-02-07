@@ -278,6 +278,20 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<While> w){
     return NO_REGISTER;
 }
 
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Break>){
+
+    asmContext->emit("jmp " + loopLabels.back().second);
+
+    return NO_REGISTER;
+}
+
+std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Continue>){
+
+    asmContext->emit("jmp " + loopLabels.back().first);
+
+    return NO_REGISTER;
+}
+
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Subscript>){
     return NO_REGISTER;
 }
@@ -306,18 +320,6 @@ std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Return> f) {
     return NO_REGISTER;
 }
 
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Break>){
-
-    asmContext->emit("jmp " + loopLabels.back().second);
-
-    return NO_REGISTER;
-}
-std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<Continue>){
-
-    asmContext->emit("jmp " + loopLabels.back().first);
-
-    return NO_REGISTER;
-}
 
 std::shared_ptr<Register> CodeGen::visit(std::shared_ptr<FunProto>){
     return NO_REGISTER;
