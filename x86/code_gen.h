@@ -17,6 +17,7 @@ public:
     std::unordered_map<std::string, std::string> reg_alloc;
 
 
+
     CodeGen(const std::string &filename,
             std::vector<std::shared_ptr<Instruction>> &&instructions,
             std::unordered_map<std::string, std::string> &&reg_alloc) :
@@ -39,6 +40,17 @@ public:
 
     std::string get_reg(std::shared_ptr<Register> r);
 
+    const std::unordered_map<int, std::string> size_specifier = {
+            {1, "byte"},
+            {2, "word"},
+            {4, "dword"},
+            {8, "qword"}
+    };
+
+    std::string get_size_specifier(int size){
+            auto it = size_specifier.find(size);
+            return (it != size_specifier.end()) ? it->second : "unknown size";
+        }
 
 };
 #endif //COMPILER_CODE_GEN_H

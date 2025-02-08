@@ -32,6 +32,10 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
         return NO_REGISTER;
     }
 
+    for (auto v : f->args){
+        v->accept(*this);
+    }
+
     emit_label(f->name, true);
 
     return_label = gen_label("ret");
@@ -81,6 +85,12 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Primary> p) {
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Call> c) {
+    if (c->identifier->value == "emit_asm"){
+        emit("emit_asm", Register::get_physical_register("rax"),std::dynamic_pointer_cast<Primary>(c->args[0])->token->value);
+        return NO_REGISTER;
+    }
+
+
     for (auto arg : c->args) {
         std::shared_ptr<Register> arg_reg = arg->accept(*this);
     }
@@ -140,33 +150,33 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Binary> b) {
             break;
         case TT::LE:
             emit("cmp", res, r2);
-            emit("setle", res);
-            emit("movzx", res, res);
+            emit("setle", res->b());
+            emit("movzx", res, res->b());
             break;
         case TT::LT:
             emit("cmp", res, r2);
-            emit("setl", res);
-            emit("movzx", res, res);
+            emit("setl", res->b());
+            emit("movzx", res, res->b());
             break;
         case TT::GE:
             emit("cmp", res, r2);
-            emit("setge", res);
-            emit("movzx", res, res);
+            emit("setge", res->b());
+            emit("movzx", res, res->b());
             break;
         case TT::GT:
             emit("cmp", res, r2);
-            emit("setg", res);
-            emit("movzx", res, res);
+            emit("setg", res->b());
+            emit("movzx", res, res->b());
             break;
         case TT::EQ:
             emit("cmp", res, r2);
-            emit("sete", res);
-            emit("movzx", res, res);
+            emit("sete", res->b());
+            emit("movzx", res, res->b());
             break;
         case TT::NE:
             emit("cmp", res, r2);
-            emit("setne", res);
-            emit("movzx", res, res);
+            emit("setne", res->b());
+            emit("movzx", res, res->b());
             break;
         case TT::LOGOR:
             emit("or", res, r2);

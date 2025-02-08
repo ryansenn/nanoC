@@ -6,8 +6,17 @@
 
 
 void CodeGen::generate(std::shared_ptr<BasicInstruction> i) {
+    if (i->opcode == "emit_asm"){
+        emit(i->value);
+        return;
+    }
+
     if (i->registers.size() == 1) {
-        emit(i->opcode + " " + get_reg(i->registers[0]) + ", " + i->value);
+        if (i->value.size()){
+            emit(i->opcode + " " + get_reg(i->registers[0]) + ", " + i->value);
+            return;
+        }
+        emit(i->opcode + " " + get_reg(i->registers[0]));
         return;
     }
 
@@ -76,10 +85,26 @@ void CodeGen::generate(){
 }
 
 std::string CodeGen::get_reg(std::shared_ptr<Register> r){
+
+    std::string location;
+
     if (r->isVirtual){
-        return reg_alloc[r->name];
+        location = reg_alloc[r->name];
     }
-    return r->name;
+
+    else{
+        switch (r->size) {
+            case 4:
+                location = r->name_d;
+            case 2:
+                location = r->name_w;
+            case 1:
+                location = r->name_b;
+            default:
+                location = r->name;
+        }
+    }
+
+
+    return location;
 }
-
-

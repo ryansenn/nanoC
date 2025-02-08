@@ -62,6 +62,7 @@ void NameAnalysis::visit(std::shared_ptr<FuncDecl> func) {
 
     for (auto a : func->args){
         a->accept(*this);
+        a->is_local = true;
     }
     for (auto s : func->block->stmts){
         s->accept(*this);
@@ -132,7 +133,6 @@ void NameAnalysis::visit(std::shared_ptr<StructDecl> structDecl) {
     int offset = 0;
 
     for (auto v : structDecl->varDecls){
-        v->accept(*this);
         alignment = v->type->size;
         maxAlignment = std::max(maxAlignment, alignment);
 
