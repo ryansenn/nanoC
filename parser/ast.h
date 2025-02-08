@@ -77,7 +77,7 @@ public:
         // array decay
         bool s2 = token->token_type == t.token->token_type
                   && name == t.name
-                  && (pointerCount == t.arraySize.size() || t.pointerCount == arraySize.size());
+                  && (pointerCount + arraySize.size() == t.pointerCount + t.arraySize.size());
 
         return s1 || s2;
     }

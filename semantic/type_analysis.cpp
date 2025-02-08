@@ -20,7 +20,7 @@ void TypeAnalysis::visit(std::shared_ptr<Primary> p) {
             break;
         case TT::STRING_LITERAL:
             p->type = std::make_shared<Type>(std::make_shared<Token>(TT::CHAR));
-            p->type->arraySize.push_back(p->token->value.size()+1);
+            p->type->pointerCount++;
             break;
         default:
             break;

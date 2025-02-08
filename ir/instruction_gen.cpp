@@ -185,33 +185,33 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Binary> b) {
             break;
         case TT::LE:
             emit("cmp", res, r2);
-            emit("setle", res->b());
-            emit("movzx", res, res->b());
+            emit("setle", res->copy(1));
+            emit("movzx", res, res->copy(1));
             break;
         case TT::LT:
             emit("cmp", res, r2);
-            emit("setl", res->b());
-            emit("movzx", res, res->b());
+            emit("setl", res->copy(1));
+            emit("movzx", res, res->copy(1));
             break;
         case TT::GE:
             emit("cmp", res, r2);
-            emit("setge", res->b());
-            emit("movzx", res, res->b());
+            emit("setge", res->copy(1));
+            emit("movzx", res, res->copy(1));
             break;
         case TT::GT:
             emit("cmp", res, r2);
-            emit("setg", res->b());
-            emit("movzx", res, res->b());
+            emit("setg", res->copy(1));
+            emit("movzx", res, res->copy(1));
             break;
         case TT::EQ:
             emit("cmp", res, r2);
-            emit("sete", res->b());
-            emit("movzx", res, res->b());
+            emit("sete", res->copy(1));
+            emit("movzx", res, res->copy(1));
             break;
         case TT::NE:
             emit("cmp", res, r2);
-            emit("setne", res->b());
-            emit("movzx", res, res->b());
+            emit("setne", res->copy(1));
+            emit("movzx", res, res->copy(1));
             break;
         case TT::LOGOR:
             emit("or", res, r2);
@@ -244,8 +244,8 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Unary> u) {
             break;
         case TT::NOT:
             emit("test", res, res);
-            emit("sete", res->b());
-            emit("movzx", res, res->b());
+            emit("sete", res->copy(1));
+            emit("movzx", res, res->copy(1));
             break;
         case TT::ASTERISK:
             if (u->expr1->type->token->token_type == TT::STRUCT){

@@ -27,16 +27,8 @@ public:
     Register(std::string name, std::string name_d, std::string name_w, std::string name_b, int size, bool virt, bool mem)
             : name(name), name_d(name_d), name_w(name_w), name_b(name_b), size(size), isVirtual(virt), isMemoryOperand(mem) {}
 
-    std::shared_ptr<Register> d(){
-        return std::make_shared<Register>(name, name_d, name_w, name_b, 4, isVirtual, isMemoryOperand);
-    }
-
-    std::shared_ptr<Register> w(){
-        return std::make_shared<Register>(name, name_d, name_w, name_b, 4, isVirtual, isMemoryOperand);
-    }
-
-    std::shared_ptr<Register> b(){
-        return std::make_shared<Register>(name, name_d, name_w, name_b, 4, isVirtual, isMemoryOperand);
+    std::shared_ptr<Register> copy(int size){
+        return std::make_shared<Register>(name, name_d, name_w, name_b, size, isVirtual, isMemoryOperand);
     }
 
     std::shared_ptr<Register> mem(){
@@ -50,6 +42,15 @@ public:
         for (auto r : registers){
             if (r->name == name){
                 return r;
+            }
+        }
+        return nullptr;
+    }
+
+    static std::shared_ptr<Register> get_physical_register(std::string name, int size){
+        for (auto r : registers){
+            if (r->name == name){
+                return r->copy(size);
             }
         }
         return nullptr;
@@ -92,6 +93,7 @@ public:
 
     BasicInstruction(std::string opcode) :
             opcode(opcode) {}
+
 
 };
 

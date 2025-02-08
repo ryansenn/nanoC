@@ -10,7 +10,8 @@
 /*
  * This is an extremely inefficient (but fully working) register allocator
  * All virtual registers are assigned a memory slot in the .bss section (`reg_alloc`).
- * On every access, the value is loaded from memory into a physical register and store back after execution
+ * If an instruction uses two virtual registers (invalid in x86, must have one physical register),
+ * Then one value is loaded from memory into a physical register and written back after execution
  */
 std::unordered_map<std::string, std::string> global_reg_alloc(std::vector<std::shared_ptr<Instruction>>& instructions) {
     std::vector<std::shared_ptr<Instruction>> n_instructions;
@@ -27,36 +28,21 @@ std::unordered_map<std::string, std::string> global_reg_alloc(std::vector<std::s
             }
         }
 
-        /*
-        if (inst->registers.size() == 1 && inst->registers[0]->isVirtual){
-            std::shared_ptr<Register> reg = inst->registers[0];
-            std::vector<std::shared_ptr<Register>> regs = {Register::get_physical_register("r10"),reg};
-            n_instructions.push_back(std::make_shared<BasicInstruction>("mov", regs));
-        }
-         */
-
-
         if (inst->registers.size() == 2 && inst->registers[0]->isVirtual && inst->registers[1]->isVirtual){
-            std::shared_ptr<Register> reg = inst->registers[1];
-            std::vector<std::shared_ptr<Register>> regs = {Register::get_physical_register("r11"),reg};
+            std::shared_ptr<Register> reg = inst->registers[0];
+            std::vector<std::shared_ptr<Register>> regs = {Register::get_physical_register("r11", reg->size),reg};
             n_instructions.push_back(std::make_shared<BasicInstruction>("mov", regs));
         }
 
         n_instructions.push_back(inst);
 
-        /*
-        if (inst->registers.size() == 1 && inst->registers[0]->isVirtual){
-            std::shared_ptr<Register> reg = inst->registers[0];
-            std::vector<std::shared_ptr<Register>> regs = {reg,Register::get_physical_register("r10")};
-            n_instructions.back()->registers[0] = Register::get_physical_register("r10");
-            n_instructions.push_back(std::make_shared<BasicInstruction>("mov", regs));
-        }
-         */
-
         if (inst->registers.size() == 2 && inst->registers[0]->isVirtual && inst->registers[1]->isVirtual){
-            std::shared_ptr<Register> reg = inst->registers[1];
-            std::vector<std::shared_ptr<Register>> regs = {reg,Register::get_physical_register("r11")};
-            n_instructions.back()->registers[1] = Register::get_physical_register("r11");
+            std::shared_ptr<Register> reg = inst->registers[0];
+            std::shared_ptr<BasicInstruction> old = std::dynamic_pointer_cast<BasicInstruction>(n_instructions.back());
+            std::vector<std::shared_ptr<Register>> old_regs = {Register::get_physical_register("r11", reg->size), old->registers[1]};
+            n_instructions.back() = std::make_shared<BasicInstruction>(old->opcode,old_regs);
+
+            std::vector<std::shared_ptr<Register>> regs = {reg,Register::get_physical_register("r11", reg->size)};
             n_instructions.push_back(std::make_shared<BasicInstruction>("mov", regs));
         }
     }

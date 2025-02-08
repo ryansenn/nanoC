@@ -58,7 +58,7 @@ void CodeGen::generate(std::shared_ptr<Instruction> i) {
 void CodeGen::generate(){
 
     if (std::dynamic_pointer_cast<GlobalVariable>(curr()) ){
-        emit("section .data");
+        emit("section .bss");
 
         while (std::dynamic_pointer_cast<GlobalVariable>(curr())){
             generate(curr());
@@ -96,12 +96,16 @@ std::string CodeGen::get_reg(std::shared_ptr<Register> r){
         switch (r->size) {
             case 4:
                 location = r->name_d;
+                break;
             case 2:
                 location = r->name_w;
+                break;
             case 1:
                 location = r->name_b;
+                break;
             default:
                 location = r->name;
+                break;
         }
     }
 
