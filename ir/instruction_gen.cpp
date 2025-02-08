@@ -6,17 +6,22 @@
 
 int VirtualRegister::count = 0;
 std::vector<std::shared_ptr<Register>> Register::registers = {
+        // General-purpose registers for temporary use
         std::make_shared<Register>("r10", "r10d", "r10w", "r10b"),
         std::make_shared<Register>("r11", "r11d", "r11w", "r11b"),
         std::make_shared<Register>("r12", "r12d", "r12w", "r12b"),
         std::make_shared<Register>("r13", "r13d", "r13w", "r13b"),
-        std::make_shared<Register>("r9", "r9d", "r9w", "r9b"),
-        std::make_shared<Register>("r8", "r8d", "r8w", "r8b"),
-        std::make_shared<Register>("rcx", "ecx", "cx", "cl"),
-        std::make_shared<Register>("rsi", "esi", "si", "sil"),
-        std::make_shared<Register>("rdi", "edi", "di", "dil"),
-        std::make_shared<Register>("rdx", "edx", "dx", "dl"),
-        std::make_shared<Register>("rax", "eax", "ax", "al")
+
+        // Return value register (rax)
+        std::make_shared<Register>("rax", "eax", "ax", "al"),
+
+        // Argument-passing registers (in order)
+        std::make_shared<Register>("rdi", "edi", "di", "dil"),  // 1st argument
+        std::make_shared<Register>("rsi", "esi", "si", "sil"),  // 2nd argument
+        std::make_shared<Register>("rdx", "edx", "dx", "dl"),   // 3rd argument
+        std::make_shared<Register>("rcx", "ecx", "cx", "cl"),   // 4th argument
+        std::make_shared<Register>("r8", "r8d", "r8w", "r8b"),  // 5th argument
+        std::make_shared<Register>("r9", "r9d", "r9w", "r9b")   // 6th argument
 };
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Program> p) {
@@ -90,12 +95,25 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Call> c) {
         return NO_REGISTER;
     }
 
+    std::vector<std::string> reg_order = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
-    for (auto arg : c->args) {
-        std::shared_ptr<Register> arg_reg = arg->accept(*this);
+    for (int i = 0; i<std::min(c->args.size(), static_cast<size_t>(6));i++) {
+        auto arg = c->args[i]->accept(*this);
+        emit("mov", Register::get_physical_register(reg_order[i]), arg);
     }
 
+    int stack_size = 0;
+
+    for (int i = c->args.size()-1; i >= 6;i--){
+        emit("push", c->args[i]->accept(*this));
+        stack_size += 8;
+    }
+
+
     emit_branch("call", c->identifier->value);
+
+    if (stack_size)
+        emit("add", Register::get_physical_register("rsp"), std::to_string(stack_size));
 
     return Register::get_physical_register("rax");
 }
