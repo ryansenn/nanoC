@@ -89,7 +89,7 @@ std::string CodeGen::get_reg(std::shared_ptr<Register> r){
     std::string location;
 
     if (r->isVirtual){
-        location = reg_alloc[r->name];
+        location = get_size_specifier(r->size) + " " + reg_alloc[r->name];
     }
 
     else{

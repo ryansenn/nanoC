@@ -20,6 +20,7 @@ public:
     std::vector<std::pair<std::string,std::string>> loop_labels;
 
     std::unordered_map<std::shared_ptr<VarDecl>, std::shared_ptr<VirtualRegister>> symbol_table;
+    std::vector<std::string> arg_reg_order = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
     void emit(std::string opcode, std::shared_ptr<Register> r1, std::shared_ptr<Register> r2);
     void emit(std::string opcode, std::shared_ptr<Register> r1);

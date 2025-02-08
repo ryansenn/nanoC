@@ -15,13 +15,17 @@ std::vector<std::shared_ptr<Register>> Register::registers = {
         // Return value register (rax)
         std::make_shared<Register>("rax", "eax", "ax", "al"),
 
+        // Stack and base pointer registers
+        std::make_shared<Register>("rbp", "ebp", "bp", "bpl"),  // Base pointer
+        std::make_shared<Register>("rsp", "esp", "sp", "spl"),   // Stack pointer
+
         // Argument-passing registers (in order)
         std::make_shared<Register>("rdi", "edi", "di", "dil"),  // 1st argument
         std::make_shared<Register>("rsi", "esi", "si", "sil"),  // 2nd argument
         std::make_shared<Register>("rdx", "edx", "dx", "dl"),   // 3rd argument
         std::make_shared<Register>("rcx", "ecx", "cx", "cl"),   // 4th argument
         std::make_shared<Register>("r8", "r8d", "r8w", "r8b"),  // 5th argument
-        std::make_shared<Register>("r9", "r9d", "r9w", "r9b")   // 6th argument
+        std::make_shared<Register>("r9", "r9d", "r9w", "r9b"),  // 6th argument
 };
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Program> p) {
@@ -37,19 +41,61 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
         return NO_REGISTER;
     }
 
-    for (auto v : f->args){
-        v->accept(*this);
+    emit_label(f->name, true);
+
+    emit("push", Register::get_physical_register("rbp"));
+    emit("mov", Register::get_physical_register("rbp"),Register::get_physical_register("rsp"));
+
+    for (int i = 0; i<std::min(f->args.size(), static_cast<size_t>(6));i++) {
+        f->args[i]->accept(*this);
+        auto arg = symbol_table[f->args[i]];
+        emit("mov", arg,Register::get_physical_register(arg_reg_order[i]));
     }
 
-    emit_label(f->name, true);
+    int offset = 16;
+
+    for (int i = 6; i < f->args.size();i++){
+        f->args[i]->accept(*this);
+        emit("mov", symbol_table[f->args[i]], "[rbp + " + std::to_string(offset) + "]");
+        offset += 8;
+    }
 
     return_label = gen_label("ret");
 
     f->block->accept(*this);
 
     emit_label(return_label, false);
+    emit("mov", Register::get_physical_register("rsp"), Register::get_physical_register("rbp"));
+    emit("pop", Register::get_physical_register("rbp"));
     emit_branch("ret","");
+
     return NO_REGISTER;
+}
+
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Call> c) {
+    if (c->identifier->value == "emit_asm"){
+        emit("emit_asm", Register::get_physical_register("rax"),std::dynamic_pointer_cast<Primary>(c->args[0])->token->value);
+        return NO_REGISTER;
+    }
+
+    for (int i = 0; i<std::min(c->args.size(), static_cast<size_t>(6));i++) {
+        auto arg = c->args[i]->accept(*this);
+        emit("mov", Register::get_physical_register(arg_reg_order[i]), arg);
+    }
+
+    int stack_size = 0;
+
+    for (int i = c->args.size()-1; i >= 6;i--){
+        emit("push", c->args[i]->accept(*this));
+        stack_size += 8;
+    }
+
+    emit_branch("call", c->identifier->value);
+
+    if (stack_size)
+        emit("add", Register::get_physical_register("rsp"), std::to_string(stack_size));
+
+    return Register::get_physical_register("rax");
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Block> b) {
@@ -87,35 +133,6 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Primary> p) {
     }
 
     return r;
-}
-
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Call> c) {
-    if (c->identifier->value == "emit_asm"){
-        emit("emit_asm", Register::get_physical_register("rax"),std::dynamic_pointer_cast<Primary>(c->args[0])->token->value);
-        return NO_REGISTER;
-    }
-
-    std::vector<std::string> reg_order = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
-
-    for (int i = 0; i<std::min(c->args.size(), static_cast<size_t>(6));i++) {
-        auto arg = c->args[i]->accept(*this);
-        emit("mov", Register::get_physical_register(reg_order[i]), arg);
-    }
-
-    int stack_size = 0;
-
-    for (int i = c->args.size()-1; i >= 6;i--){
-        emit("push", c->args[i]->accept(*this));
-        stack_size += 8;
-    }
-
-
-    emit_branch("call", c->identifier->value);
-
-    if (stack_size)
-        emit("add", Register::get_physical_register("rsp"), std::to_string(stack_size));
-
-    return Register::get_physical_register("rax");
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Return> r) {

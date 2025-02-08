@@ -27,14 +27,16 @@ std::unordered_map<std::string, std::string> global_reg_alloc(std::vector<std::s
             }
         }
 
+        /*
         if (inst->registers.size() == 1 && inst->registers[0]->isVirtual){
             std::shared_ptr<Register> reg = inst->registers[0];
             std::vector<std::shared_ptr<Register>> regs = {Register::get_physical_register("r10"),reg};
             n_instructions.push_back(std::make_shared<BasicInstruction>("mov", regs));
-
         }
+         */
 
-        if (inst->registers.size() == 2 && inst->registers[1]->isVirtual){
+
+        if (inst->registers.size() == 2 && inst->registers[0]->isVirtual && inst->registers[1]->isVirtual){
             std::shared_ptr<Register> reg = inst->registers[1];
             std::vector<std::shared_ptr<Register>> regs = {Register::get_physical_register("r11"),reg};
             n_instructions.push_back(std::make_shared<BasicInstruction>("mov", regs));
@@ -42,14 +44,16 @@ std::unordered_map<std::string, std::string> global_reg_alloc(std::vector<std::s
 
         n_instructions.push_back(inst);
 
+        /*
         if (inst->registers.size() == 1 && inst->registers[0]->isVirtual){
             std::shared_ptr<Register> reg = inst->registers[0];
             std::vector<std::shared_ptr<Register>> regs = {reg,Register::get_physical_register("r10")};
             n_instructions.back()->registers[0] = Register::get_physical_register("r10");
             n_instructions.push_back(std::make_shared<BasicInstruction>("mov", regs));
         }
+         */
 
-        if (inst->registers.size() == 2 && inst->registers[1]->isVirtual){
+        if (inst->registers.size() == 2 && inst->registers[0]->isVirtual && inst->registers[1]->isVirtual){
             std::shared_ptr<Register> reg = inst->registers[1];
             std::vector<std::shared_ptr<Register>> regs = {reg,Register::get_physical_register("r11")};
             n_instructions.back()->registers[1] = Register::get_physical_register("r11");
