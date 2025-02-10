@@ -109,6 +109,11 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Block> b) {
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<VarDecl> v) {
     if (v->is_local){
         symbol_table[v] = gen_register();
+
+        if (v->type->token->token_type == TT::STRUCT){
+            emit("sub", Register::get_physical_register("rsp"), std::to_string(std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl)->size));
+            emit("mov", symbol_table[v], Register::get_physical_register("rsp"));
+        }
     }
 
     return NO_REGISTER;
@@ -151,7 +156,7 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Binary> b) {
     if (b->op->token_type == TT::ASSIGN){
         std::shared_ptr<Register> r1 = get_address(b->expr1);
         std::shared_ptr<Register> r2 = b->expr2->accept(*this);
-        emit("mov", r1, r2);
+        emit("mov", r1->mem(), r2);
         return r2;
     }
 
@@ -323,13 +328,8 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Continue>) {
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Member> m) {
-    std::shared_ptr<Register> r = m->structure->accept(*this);
-    int offset = std::dynamic_pointer_cast<VarDecl>(m->symbol->decl)->offset;
-
-    emit("add", r, std::to_string(offset));
-
     std::shared_ptr<VirtualRegister> res = gen_register();
-    emit("mov", res, r->mem());
+    emit("mov", res, get_address(m)->mem());
 
     return res;
 }
@@ -387,6 +387,7 @@ std::string InstructionGen::gen_label(std::string name) {
 
 std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
     if (auto p = std::dynamic_pointer_cast<Primary>(e)) {
+        // this should only be for identifiers
         return symbol_table[std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)];
     }
     else if (auto s = std::dynamic_pointer_cast<Subscript>(e)) {
@@ -399,7 +400,7 @@ std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
         return res;
     }
     else if (auto m = std::dynamic_pointer_cast<Member>(e)) {
-        std::shared_ptr<Register> base = m->structure->accept(*this);
+        std::shared_ptr<Register> base = get_address(m->structure);
         std::shared_ptr<VirtualRegister> res = gen_register();
         emit("mov", res, base);
         emit("add", res, std::to_string(std::dynamic_pointer_cast<VarDecl>(m->symbol->decl)->offset));

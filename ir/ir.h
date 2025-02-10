@@ -47,10 +47,12 @@ public:
         return nullptr;
     }
 
-    static std::shared_ptr<Register> get_physical_register(std::string name, int size){
+    static std::shared_ptr<Register> get_physical_register(std::string name, int size, bool mem){
         for (auto r : registers){
             if (r->name == name){
-                return r->copy(size);
+                auto res = r->copy(size);
+                res->isMemoryOperand = mem;
+                return res;
             }
         }
         return nullptr;

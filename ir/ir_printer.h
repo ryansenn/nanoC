@@ -2,7 +2,10 @@
 #define COMPILER_IR_PRINTER_H
 
 #include "ir.h"
-
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <fstream>
 
 class IRPrinter {
 public:
@@ -23,7 +26,11 @@ public:
                 } else {
                     outFile << "\t" << basic->opcode;
                     for (const auto& reg : basic->registers) {
-                        outFile << " " << (reg->isVirtual ? "%" : "") << reg->name;
+                        if (reg->isMemoryOperand) {
+                            outFile << " [" << (reg->isVirtual ? "%" : "") << reg->name << "]";
+                        } else {
+                            outFile << " " << (reg->isVirtual ? "%" : "") << reg->name;
+                        }
                     }
                     if (!basic->value.empty()) {
                         outFile << ", " << basic->value;

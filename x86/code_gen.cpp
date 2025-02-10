@@ -89,26 +89,27 @@ std::string CodeGen::get_reg(std::shared_ptr<Register> r){
     std::string location;
 
     if (r->isVirtual){
-        location = get_size_specifier(r->size) + " " + reg_alloc[r->name];
+        return get_size_specifier(r->size) + " " + reg_alloc[r->name];
     }
 
-    else{
-        switch (r->size) {
-            case 4:
-                location = r->name_d;
-                break;
-            case 2:
-                location = r->name_w;
-                break;
-            case 1:
-                location = r->name_b;
-                break;
-            default:
-                location = r->name;
-                break;
-        }
+    switch (r->size) {
+        case 4:
+            location = r->name_d;
+            break;
+        case 2:
+            location = r->name_w;
+            break;
+        case 1:
+            location = r->name_b;
+            break;
+        default:
+            location = r->name;
+            break;
     }
 
+    if (r->isMemoryOperand){
+        location = "[" + location + "]";
+    }
 
     return location;
 }

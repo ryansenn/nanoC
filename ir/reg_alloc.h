@@ -30,14 +30,14 @@ std::unordered_map<std::string, std::string> global_reg_alloc(std::vector<std::s
                     reg_to_mem[reg->name] = "[rel reg_alloc + " + std::to_string(offset) + "]";
                     offset += 8;
                 }
-                std::shared_ptr<Register> physical = Register::get_physical_register(pool[i%2],reg->size);
+                std::shared_ptr<Register> physical = Register::get_physical_register(pool[i%2],reg->size, false);
                 std::vector<std::shared_ptr<Register>> load = {physical,reg};
                 std::vector<std::shared_ptr<Register>> write = {reg,physical};
 
                 n_instructions.push_back(std::make_shared<BasicInstruction>("mov", load));
                 write_back.push_back(std::make_shared<BasicInstruction>("mov",write));
 
-                inst->registers[i] = physical;
+                inst->registers[i] = Register::get_physical_register(pool[i%2],reg->size, reg->isMemoryOperand);
             }
         }
         n_instructions.push_back(inst);
