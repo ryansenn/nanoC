@@ -60,6 +60,20 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
         offset += 8;
     }
 
+    // Copying structs
+    for (auto a : f->args){
+        if (a->type->token->token_type == TT::STRUCT){
+            int size = std::dynamic_pointer_cast<StructDecl>(a->type->symbol->decl)->size;
+            emit("sub", Register::get_physical_register("rsp"), std::to_string(size));
+            emit("mov", Register::get_physical_register("rsi"), symbol_table[a]);
+            emit("mov", Register::get_physical_register("rdi"), Register::get_physical_register("rsp"));
+            emit("mov", Register::get_physical_register("rcx"), std::to_string(size/8));
+            emit("cld");
+            emit("rep movsq");
+            emit("mov", symbol_table[a], Register::get_physical_register("rsp"));
+        }
+    }
+
     return_label = gen_label("ret");
 
     f->block->accept(*this);
@@ -154,8 +168,13 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Return> r) {
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Binary> b) {
 
     if (b->op->token_type == TT::ASSIGN){
-        std::shared_ptr<Register> r1 = get_address(b->expr1);
         std::shared_ptr<Register> r2 = b->expr2->accept(*this);
+        if (std::dynamic_pointer_cast<Primary>(b->expr1) && std::dynamic_pointer_cast<Primary>(b->expr1)->token->token_type == TT::IDENTIFIER){
+            std::shared_ptr<VirtualRegister> r1 = symbol_table[std::dynamic_pointer_cast<VarDecl>(b->expr1->symbol->decl)];
+            emit("mov", r1, r2);
+            return r2;
+        }
+        std::shared_ptr<Register> r1 = get_address(b->expr1);
         emit("mov", r1->mem(), r2);
         return r2;
     }
@@ -316,12 +335,10 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<While> w) {
     return NO_REGISTER;
 
 }
-
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Break> b) {
     emit_branch("jmp", loop_labels.back().second);
     return NO_REGISTER;
 }
-
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Continue>) {
     emit_branch("jmp", loop_labels.back().first);
     return NO_REGISTER;
@@ -385,10 +402,16 @@ std::string InstructionGen::gen_label(std::string name) {
     return name + std::to_string(label_id++);
 }
 
+/*
+ * Returns a register holding the address of the expression
+ * It is assumed that virtual register will point to an addressable memory location
+ */
 std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
     if (auto p = std::dynamic_pointer_cast<Primary>(e)) {
-        // this should only be for identifiers
-        return symbol_table[std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)];
+        auto r = symbol_table[std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)];
+        std::shared_ptr<Register> res = gen_register();
+        emit("lea", res, r);
+        return res;
     }
     else if (auto s = std::dynamic_pointer_cast<Subscript>(e)) {
         std::shared_ptr<Register> base = get_address(s->array);

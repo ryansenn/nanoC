@@ -75,54 +75,58 @@ class CodeGen;
 class Instruction {
 public:
     std::vector<std::shared_ptr<Register>> registers;
+    std::string opcode;
     virtual ~Instruction() = default;
 };
 
 class BasicInstruction : public Instruction {
 public:
-    std::string opcode;
     std::string value;
 
-    BasicInstruction(std::string opcode, std::vector<std::shared_ptr<Register>> regs) :
-            opcode(opcode) {
+    BasicInstruction(std::string opcode_, std::vector<std::shared_ptr<Register>> regs) {
         registers = regs;
+        opcode = opcode_;
     }
 
-    BasicInstruction(std::string opcode, std::vector<std::shared_ptr<Register>> regs, std::string value) :
-            opcode(opcode), value(value) {
+    BasicInstruction(std::string opcode_, std::vector<std::shared_ptr<Register>> regs, std::string value) :
+        value(value) {
         registers = regs;
+        opcode = opcode_;
     }
 
-    BasicInstruction(std::string opcode) :
-            opcode(opcode) {}
+    BasicInstruction(std::string opcode_) {
+            opcode = opcode_;
+        }
 
 
 };
 
 class BranchInstruction : public Instruction {
 public:
-    std::string opcode;
     std::string label;
 
-    BranchInstruction(std::string opcode, std::string label)
-            : opcode(opcode), label(label) {}
+    BranchInstruction(std::string opcode_, std::string label)
+            : label(label) {
+        opcode=opcode_;
+    }
 
-    BranchInstruction(std::string opcode,
-                      std::vector<std::shared_ptr<Register>> regs)
-            : opcode(opcode) {
+    BranchInstruction(std::string opcode_,
+                      std::vector<std::shared_ptr<Register>> regs){
         registers = regs;
+        opcode = opcode_;
     }
 
 };
 
 class Label : public Instruction {
 public:
-    std::string opcode;
     std::string label;
     bool funcDecl;
 
     Label(std::string label, bool funcDecl)
-            : opcode("LABEL"), label(std::move(label)), funcDecl(funcDecl) {}
+            : label(std::move(label)), funcDecl(funcDecl) {
+        opcode = "LABEL";
+    }
 
 };
 

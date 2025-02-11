@@ -26,6 +26,9 @@ std::unordered_map<std::string, std::string> global_reg_alloc(std::vector<std::s
         for (int i=0;i<inst->registers.size();i++){
             auto reg = inst->registers[i];
             if (reg->isVirtual){
+                if (inst->opcode == "lea" && i == 1){
+                    continue;
+                }
                 if (reg_to_mem.find(reg->name) == reg_to_mem.end()){
                     reg_to_mem[reg->name] = "[rel reg_alloc + " + std::to_string(offset) + "]";
                     offset += 8;
@@ -38,6 +41,7 @@ std::unordered_map<std::string, std::string> global_reg_alloc(std::vector<std::s
                 write_back.push_back(std::make_shared<BasicInstruction>("mov",write));
 
                 inst->registers[i] = Register::get_physical_register(pool[i%2],reg->size, reg->isMemoryOperand);
+
             }
         }
         n_instructions.push_back(inst);
