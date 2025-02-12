@@ -1,0 +1,95 @@
+
+print_c:
+	push rbp
+	mov rbp rsp
+	mov %0 rdi
+	sub rsp, 8
+	mov [rsp], dil
+	mov rsi, rsp
+	mov rdi, 1
+	mov rdx, 1
+	mov rax, 0x2000004
+	syscall
+	add rsp, 8
+ret0:
+	mov rsp rbp
+	pop rbp
+	ret 
+
+print_i:
+	push rbp
+	mov rbp rsp
+	mov %1 rdi
+	sub rsp, 20
+	mov rax, rdi
+	mov rcx, 10
+	mov byte [rsp], 0
+	test rax, rax
+	jge .not_neg
+	neg rax
+	mov byte [rsp], 1
+	.not_neg:
+	lea rdi, [rsp+19]
+	.convert:
+	xor rdx, rdx
+	div rcx
+	add dl, '0'
+	dec rdi
+	mov [rdi], dl
+	test rax, rax
+	jnz .convert
+	cmp byte [rsp], 0
+	je .done_sign
+	dec rdi
+	mov byte [rdi], '-'
+	.done_sign:
+	mov rax, 0x2000004
+	mov rsi, rdi
+	lea rdx, [rsp+19]
+	sub rdx, rdi
+	mov rdi, 1
+	syscall
+	add rsp, 20
+ret1:
+	mov rsp rbp
+	pop rbp
+	ret 
+
+main:
+	push rbp
+	mov rbp rsp
+	mov %3, 0
+	mov %2 %3
+	mov %5, 0
+	mov %4 %5
+while3:
+	mov %6, 7
+	mov %7 %4
+	cmp %7 %6
+	setl %7
+	movzx %7 %7
+	cmp %7, 1
+	jne end4
+	mov %8 %2
+	add %8 %4
+	mov %2 %8
+	mov %9, 1
+	mov %10 %4
+	add %10 %9
+	mov %4 %10
+	jmp while3
+end4:
+	mov rdi %4
+	call print_i
+	mov %11, 10
+	mov rdi %11
+	call print_c
+	mov rdi %2
+	call print_i
+	mov %12, 0
+	mov rax %12
+	jmp ret2
+ret2:
+	mov rsp rbp
+	pop rbp
+	ret 

@@ -260,13 +260,13 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Unary> u) {
     std::shared_ptr<Register> r = u->expr1->accept(*this);
     std::shared_ptr<Register> res = gen_register();
 
-    emit("mov", res, r);
-
     switch (u->op->token_type) {
         case TT::MINUS:
+            emit("mov", res, r);
             emit("neg ", res);
             break;
         case TT::NOT:
+            emit("mov", res, r);
             emit("test", res, res);
             emit("sete", res->copy(1));
             emit("movzx", res, res->copy(1));
@@ -275,7 +275,7 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Unary> u) {
             if (u->expr1->type->token->token_type == TT::STRUCT){
                 return res;
             }
-            emit("mov ", res, res->mem());
+            emit("mov ", res, r->mem());
             break;
         default:
             break;
@@ -408,6 +408,10 @@ std::string InstructionGen::gen_label(std::string name) {
  */
 std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
     if (auto p = std::dynamic_pointer_cast<Primary>(e)) {
+        if (p->type->token->token_type == TT::STRUCT){
+            return symbol_table[std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)];
+        }
+
         auto r = symbol_table[std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)];
         std::shared_ptr<Register> res = gen_register();
         emit("lea", res, r);
