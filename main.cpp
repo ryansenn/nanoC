@@ -88,7 +88,9 @@ int main(int argc, char *argv[]) {
         InstructionGen i;
         program->accept(i);
         IRPrinter::print(i.instructions, "ir.txt");
-        std::unordered_map<std::string, std::string> reg_alloc = global_reg_alloc(i.instructions);
+
+        RegAlloc r;
+        std::unordered_map<std::string, std::string> reg_alloc = r.naive_reg_alloc(i.instructions);
 
         CodeGen c("output.asm", std::move(i.instructions), std::move(reg_alloc));
         c.generate();

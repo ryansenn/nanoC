@@ -18,4 +18,5 @@ add_executable(compiler main.cpp
         x86/code_gen.cpp
         ir/instruction_gen.cpp
         ir/ir_printer.h
+        ir/reg_alloc.cpp
 )
