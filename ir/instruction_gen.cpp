@@ -56,22 +56,21 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
 
     for (int i = 6; i < f->args.size();i++){
         f->args[i]->accept(*this);
-        emit("mov", symbol_table[f->args[i]], "[rbp + " + std::to_string(offset) + "]");
-        offset += 8;
-    }
 
-    // Copying structs
-    for (auto a : f->args){
-        if (a->type->token->token_type == TT::STRUCT){
+        // copying struct
+        if (f->args[i]->type->token->token_type == TT::STRUCT){
+            auto a = f->args[i];
             int size = std::dynamic_pointer_cast<StructDecl>(a->type->symbol->decl)->size;
-            emit("sub", Register::get_physical_register("rsp"), std::to_string(size));
-            emit("mov", Register::get_physical_register("rsi"), symbol_table[a]);
-            emit("mov", Register::get_physical_register("rdi"), Register::get_physical_register("rsp"));
+            emit("mov", Register::get_physical_register("rsi"), "[rbp + " + std::to_string(offset) + "]"); // source
+            emit("mov", Register::get_physical_register("rdi"), symbol_table[a]); // dest
             emit("mov", Register::get_physical_register("rcx"), std::to_string(size/8));
             emit("cld");
             emit("rep movsq");
-            emit("mov", symbol_table[a], Register::get_physical_register("rsp"));
+            continue;
         }
+
+        emit("mov", symbol_table[f->args[i]], "[rbp + " + std::to_string(offset) + "]");
+        offset += 8;
     }
 
     return_label = gen_label("ret");
@@ -125,8 +124,12 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<VarDecl> v) {
         symbol_table[v] = gen_register();
 
         if (v->type->token->token_type == TT::STRUCT){
+            /*
             emit("sub", Register::get_physical_register("rsp"), std::to_string(std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl)->size));
             emit("mov", symbol_table[v], Register::get_physical_register("rsp"));
+            */
+            int size = std::to_string(std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl)->size;
+            emit("allocate", symbol_table[v], std::to_string(size));
         }
     }
 

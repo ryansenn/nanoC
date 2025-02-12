@@ -20,6 +20,13 @@ std::unordered_map<std::string, std::string> RegAlloc::naive_reg_alloc(std::vect
             }
         }
 
+        if (inst->opcode == "allocate"){
+            auto i = std::dynamic_pointer_cast<BasicInstruction>(inst);
+            offset += std::stoi(i->value);
+            emit("mov", inst->registers[0], Register::get_physical_register("rsp"));
+            emit("sub", Register::get_physical_register("rsp"), i->value);
+        }
+
         std::vector<std::shared_ptr<Instruction>> write_back;
 
         for (int i=0;i<inst->registers.size();i++){
@@ -54,5 +61,11 @@ std::unordered_map<std::string, std::string> RegAlloc::naive_reg_alloc(std::vect
 std::shared_ptr<Instruction> RegAlloc::emit(std::string opcode, std::shared_ptr<Register> r1, std::shared_ptr<Register> r2){
     std::vector<std::shared_ptr<Register>> r = {r1,r2};
     std::shared_ptr<Instruction> i = std::make_shared<BasicInstruction>(opcode, r);
+    return i;
+}
+
+std::shared_ptr<Instruction> RegAlloc::emit(std::string opcode, std::shared_ptr<Register> r1, std::string value){
+    std::vector<std::shared_ptr<Register>> r = {r1};
+    std::shared_ptr<Instruction> i = std::make_shared<BasicInstruction>(opcode, r, value);
     return i;
 }
