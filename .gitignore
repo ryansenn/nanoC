@@ -4,3 +4,5 @@ test/test.c
 changes.txt
 test/ir.txt
 test/ir2.txt
+.DS_Store
+test/.DS_Store

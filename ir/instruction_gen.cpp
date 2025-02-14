@@ -473,7 +473,9 @@ std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<TypeCast> typeCast) {
-    return NO_REGISTER;
+    std::shared_ptr<VirtualRegister> res = gen_register();
+    emit("mov", res, typeCast->expr1->accept(*this));
+    return res;
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Type> type) {
