@@ -92,6 +92,8 @@ int main(int argc, char *argv[]) {
         RegAlloc r;
         std::unordered_map<std::string, std::string> reg_alloc = r.naive_reg_alloc(i.instructions);
 
+        IRPrinter::print(i.instructions, "ir2.txt");
+
         CodeGen c("output.asm", std::move(i.instructions), std::move(reg_alloc));
         c.generate();
 

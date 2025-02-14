@@ -10,32 +10,47 @@
 */
 std::unordered_map<std::string, std::string> RegAlloc::naive_reg_alloc(std::vector<std::shared_ptr<Instruction>>& instructions) {
     std::unordered_map<std::string, std::string> reg_to_mem;
+    std::vector<std::string> func_to_offset;
     std::vector<std::string> pool = {"r10", "r11"};
     int offset = 0;
 
-    for (auto inst : instructions) {
-        if (auto p = std::dynamic_pointer_cast<Label>(inst)){
-            if (p->funcDecl){
-                offset = 0;
+    for (int i=0;i<instructions.size();i++) {
+        auto inst = instructions[i];
+        if (inst->opcode == "ret") {
+            func_to_offset.push_back(std::to_string(offset));
+            offset = 0;
+        }
+
+        for (auto reg : inst->registers) {
+            if (reg->isVirtual && reg_to_mem.find(reg->name) == reg_to_mem.end()) {
+                offset += 8;
+                reg_to_mem[reg->name] = "[rbp - " + std::to_string(offset) + "]";
             }
         }
 
         if (inst->opcode == "allocate"){
-            auto i = std::dynamic_pointer_cast<BasicInstruction>(inst);
-            offset += std::stoi(i->value);
-            emit("mov", inst->registers[0], Register::get_physical_register("rsp"));
-            emit("sub", Register::get_physical_register("rsp"), i->value);
+            offset += std::stoi(std::dynamic_pointer_cast<BasicInstruction>(inst)->value);
+            instructions[i] = emit("lea", inst->registers[0], "[rbp - " + std::to_string(offset) + "]");
         }
+    }
+
+    int label = 0;
+    for (int i=0; i<instructions.size(); i++) {
+        if (auto p = std::dynamic_pointer_cast<Label>(instructions[i]); p && p->funcDecl) {
+            n_instructions.push_back(instructions[i]);
+            n_instructions.push_back(instructions[i+1]);
+            n_instructions.push_back(instructions[i+2]);
+            n_instructions.push_back(emit("sub", Register::get_physical_register("rsp"), func_to_offset[label++]));
+            i += 3;
+        }
+
+        auto inst = instructions[i];
 
         std::vector<std::shared_ptr<Instruction>> write_back;
 
         for (int i=0;i<inst->registers.size();i++){
             auto reg = inst->registers[i];
             if (reg->isVirtual){
-                if (reg_to_mem.find(reg->name) == reg_to_mem.end()){
-                    reg_to_mem[reg->name] = "[rbp - " + std::to_string(offset) + "]";
-                    offset += 8;
-                }
                 if (inst->opcode == "lea" && i == 1){
                     continue;
                 }
@@ -43,7 +58,10 @@ std::unordered_map<std::string, std::string> RegAlloc::naive_reg_alloc(std::vect
                 auto physical = Register::get_physical_register(pool[i%2], reg->size, reg->isMemoryOperand);
                 n_instructions.push_back(emit("mov", Register::get_physical_register(pool[i%2]), reg->copy(8)));
                 inst->registers[i] = physical;
-                write_back.push_back(emit("mov", reg->copy(8), Register::get_physical_register(pool[i%2])));
+
+                if (i == 0){
+                    write_back.push_back(emit("mov", reg->copy(8), Register::get_physical_register(pool[i%2])));
+                }
             }
         }
         n_instructions.push_back(inst);
@@ -51,6 +69,7 @@ std::unordered_map<std::string, std::string> RegAlloc::naive_reg_alloc(std::vect
         for (auto w : write_back){
             n_instructions.push_back(w);
         }
+
     }
 
     instructions = std::move(n_instructions);

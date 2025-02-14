@@ -218,10 +218,10 @@ void NameAnalysis::visit(std::shared_ptr<Type> t) {
         for (auto pair : scopes[0]){
             if (pair.second->type == Symbol::Type::STRUCT && pair.first == t->name + "$struct"){
                 t->symbol = pair.second;
-                return;
             }
         }
-        throw semantic_exception("Type struct '"+ t->name +"' is not declared", t->token);
+        if (!t->symbol)
+            throw semantic_exception("Type struct '"+ t->name +"' is not declared", t->token);
     }
 
     // size of type

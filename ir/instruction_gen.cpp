@@ -48,6 +48,19 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
 
     for (int i = 0; i<std::min(f->args.size(), static_cast<size_t>(6));i++) {
         f->args[i]->accept(*this);
+
+        // copying struct
+        if (f->args[i]->type->token->token_type == TT::STRUCT){
+            auto a = f->args[i];
+            int size = std::dynamic_pointer_cast<StructDecl>(a->type->symbol->decl)->size;
+            emit("mov", Register::get_physical_register("rsi"), Register::get_physical_register(arg_reg_order[i])); // source
+            emit("mov", Register::get_physical_register("rdi"), symbol_table[a]); // dest
+            emit("mov", Register::get_physical_register("rcx"), std::to_string(size/8));
+            emit("cld");
+            emit("rep movsq");
+            continue;
+        }
+
         auto arg = symbol_table[f->args[i]];
         emit("mov", arg,Register::get_physical_register(arg_reg_order[i]));
     }
@@ -128,7 +141,8 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<VarDecl> v) {
             emit("sub", Register::get_physical_register("rsp"), std::to_string(std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl)->size));
             emit("mov", symbol_table[v], Register::get_physical_register("rsp"));
             */
-            int size = std::to_string(std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl)->size;
+            std::shared_ptr<StructDecl> rr = std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl);
+            int size =std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl)->size;
             emit("allocate", symbol_table[v], std::to_string(size));
         }
     }
