@@ -24,6 +24,7 @@ std::shared_ptr<Type> Parser::type(){
 void Parser::array(std::shared_ptr<Type>& t){
     while (accept(TT::LSBR)){
         consume(TT::LSBR, "");
+        t->pointerCount++;
         if (accept(TT::INT_LITERAL)){
             t->arraySize.push_back(std::stoi(consume(TT::INT_LITERAL, "")->value));
         }

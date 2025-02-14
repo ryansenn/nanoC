@@ -1,11 +1,11 @@
 /*
 Program (
-    StructDecl Person (VarDecl(int), VarDecl(char[50]))
+    StructDecl Person (VarDecl(int), VarDecl(char*))
     FunProto add(VarDecl(int), VarDecl(int)) (int)
     FuncDecl main() (int) (
         VarDecl(int)
         VarDecl(int)
-        VarDecl(int[5][10])
+        VarDecl(int**)
         VarDecl(struct Person)
         (x = 10)
         (y = 20)

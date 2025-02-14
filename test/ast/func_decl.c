@@ -1,6 +1,6 @@
 /*
 Program (
-    FuncDecl f(VarDecl(int), VarDecl(char[])) (void) (
+    FuncDecl f(VarDecl(int), VarDecl(char*)) (void) (
         return(  )
     )
     FuncDecl h(VarDecl(struct s*)) (int) (

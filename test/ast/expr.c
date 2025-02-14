@@ -7,7 +7,7 @@ Program (
         VarDecl(int)
         VarDecl(int)
         VarDecl(int)
-        VarDecl(int[1][2])
+        VarDecl(int**)
         (a = (Func Call f (((arr[2])[0]) ) - 5))
         (b = (((*(&(b)) * c) + (2 % 5)) + 2))
         (c = (((10 - 5) > 3) && (1 || (0 == 20))))

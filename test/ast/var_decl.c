@@ -2,7 +2,7 @@
 Program (
     FuncDecl main() (int) (
         VarDecl(int)
-        VarDecl(char**[2][10])
+        VarDecl(char****)
         VarDecl(void***)
         return( 0 )
     )

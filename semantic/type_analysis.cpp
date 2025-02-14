@@ -108,6 +108,7 @@ void TypeAnalysis::visit(std::shared_ptr<Subscript> s) {
     }
 
     s->type = std::make_shared<Type>(*(s->array->type));
+    s->type->pointerCount--;
     s->type->arraySize.clear();
     for (int i=0;i<s->array->type->arraySize.size()-1;i++){
         s->type->arraySize.push_back(s->array->type->arraySize[i]);

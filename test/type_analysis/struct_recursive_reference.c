@@ -1,12 +1,12 @@
 /*
-Semantic error: Recursive reference 'arr' without a pointer in struct 'S' at line 9 column 11
+Semantic error: Recursive reference 's' without a pointer in struct 'S' at line 9 column 11
 */
 
 struct S {
     int a;
-    struct S* s;
+    struct S* sp;
     char b;
-    struct S arr[10];
+    struct S s;
 };
 
 int main(){

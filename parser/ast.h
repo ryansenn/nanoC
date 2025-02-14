@@ -70,19 +70,9 @@ public:
 
     bool operator==(const Type& t) const {
         bool t1 = token->token_type == t.token->token_type
-                  && name == t.name;
+                  && name == t.name && pointerCount == t.pointerCount;
 
-        // char can be int
-        bool t2 = (token->token_type == TokenType::INT && t.token->token_type == TokenType::CHAR) ||
-                (token->token_type == TokenType::CHAR && t.token->token_type == TokenType::INT);
-
-
-        bool s1 = pointerCount == t.pointerCount && arraySize == t.arraySize;
-
-        // array decay
-        bool s2 = (pointerCount + arraySize.size() == t.pointerCount + t.arraySize.size());
-
-        return t1 && (s1 || s2);
+        return t1;
     }
 
     bool operator!=(const Type& t) const {
@@ -139,7 +129,6 @@ struct Subscript : Expr, std::enable_shared_from_this<Subscript> {
     std::shared_ptr<VirtualRegister> accept(Visitor<std::shared_ptr<VirtualRegister>>& visitor){
         return visitor.visit(shared_from_this());
     }
-
 };
 
 struct Member : Expr, std::enable_shared_from_this<Member> {

@@ -381,8 +381,11 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Member> m) {
     return res;
 }
 
-std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Subscript> subscript) {
-    return NO_REGISTER;
+std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Subscript> s) {
+    std::shared_ptr<VirtualRegister> res = gen_register();
+    emit("mov", res, get_address(s)->mem());
+
+    return res;
 }
 
 void InstructionGen::emit(std::string opcode, std::shared_ptr<Register> r1, std::shared_ptr<Register> r2){

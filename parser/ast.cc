@@ -14,14 +14,6 @@ std::ostream& operator<<(std::ostream& os, const Type& type) {
     for (int i=0;i<type.pointerCount;i++){
         os << "*";
     }
-    for (auto p:type.arraySize){
-        if (p == -1){
-            os << "[]";
-        }
-        else{
-            os << "[" << p << "]";
-        }
-    }
     return os;
 }
 
