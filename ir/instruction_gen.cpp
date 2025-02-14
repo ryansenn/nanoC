@@ -51,6 +51,11 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
 
         // copying struct
         if (f->args[i]->type->token->token_type == TT::STRUCT){
+
+            for (auto r : arg_reg_order){
+                emit("push", Register::get_physical_register(r));
+            }
+
             auto a = f->args[i];
             int size = std::dynamic_pointer_cast<StructDecl>(a->type->symbol->decl)->size;
             emit("mov", Register::get_physical_register("rsi"), Register::get_physical_register(arg_reg_order[i])); // source
@@ -58,6 +63,11 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<FuncDecl> f) {
             emit("mov", Register::get_physical_register("rcx"), std::to_string(size/8));
             emit("cld");
             emit("rep movsq");
+
+            for (int i=arg_reg_order.size()-1;i>=0;i--){
+                emit("pop", Register::get_physical_register(arg_reg_order[i]));
+            }
+
             continue;
         }
 
@@ -121,7 +131,10 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Call> c) {
     if (stack_size)
         emit("add", Register::get_physical_register("rsp"), std::to_string(stack_size));
 
-    return Register::get_physical_register("rax");
+    std::shared_ptr<VirtualRegister> res = gen_register();
+    emit("mov", res, Register::get_physical_register("rax"));
+
+    return res;
 }
 
 std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<Block> b) {

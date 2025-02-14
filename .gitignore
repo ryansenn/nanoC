@@ -2,3 +2,5 @@
 cmake-build-debug/
 test/test.c
 changes.txt
+test/ir.txt
+test/ir2.txt
