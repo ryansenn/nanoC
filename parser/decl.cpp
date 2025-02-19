@@ -44,6 +44,7 @@ std::vector<std::shared_ptr<VarDecl>> Parser::args(){
         std::shared_ptr<Type> t = type();
         std::string name = consume(TT::IDENTIFIER, "Expected identifier in function declaration args")->value;
         array(t);
+        t->arraySize.clear();
         vardecls.push_back(std::make_shared<VarDecl>(std::move(t), name,false));
         if (accept(TT::RPAR)){
             break;

@@ -56,7 +56,9 @@ std::unordered_map<std::string, std::string> RegAlloc::naive_reg_alloc(std::vect
                 }
 
                 auto physical = Register::get_physical_register(pool[i%2], reg->size, reg->isMemoryOperand);
-                n_instructions.push_back(emit("mov", Register::get_physical_register(pool[i%2]), reg->copy(8)));
+                if (i == 1){
+                    n_instructions.push_back(emit("mov", Register::get_physical_register(pool[i%2]), reg->copy(8)));
+                }
                 inst->registers[i] = physical;
 
                 if (i == 0){

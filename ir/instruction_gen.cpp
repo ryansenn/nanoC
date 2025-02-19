@@ -149,13 +149,21 @@ std::shared_ptr<Register> InstructionGen::visit(std::shared_ptr<VarDecl> v) {
     if (v->is_local){
         symbol_table[v] = gen_register();
 
-        if (v->type->token->token_type == TT::STRUCT){
+        if (v->type->token->token_type == TT::STRUCT && v->type->pointerCount == 0){
             /*
             emit("sub", Register::get_physical_register("rsp"), std::to_string(std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl)->size));
             emit("mov", symbol_table[v], Register::get_physical_register("rsp"));
             */
             std::shared_ptr<StructDecl> rr = std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl);
             int size =std::dynamic_pointer_cast<StructDecl>(v->type->symbol->decl)->size;
+            emit("allocate", symbol_table[v], std::to_string(size));
+        }
+
+        else if (v->type->arraySize.size()){
+            int size = v->type->size;
+            for (int i : v->type->arraySize){
+                size = size * i;
+            }
             emit("allocate", symbol_table[v], std::to_string(size));
         }
     }
@@ -441,7 +449,8 @@ std::string InstructionGen::gen_label(std::string name) {
  */
 std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
     if (auto p = std::dynamic_pointer_cast<Primary>(e)) {
-        if (p->type->token->token_type == TT::STRUCT){
+        if ((p->type->token->token_type == TT::STRUCT && p->type->pointerCount == 0)
+             || p->type){
             return symbol_table[std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)];
         }
 
