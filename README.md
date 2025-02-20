@@ -7,6 +7,7 @@ This is a compiler for a subset of C I built from scratch, targets x86 assembly.
 -variables, functions, structs, pointers, arrays  
 -control flow (if, while, break, continue)  
 -expressions, function calls, returns  
+-binary/unary operations (arithmetic, relational, logical)  
 -standard types (int, char, void)
 
 ### Implements:
