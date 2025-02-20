@@ -25,13 +25,6 @@ public:
     CFG(std::string name) : name(name) {}
 };
 
-class cfg_gen {
-public:
-
-    std::vector<std::shared_ptr<CFG>> results;
-
-};
-
 
 
 #endif //COMPILER_CFG_GEN_H
