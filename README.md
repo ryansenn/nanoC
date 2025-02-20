@@ -1,23 +1,23 @@
-### C compiler built from scratch
+## C compiler built from scratch
 
-#### Supports:
+### Supports:
 
 -variables, functions, structs, pointers, arrays  
 -control flow (if, while, break, continue)  
 -expressions, function calls, returns  
 -standard types (int, char, void)
 
-#### Implements:
+### Implements:
 Lexing, recursive descent parsing, name/type analysis, register allocation and x86 assembly
 
-#### Current goals:
+### Current goals:
 -Control flow graph, liveness analysis and optimized register allocation  
 -Support dynamic memory with malloc/free  
 -Support basic OOP  
 -Build a multithreading library
 
 
-#### Running compiler:
+### Running compiler:
 
     ./compiler <file.c>
 
@@ -28,7 +28,7 @@ Options:
 
 ---
 
-Example fibonacci program:
+### Example fibonacci program:
 
 ```
 #include <print>
