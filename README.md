@@ -1,4 +1,6 @@
-## C compiler built from scratch
+## C compiler
+
+This is a compiler for a subset of C I built from scratch, targets x86 assembly. I am currently focusing on optimizations and performance improvement
 
 ### Supports:
 
@@ -10,11 +12,10 @@
 ### Implements:
 Lexing, recursive descent parsing, name/type analysis, register allocation and x86 assembly
 
-### Current goals:
--Control flow graph, liveness analysis and optimized register allocation  
+### Goals:
+-(Current) Control flow graph, liveness analysis and optimized register allocation  
 -Support dynamic memory with malloc/free  
--Support basic OOP  
--Build a multithreading library
+-Support basic OOP
 
 
 ### Running compiler:
