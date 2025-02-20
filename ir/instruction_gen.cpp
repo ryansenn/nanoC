@@ -449,8 +449,7 @@ std::string InstructionGen::gen_label(std::string name) {
  */
 std::shared_ptr<Register> InstructionGen::get_address(std::shared_ptr<Expr> e) {
     if (auto p = std::dynamic_pointer_cast<Primary>(e)) {
-        if ((p->type->token->token_type == TT::STRUCT && p->type->pointerCount == 0)
-             || p->type){
+        if ((p->type->token->token_type == TT::STRUCT && p->type->pointerCount == 0)){
             return symbol_table[std::dynamic_pointer_cast<VarDecl>(p->symbol->decl)];
         }
 
