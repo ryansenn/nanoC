@@ -1,6 +1,6 @@
 ## C compiler
 
-This is a compiler for a subset of C I built from scratch, targets x86 assembly. I am currently focusing on optimizations and performance improvement
+This is a compiler for a subset of C I built from scratch, targets x86 assembly.
 
 ### Supports:
 
@@ -13,7 +13,7 @@ This is a compiler for a subset of C I built from scratch, targets x86 assembly.
 ### Implements:
 Lexing, recursive descent parsing, name/type analysis, register allocation and x86 assembly
 
-### Goals:
+### Future goals:
 -(Current) Control flow graph, liveness analysis and optimized register allocation  
 -Support dynamic memory with malloc/free  
 -Support basic OOP
@@ -74,23 +74,6 @@ Program (
 Generated IR:
 
 ```
-print_c:
-    push rbp
-    mov rbp, rsp
-    mov %0, rdi
-    sub rsp, 8
-    mov [rsp], dil
-    mov rsi, rsp
-    mov rdi, 1
-    mov rdx, 1
-    mov rax, 0x2000004
-    syscall
-    add rsp, 8
-ret0:
-    mov rsp, rbp
-    pop rbp
-    ret
-
 fibonnaci:
     push rbp
     mov rbp, rsp
